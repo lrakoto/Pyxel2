@@ -154,6 +154,12 @@ export interface SignLight {
   intensity: number;
   /** 0 = a steady lamp, 1 = a tube on its way out. */
   flicker?: number;
+  /**
+   * Flare scale, for fixtures that earn one: a bare lamp pointed into the
+   * room, or light behind glass. Absent for anything diffuse — a neon sign
+   * facing the street, a monitor wall — which gets only its halo.
+   */
+  flare?: number;
 }
 export interface Area {
   id: AreaId;
@@ -246,9 +252,13 @@ export const AREAS: Record<AreaId, Area> = {
     figureScale: 2.8,
     ground: 438,
     lights: [
-      { x: 130, y: 300, color: '#7fd98c', intensity: 0.8, flicker: 0.5 }, // terminal screen
-      { x: 700, y: 120, color: '#ffc271', intensity: 2.1, flicker: 0.55 }, // failing bulb
-      { x: 1390, y: 260, color: '#4fe6e0', intensity: 1.6, flicker: 0.25 }, // neural receiver
+      // Interior fixtures measured off their plates, same as the street signs.
+      { x: 227, y: 213, color: '#7fd98c', intensity: 0.8, flicker: 0.5 }, // terminal screen
+      // A bare bulb hung into the room and a lit glass cylinder: both are
+      // point sources, so both flare. The terminal screen beside them is
+      // diffuse and keeps its halo alone.
+      { x: 788, y: 87, color: '#ffc271', intensity: 2.1, flicker: 0.55, flare: 0.3 }, // failing bulb
+      { x: 1251, y: 236, color: '#4fe6e0', intensity: 1.6, flicker: 0.25, flare: 0.22 }, // neural receiver
       { x: 60, y: 330, color: '#ffb066', intensity: 0.9 }, // street through the door
     ],
     hotspots: [
@@ -293,9 +303,9 @@ export const AREAS: Record<AreaId, Area> = {
     figureScale: 2.85,
     ground: 438,
     lights: [
-      { x: 30, y: 220, color: '#ffb066', intensity: 0.9, flicker: 0.2 }, // stairwell lamp
-      { x: 700, y: 280, color: '#5ef0ea', intensity: 2.4, flicker: 0.18 }, // memory column
-      { x: 1280, y: 260, color: '#4fd6e8', intensity: 1.3, flicker: 0.6 }, // monitor wall
+      { x: 79, y: 227, color: '#ffb066', intensity: 0.9, flicker: 0.2, flare: 0.18 }, // stairwell lamp
+      { x: 823, y: 201, color: '#5ef0ea', intensity: 2.4, flicker: 0.18, flare: 0.34 }, // memory column
+      { x: 1196, y: 195, color: '#4fd6e8', intensity: 1.3, flicker: 0.6 }, // monitor wall
     ],
     hotspots: [
       {

@@ -177,9 +177,15 @@ export class Renderer {
     }
     c.globalAlpha = 1;
     c.globalCompositeOperation = 'source-over';
-    // The signs get a soft halo but no flare. A tube facing the street is a
-    // diffuse emitter: flares are for specular catches off metal and glass,
-    // and for lamps aimed at the lens.
+    // Only fixtures that declare a flare get one: a bare lamp aimed into the
+    // room, or light behind glass. A tube facing the street is a diffuse
+    // emitter and keeps its halo alone.
+    for (const light of world.lights) {
+      if (!light.flare) continue;
+      const power = light.intensity * flickerOf(light, t);
+      if (power < 0.3) continue;
+      drawFlare(c, light.x - cam, light.y, light.flare, Math.min(1, power * 0.6), light.color);
+    }
     // Lamps breathe slowly; light is a cached texture, not a per-frame blur pass.
     c.globalCompositeOperation = 'screen';
     c.globalAlpha = 0.08 + Math.sin(t * 0.6) * 0.018;
@@ -244,14 +250,7 @@ export class Renderer {
       c.fillRect(sx - 65, 0, 65, H);
     }
     if (area === 'street') this.weather(c, t, cam, v.reducedMotion);
-    else {
-      c.fillStyle = '#dfc69a';
-      for (let i = 0; i < 26; i++) {
-        c.globalAlpha = 0.08 + (i % 3) * 0.04;
-        c.fillRect((i * 137 + t * (i % 2 ? 1 : -1)) % W, (i * 59 + t * 2) % 440, 1, 1);
-      }
-      c.globalAlpha = 1;
-    }
+    else this.interiorAir(c, cam, t, world.lights);
     if (area === 'street') {
       if (!v.reducedMotion) this.traffic.step(v.dt, W);
       this.traffic.draw(c, cam, world.lights, t);
@@ -475,6 +474,80 @@ export class Renderer {
         }
       }
     }
+  }
+
+  /**
+   * The air inside a room. The street has rain and fog to give it depth;
+   * without an equivalent an interior reads as a flat painting with a figure
+   * standing on it, which is what these rooms had.
+   *
+   * Three parts: a shaft of light falling from each fixture bright enough to
+   * throw one, a haze that pools toward the floor, and dust turning in the
+   * light. The motes are drawn brighter where they pass near a fixture, so
+   * the air itself shows where the light is.
+   */
+  private interiorAir(c: CanvasRenderingContext2D, cam: number, t: number, lights: SignLight[]) {
+    const W = c.canvas.width;
+    c.save();
+
+    // Shafts. Wider at the floor than at the fixture, and only from the
+    // strong ones — every light throwing a beam reads as fog, not lighting.
+    c.globalCompositeOperation = 'lighter';
+    for (const light of lights) {
+      if (light.intensity < 1.2) continue;
+      const level = flickerOf(light, t);
+      const x = light.x - cam;
+      if (x < -260 || x > W + 260) continue;
+      const drop = 470 - light.y;
+      if (drop <= 0) continue;
+      const shaft = c.createLinearGradient(0, light.y, 0, light.y + drop);
+      shaft.addColorStop(0, `${light.color}00`);
+      shaft.addColorStop(0.12, `${light.color}2e`);
+      shaft.addColorStop(1, `${light.color}00`);
+      c.globalAlpha = Math.min(0.5, 0.22 * light.intensity * level);
+      c.fillStyle = shaft;
+      c.beginPath();
+      c.moveTo(x - 16, light.y);
+      c.lineTo(x + 16, light.y);
+      c.lineTo(x + 34 + drop * 0.34, light.y + drop);
+      c.lineTo(x - 34 - drop * 0.34, light.y + drop);
+      c.closePath();
+      c.fill();
+    }
+
+    // Haze pooling toward the floor.
+    c.globalCompositeOperation = 'source-over';
+    const haze = c.createLinearGradient(0, 150, 0, 470);
+    haze.addColorStop(0, '#6f8a9400');
+    haze.addColorStop(0.6, '#6f8a9412');
+    haze.addColorStop(1, '#7d97a02b');
+    c.fillStyle = haze;
+    c.fillRect(0, 150, W, 320);
+
+    // Dust, lit by whatever it is drifting past.
+    c.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 70; i++) {
+      const seed = i * 97.3;
+      const x = (((i * 137.5 + Math.sin(t * 0.32 + seed) * 26 - cam * 0.6) % W) + W) % W;
+      const y = ((i * 61.7 + t * (7 + (i % 5) * 3)) % 430) + 40;
+      let lit = 0.05;
+      let tone = '#dfc69a';
+      for (const light of lights) {
+        const d = Math.hypot(light.x - cam - x, light.y - y);
+        if (d < 190) {
+          const near = (1 - d / 190) * flickerOf(light, t) * light.intensity;
+          if (near > lit) {
+            lit = near;
+            tone = light.color;
+          }
+        }
+      }
+      c.globalAlpha = Math.min(0.5, lit * 0.34);
+      c.fillStyle = tone;
+      const size = i % 7 === 0 ? 2 : 1;
+      c.fillRect(Math.round(x), Math.round(y), size, size);
+    }
+    c.restore();
   }
 
   private drawReflections(c: CanvasRenderingContext2D, cam: number, t: number) {
