@@ -19,6 +19,8 @@ const TRAIN_SPEED = 165;
  * are world positions on the midground plane, so they parallax with it and
  * stay put while the train runs past them.
  */
+/** The warm cast on the train's catch, over the flare's own gold. */
+const TRAIN_GOLD = '#ffb457';
 /** Half-width of the window in which a carriage catches a mirror, in pixels. */
 const TRAIN_CATCH = 12;
 const TRAIN_MIRRORS = [
@@ -469,7 +471,7 @@ export class Renderer {
         // on as the carriage arrives and snaps off as it leaves, rather than
         // swelling and fading like a lamp being dimmed.
         if (gap < TRAIN_CATCH) {
-          drawFlare(c, mirror.x, 178, 0.15, mirror.strength);
+          drawFlare(c, mirror.x, 178, 0.15, mirror.strength, TRAIN_GOLD);
         }
       }
     }

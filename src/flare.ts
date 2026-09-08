@@ -152,12 +152,15 @@ export function drawFlare(
   }
   if (tint) {
     // A wash of the source's own colour through the burst, so a red sign
-    // flares red without losing the gold and white at its centre.
-    const r = 60 * scale;
+    // flares red without losing the gold and white at its centre. It reaches
+    // past the core deliberately: confined to the centre it disappears on the
+    // small flares, which are most of them.
+    const r = 95 * scale;
     const wash = c.createRadialGradient(x, y, 0, x, y, r);
     wash.addColorStop(0, tint);
+    wash.addColorStop(0.45, `${tint}9c`);
     wash.addColorStop(1, `${tint}00`);
-    c.globalAlpha = Math.min(0.55, intensity * 0.45);
+    c.globalAlpha = Math.min(0.72, intensity * 0.62);
     c.fillStyle = wash;
     c.fillRect(x - r, y - r, r * 2, r * 2);
   }

@@ -37,7 +37,7 @@ const GAP_MAX = 10;
  * and the kerb, so it is free to cross it.
  */
 const LANES = [
-  { y: 506, scale: 1.1, speed: 305 },
+  { y: 516, scale: 1.3, speed: 305 },
   { y: 528, scale: 1.85, speed: 430 },
 ];
 const BODIES = ['#0e1319', '#141118', '#0d161a', '#181113'];
@@ -52,8 +52,8 @@ const CAR_W = 220;
 const CAR_H = 74;
 /** How far either side of a sign the specular catch reaches, in world pixels. */
 const GLINT_RANGE = 260;
-/** How square to a light the bodywork must be before it catches a flare. */
-const CAR_CATCH = 0.4;
+/** How far in from each end of the body a light must be to catch a flare. */
+const CAR_CATCH = 0.3;
 /** Half-length of the moving highlight along the body, in car pixels. */
 const GLINT_WIDTH = 34;
 
@@ -212,15 +212,21 @@ export class Traffic {
       }
     }
     if (!best) return;
-    const offset = (best.x - worldX) / GLINT_RANGE;
-    if (Math.abs(offset) > 1.6) return;
-    // The rolling band still eases, because that is the light sliding along
-    // the flank. The flare on top of it does not: it is a threshold, on only
-    // while the bodywork is actually square to the light.
-    const power = Math.max(0, 1 - Math.abs(offset) / 1.6) ** 2 * Math.min(1, best.intensity);
+    // Where the light actually lands on the bodywork, in the car's own
+    // pixels. This is the exact projection of a fixed world point onto the
+    // panel rather than a normalised approximation of it, so the highlight
+    // holds still in the world and the car slides through it — the same way
+    // the train passes its mirrors. An approximation here reads as a glint
+    // that travels with the car, which is the thing it must not do.
+    const u = CAR_W / 2 + ((best.x - worldX) / scale) * car.dir;
+    if (u < -GLINT_WIDTH || u > CAR_W + GLINT_WIDTH) return;
+    // How hard the reflection is, from the light's own strength and reach.
+    const power =
+      Math.min(1, best.intensity) *
+      Math.max(0, 1 - Math.abs(best.x - worldX) / (GLINT_RANGE * 1.7));
     if (power < 0.02) return;
-    const caught = Math.abs(offset) < CAR_CATCH;
-    const u = CAR_W * (0.5 + Math.max(-0.75, Math.min(0.75, offset * 0.85)) * car.dir);
+    // The flare is a threshold: on only while the light is over the panel.
+    const caught = u > CAR_W * CAR_CATCH && u < CAR_W * (1 - CAR_CATCH);
 
     const sc = glintBuffer.getContext('2d')!;
     sc.globalCompositeOperation = 'source-over';
