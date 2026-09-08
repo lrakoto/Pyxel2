@@ -137,6 +137,7 @@ export function stepBody(
   dt: number,
   width: number,
   dash = false,
+  ground = 438,
 ) {
   const speed = dash ? 290 : 145;
   p.vx += (axis * speed - p.vx) * Math.min(1, dt * (axis ? 18 : 24));
@@ -148,8 +149,8 @@ export function stepBody(
   p.vy += 900 * dt;
   p.x = clamp(p.x + p.vx * dt, 32, width - 32);
   p.y += p.vy * dt;
-  if (p.y >= 438) {
-    p.y = 438;
+  if (p.y >= ground) {
+    p.y = ground;
     p.vy = 0;
     p.grounded = true;
   }

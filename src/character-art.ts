@@ -55,46 +55,59 @@ function spriteFromRows(rows: string[], palette: Record<string, string>): HTMLCa
 }
 
 /* ------------------------------------------------------------------ */
-/* Cole: 32×64. Tall cinematic side-profile, facing right.             */
+/* Cole: 32x64. Tall cinematic side-profile, facing right.             */
 /*                                                                     */
 /* Vertical layout (texels):                                           */
-/*   hat crown   2–9    (the 0–1 rows are padding)                     */
-/*   hat brim    10–11  (wide, dips low over the eyes)                 */
-/*   face/skin   12–18  (sunglasses + face shade; glint rows ~12–13)   */
-/*   scarf wrap  19–21  (the *body* wrap; the verlet tail sits on top) */
-/*   coat        22–47  (lapel, shoulders, back seam, belt, hem)       */
-/*   legs/boots  48–53  (frame-specific)                               */
+/*   hat crown   4-10   (tapered; rows 0-3 are padding)                */
+/*   hat brim    11-14  (wide, dips at the front over the eyes)        */
+/*   face/skin   14-20  (mostly brim shadow; nose and jaw catch light) */
+/*   scarf       18-33  (bulked wrap + a short front drape; the verlet */
+/*                       tail continues from the neck anchor at ~23)   */
+/*   coat        21-48  (lapel, shoulders, waist, knee-length hem)     */
+/*   legs/boots  46-63  (frame-specific)                               */
+/*                                                                     */
+/* Proportions follow the reference sheet: a small head under a wide   */
+/* brim, a long charcoal coat to the knee, and the red scarf as the    */
+/* single element that reads at any distance.                          */
 /* ------------------------------------------------------------------ */
 
 export const COLE_W = 32;
 export const COLE_H = 64;
 
 export const COLE_PALETTE: Record<string, string> = {
-  H: '#14171d', // hat
-  h: '#20242c', // hat brim
-  b: '#1a1f28', // hat band
-  S: '#c49070', // skin
-  f: '#7a5a44', // face shadow (under hat brim)
-  g: '#0d0f13', // sunglasses lens
-  C: '#2c333d', // trench coat
-  D: '#1b212a', // coat shadow (seam, hem)
-  L: '#3a4350', // coat highlight (lapel, shoulder)
-  N: '#62788a', // rain-caught blue-grey edge
-  G: '#ee4444', // scarf
-  t: '#0d0f13', // belt
-  P: '#20242c', // trousers
-  P2: '#282e38', // trouser highlight
-  B: '#0d0f13', // boots
+  H: '#0e1013', // hat crown
+  h: '#191c21', // hat brim (top face)
+  b: '#07090b', // hat band and brim underside
+  S: '#6b4a38', // skin
+  f: '#3d2a20', // face in brim shadow
+  d: '#241812', // hair, deepest facial shadow
+  G: '#d92b23', // scarf, lit
+  G2: '#b01f1c', // scarf, mid fold
+  G3: '#7d1512', // scarf, deep fold
+  C: '#3a3f47', // coat, lit upper
+  D: '#22262c', // coat, shadowed
+  E: '#171a1f', // coat, darkest panel and inner lining
+  L: '#4d545e', // coat highlight (shoulder, lapel edge)
+  N: '#62788a', // rain-caught edge
+  P: '#1b1e23', // trousers
+  P2: '#262a30', // trouser highlight
+  B: '#0e1013', // boots and gloves
 };
 
 type ColePose = { stride?: number; crouch?: number; airborne?: boolean };
 
-/** Fresh 32×64 Cole art: every pose is drawn independently at native pixel size. */
+/**
+ * Fresh 32x64 Cole art: every pose is drawn independently at native pixel
+ * size. Draw order is the character's own layering, back to front — legs,
+ * coat over the thighs, head over the collar, hat over the head, and the
+ * scarf last so its drape reads on top of the coat rather than behind it.
+ */
 function makeColeFrame({
   stride = 0,
   crouch = 0,
   airborne = false,
 }: ColePose = {}): HTMLCanvasElement {
+  const K = COLE_PALETTE;
   return canvasTexture(COLE_W, COLE_H, (ctx) => {
     const rect = (color: string, x: number, y: number, w: number, h: number) => {
       ctx.fillStyle = color;
@@ -108,126 +121,148 @@ function makeColeFrame({
       ctx.fill();
     };
 
-    // Low fedora with a restrained brim; crown, band and wet edge stay
-    // separate so the hat no longer merges into one oversized dark block.
-    rect(COLE_PALETTE.H, 13, 2, 8, 1);
-    rect(COLE_PALETTE.H, 11, 3, 12, 6);
-    rect(COLE_PALETTE.b, 10, 8, 14, 2);
-    rect(COLE_PALETTE.h, 8, 10, 18, 2);
-    rect('#080a0d', 10, 11, 15, 1);
-    rect(COLE_PALETTE.N, 22, 4, 1, 4);
-
-    // Refined side-profile head: hair/ear at the rear, two-value face,
-    // slim glasses with a cyan catch, and an explicit nose/chin silhouette.
-    rect('#201711', 11, 12, 4, 7);
-    rect(COLE_PALETTE.f, 13, 12, 9, 8);
-    rect(COLE_PALETTE.S, 15, 12, 8, 7);
-    rect(COLE_PALETTE.S, 22, 14, 3, 2);
-    rect(COLE_PALETTE.S, 23, 15, 3, 2);
-    rect(COLE_PALETTE.f, 13, 14, 2, 3);
-    rect('#5f4233', 13, 15, 1, 1);
-    rect(COLE_PALETTE.g, 16, 13, 8, 2);
-    rect('#273746', 18, 13, 3, 1);
-    rect(COLE_PALETTE.N, 23, 13, 1, 1);
-    rect(COLE_PALETTE.f, 16, 19, 7, 1);
-    rect(COLE_PALETTE.S, 17, 20, 5, 1);
-
-    // Compact scarf wrap leaves breathing room beneath the jaw; the
-    // simulated tail supplies the dramatic motion outside the sprite.
-    rect('#9e2630', 11, 20, 12, 2);
-    rect(COLE_PALETTE.G, 12, 22, 10, 2);
-
-    // Structured shoulders, lapels, waist and two distinct coat tails.
-    poly(COLE_PALETTE.D, [
-      [8, 23],
-      [12, 21],
-      [22, 22],
-      [25, 27],
-      [23, 44],
-      [18, 49],
-      [9, 46],
-      [6, 28],
-    ]);
-    poly(COLE_PALETTE.C, [
-      [10, 23],
-      [14, 22],
-      [21, 23],
-      [23, 28],
-      [21, 43],
-      [17, 48],
-      [11, 45],
-      [9, 28],
-    ]);
-    poly(COLE_PALETTE.L, [
-      [10, 23],
-      [15, 22],
-      [13, 32],
-      [10, 28],
-    ]);
-    poly(COLE_PALETTE.L, [
-      [21, 23],
-      [23, 26],
-      [19, 32],
-      [15, 23],
-    ]);
-    rect(COLE_PALETTE.t, 10, 34, 13, 2);
-    rect('#59616d', 17, 34, 3, 2);
-    poly(COLE_PALETTE.D, [
-      [10, 36],
-      [16, 37],
-      [15, 49],
-      [9, 46],
-    ]);
-    poly('#141922', [
-      [16, 37],
-      [21, 36],
-      [23, 46],
-      [17, 49],
-    ]);
-    rect(COLE_PALETTE.N, 23, 25, 1, 15);
-
-    // Arms counter-swing with the stride; hands remain clearly separate.
-    const arm = Math.round(stride * 2);
-    poly(COLE_PALETTE.C, [
-      [8, 24],
-      [11, 25],
-      [10 + arm, 36],
-      [7 + arm, 36],
-      [5, 28],
-    ]);
-    rect(COLE_PALETTE.B, 7 + arm, 35, 4, 4);
-    poly(COLE_PALETTE.C, [
-      [22, 24],
-      [25, 27],
-      [23 - arm, 36],
-      [20 - arm, 35],
-      [20, 27],
-    ]);
-    rect(COLE_PALETTE.B, 20 - arm, 35, 4, 4);
-
-    // Anatomical legs: hip → knee → ankle, with a six-phase stride.
+    // --- Legs, drawn first so the coat hem falls over the thighs ------
     const front = Math.round(stride * 5);
     const back = Math.round(-stride * 4);
-    const legTop = airborne ? 46 : 45;
-    poly(COLE_PALETTE.P2, [
-      [14, legTop],
-      [18, legTop],
+    const legTop = airborne ? 44 : 43;
+    poly(K.P, [
+      [11, legTop],
+      [15, legTop],
+      [13 + back, 53],
+      [12 + back, 60],
+      [9 + back, 60],
+      [10, 52],
+    ]);
+    rect(K.B, 9 + back, 58, 6, 3);
+    rect(K.B, 8 + back, 60, 8, 3);
+    poly(K.P2, [
+      [15, legTop],
+      [19, legTop],
       [20 + front, 53],
-      [19 + front, 61],
-      [16 + front, 61],
+      [19 + front, 60],
+      [16 + front, 60],
       [16, 52],
     ]);
-    poly(COLE_PALETTE.P, [
-      [10, legTop],
-      [14, legTop],
-      [12 + back, 53],
-      [11 + back, 61],
-      [8 + back, 61],
-      [9, 52],
+    rect(K.B, 16 + front, 58, 6, 3);
+    rect(K.B, 15 + front, 60, 8, 3);
+    rect('#2b323c', 17 + front, 58, 3, 1);
+
+    // --- Coat ---------------------------------------------------------
+    // Straight-cut and knee-length. Narrow enough that the legs read
+    // below it, with the front panel catching the street light.
+    poly(K.E, [
+      [9, 22],
+      [13, 19],
+      [20, 19],
+      [24, 22],
+      [25, 29],
+      [24, 45],
+      [9, 45],
+      [8, 29],
     ]);
-    rect(COLE_PALETTE.B, 15 + front, 60, 7, 3);
-    rect(COLE_PALETTE.B, 7 + back, 60, 7, 3);
-    rect('#343b47', 17 + front, 60, 3, 1);
+    poly(K.D, [
+      [10, 22],
+      [14, 20],
+      [20, 20],
+      [23, 22],
+      [24, 29],
+      [23, 44],
+      [10, 44],
+      [9, 29],
+    ]);
+    poly(K.C, [
+      [17, 20],
+      [22, 22],
+      [24, 29],
+      [23, 44],
+      [17, 44],
+    ]);
+    // Lapel edge and shoulder catch.
+    poly(K.L, [
+      [15, 20],
+      [19, 21],
+      [17, 30],
+      [14, 25],
+    ]);
+    rect(K.L, 21, 23, 2, 5);
+    // Front opening, belt and hem shadow.
+    rect(K.E, 17, 30, 1, 15);
+    rect(K.b, 11, 33, 12, 1);
+    rect(K.b, 10, 43, 14, 2);
+
+    // --- Head ---------------------------------------------------------
+    // A real profile: nape, brow in brim shadow, a lit cheek, and a nose
+    // that breaks the silhouette so he reads facing his direction.
+    rect(K.d, 13, 13, 4, 9);
+    rect(K.f, 16, 13, 7, 9);
+    rect(K.d, 16, 13, 7, 3);
+    rect(K.S, 18, 16, 5, 4);
+    rect('#7d5843', 19, 17, 3, 2);
+    rect(K.S, 22, 16, 2, 3);
+    rect(K.S, 23, 17, 1, 2);
+    rect(K.f, 17, 20, 5, 2);
+    rect(K.d, 16, 19, 2, 1);
+
+    // --- Wide-brim fedora ---------------------------------------------
+    // The brim is what reads at a distance: wider than the shoulders,
+    // dipping at the front so the eyes stay buried.
+    rect(K.H, 15, 5, 5, 1);
+    rect(K.H, 14, 6, 7, 1);
+    rect(K.H, 13, 7, 9, 3);
+    rect(K.b, 13, 10, 10, 1);
+    rect(K.h, 8, 11, 17, 2);
+    rect(K.h, 21, 12, 5, 1);
+    rect(K.b, 9, 13, 16, 1);
+    rect(K.N, 20, 6, 1, 4);
+
+    // --- Scarf ---------------------------------------------------------
+    // Bulked around the neck and over the jaw, then draped down the coat
+    // front. The simulated cloth tail continues from the same anchor.
+    // The wrap stays inside the coat's shoulders, and the drape is kept
+    // short: the simulated tail hangs from the same anchor, and a wide
+    // static drape on top of it turns the whole figure into a red slab.
+    poly(K.G3, [
+      [14, 19],
+      [23, 19],
+      [24, 23],
+      [21, 26],
+      [15, 25],
+      [13, 22],
+    ]);
+    poly(K.G, [
+      [15, 20],
+      [22, 20],
+      [23, 23],
+      [20, 25],
+      [16, 24],
+      [14, 22],
+    ]);
+    rect(K.G2, 16, 22, 6, 1);
+    rect(K.G2, 17, 21, 3, 1);
+    // The drape, on top of the coat.
+    poly(K.G, [
+      [19, 25],
+      [22, 25],
+      [22, 30],
+      [21, 34],
+      [19, 34],
+    ]);
+    rect(K.G3, 21, 26, 1, 8);
+    rect(K.G2, 19, 29, 2, 1);
+
+    // --- Arm ------------------------------------------------------------
+    // Counter-swings with the stride; the glove stays a separate block so
+    // it doesn't read as a hole in the coat.
+    const arm = Math.round(stride * 2);
+    poly(K.D, [
+      [21, 23],
+      [24, 26],
+      [24 - arm, 36],
+      [21 - arm, 35],
+      [20, 27],
+    ]);
+    rect(K.E, 21 - arm, 34, 3, 2);
+    rect(K.B, 21 - arm, 36, 4, 4);
   });
 }
 
@@ -388,98 +423,110 @@ export const PED_H = 28;
  * set that the caller maps to a chosen tone. 'k' is the coat/hood fill, 'f'
  * the sliver of face at the collar.
  */
+/** The colour of the night air a block back, used to bake in distance haze. */
+export const NIGHT_AIR = '#1a2a30';
+
+/** How far the background walkers and their umbrellas sit into that air. */
+export const PED_HAZE = 0.62;
+
+/** Blends `hex` toward `air`; t=0 keeps the colour, t=1 returns the air. */
+export function mixHex(hex: string, air: string, t: number): string {
+  const parse = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const [r, g, b] = parse(hex);
+  const [ar, ag, ab] = parse(air);
+  const channel = (c: number, a: number) =>
+    Math.round(c * (1 - t) + a * t)
+      .toString(16)
+      .padStart(2, '0');
+  return `#${channel(r, ar)}${channel(g, ag)}${channel(b, ab)}`;
+}
+
 export function pedPalette(coat: string, face = '#caa07c'): Record<string, string> {
   return {
     H: '#15191f',
     k: coat,
+    // The coat's shaded side. Without it the silhouette is a flat slab.
+    j: mixHex(coat, '#000000', 0.42),
     f: face,
     P: '#1b1f25',
     B: '#0d0f13',
   };
 }
 
+/*
+ * The coat has to end in a hem wide enough to sit over both legs. An earlier
+ * cut tapered to two pixels at the waist while the legs started four pixels
+ * apart, so the walker read as a cape hung over a disconnected pair of legs.
+ * The torso now keeps its mass down to a flared skirt, and the legs start
+ * directly under it.
+ */
 const PED_COAT_BODY = [
-  '......HHH.......', // 0 hat crown
-  '.....HHHf.......', // 1 hat + face sliver
-  '.....kkkk.......', // 2 collar
-  '....kkkkkk......', // 3 shoulders
-  '....kkkkkk......', // 4
-  '...kkkkkkkk.....', // 5
-  '...kkkkkkkk.....', // 6
-  '...kkkkkkkk.....', // 7
-  '...kkkkkkk......', // 8
-  '...kkkkkkk......', // 9
-  '...kkkkkkk......', // 10
-  '...kkkkkk.......', // 11
-  '...kkkkkk.......', // 12
-  '...kkkkkk.......', // 13
-  '....kkkkk.......', // 14
-  '....kkkkk.......', // 15
-  '....kkkk........', // 16
-  '....kkkk........', // 17
-  '.....kk.........', // 18
-  '.....kk.........', // 19
-  '................', // 20
-  '................', // 21
-  '................', // 22
-  '................', // 23 gap before legs
-  '................', // 24
-  '................', // 25
-  '................', // 26
-  '................', // 27 legs rows are pose-specific
+  '.....HHHH.......', // 0  hat crown
+  '....HHHHHH......', // 1  brim
+  '.....jkkf.......', // 2  collar + face sliver
+  '....jkkkkk......', // 3  shoulders
+  '...jkkkkkkk.....', // 4
+  '...jkkkkkkk.....', // 5
+  '...jkkkkkkk.....', // 6
+  '...jkkkkkkk.....', // 7  chest
+  '...jkkkkkk......', // 8  taper to the waist
+  '...jkkkkkk......', // 9
+  '...jkkkkkk......', // 10
+  '...jkkkkkk......', // 11 waist
+  '..jkkkkkkk......', // 12 skirt flares
+  '..jkkkkkkkk.....', // 13
+  '..jkkkkkkkk.....', // 14
+  '..jkkkkkkkk.....', // 15
+  '..jkkkkkkkk.....', // 16
+  '..jkkkkkkkk.....', // 17
+  '..jkkkkkkkk.....', // 18 hem
+  '..BBBBBBBBB.....', // 19 hem underside
 ];
 
 const PED_HOOD_BODY = [
-  '.....kkkk.......',
-  '....kkkkfk......',
-  '....kkkkkk......',
-  '...kkkkkkkk.....',
-  '..kkkkkkkkk.....',
-  '..kkkkkkkk......',
-  '..kkkkkkk.......',
-  '..kkkkkkk.......',
-  '..kkkkkk........',
-  '..kkkkkk........',
-  '..kkkkkk........',
-  '..kkkkk.........',
-  '..kkkkk.........',
-  '..kkkkk.........',
-  '...kkkk.........',
-  '...kkkk.........',
-  '...kkk..........',
-  '...kkk..........',
-  '...kk...........',
-  '...kk...........',
-  '................',
-  '................',
-  '................',
-  '................',
-  '................',
-  '................',
-  '................',
-  '................',
+  '.....kkkk.......', // 0  hood crown
+  '....jkkkkk......', // 1
+  '....jkkkfk......', // 2  hood opening + face
+  '...jkkkkkkk.....', // 3  shoulders
+  '...jkkkkkkk.....', // 4
+  '...jkkkkkkk.....', // 5
+  '...jkkkkkk......', // 6
+  '...jkkkkkk......', // 7
+  '...jkkkkkk......', // 8
+  '...jkkkkkk......', // 9
+  '...jkkkkkk......', // 10
+  '..jkkkkkkk......', // 11
+  '..jkkkkkkkk.....', // 12
+  '..jkkkkkkkk.....', // 13
+  '..jkkkkkkkk.....', // 14
+  '..jkkkkkkkk.....', // 15
+  '..jkkkkkkkk.....', // 16
+  '..jkkkkkkkk.....', // 17
+  '..jkkkkkkkk.....', // 18
+  '..BBBBBBBBB.....', // 19
 ];
 
+/* Legs run to the bottom row, so the walker's feet meet its contact shadow. */
 const PED_LEGS_A = [
-  '....PP..PP......', // 20
-  '....PP..PP......',
-  '...PP....PP.....',
-  '...PP....PP.....',
-  '..BBB....BBB....',
-  '..BBB....BBB....',
-  '................',
-  '................',
+  '...PP...PP......', // 20
+  '...PP...PP......',
+  '...PP...PP......',
+  '..PP.....PP.....',
+  '..PP.....PP.....',
+  '..PP.....PP.....',
+  '.BBB.....BBB....',
+  '.BBB.....BBB....', // 27
 ];
 
 const PED_LEGS_B = [
-  '.....PPPP.......',
-  '.....PPPP.......',
-  '....PPP.PPP.....',
-  '....PP...PP.....',
+  '....PP.PP.......', // 20
+  '....PP.PP.......',
+  '....PP.PP.......',
+  '....PP..PP......',
+  '...PP...PP......',
+  '...PP....PP.....',
   '..BBB....BBB....',
-  '..BBB....BBB....',
-  '................',
-  '................',
+  '..BBB....BBB....', // 27
 ];
 
 /** Pads the body block (rows 0–19) with an 8-row leg pose to reach 28 rows. */
@@ -487,9 +534,21 @@ function pedRows(body: string[], legs: string[]): string[] {
   return [...body.slice(0, 20), ...legs];
 }
 
-export function makePedFrames(kind: 'coat' | 'hood', coatTone: string): HTMLCanvasElement[] {
+/**
+ * Background walkers. `haze` bakes the distance wash into the palette instead
+ * of drawing the sprite at reduced alpha, which would let the storefronts
+ * behind them show straight through the figure.
+ */
+export function makePedFrames(
+  kind: 'coat' | 'hood',
+  coatTone: string,
+  haze = 0,
+): HTMLCanvasElement[] {
   const body = kind === 'coat' ? PED_COAT_BODY : PED_HOOD_BODY;
-  const pal = pedPalette(coatTone);
+  const base = pedPalette(coatTone);
+  const pal = Object.fromEntries(
+    Object.entries(base).map(([key, color]) => [key, mixHex(color, NIGHT_AIR, haze)]),
+  );
   return framesFromRows(
     PED_W,
     [

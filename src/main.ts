@@ -87,7 +87,14 @@ class Game {
   model = model;
   renderer = new Renderer($<HTMLCanvasElement>('world'));
   audio = new AudioEngine();
-  player: Body = { x: model.save.x, y: 438, vx: 0, vy: 0, grounded: true, facing: 1 };
+  player: Body = {
+    x: model.save.x,
+    y: AREAS[model.save.area].ground,
+    vx: 0,
+    vy: 0,
+    grounded: true,
+    facing: 1,
+  };
   camera = clamp(model.save.x - this.viewW * 0.48, 0, AREAS[model.save.area].width - this.viewW);
   time = 0;
   started = false;
@@ -624,7 +631,7 @@ class Game {
     const from = this.model.save.area;
     this.model.save.area = id;
     this.player.x = id === 'street' ? (from === 'studio' ? 965 : 1465) : this.currentArea.spawn;
-    this.player.y = 438;
+    this.player.y = this.currentArea.ground;
     this.player.vy = 0;
     this.player.grounded = true;
     this.nearest = null;
@@ -862,7 +869,14 @@ class Game {
         break;
       case 'restart':
         this.model.save = freshSave();
-        this.player = { x: 440, y: 438, vx: 0, vy: 0, grounded: true, facing: 1 };
+        this.player = {
+          x: 440,
+          y: AREAS.street.ground,
+          vx: 0,
+          vy: 0,
+          grounded: true,
+          facing: 1,
+        };
         this.camera = 0;
         this.combat = null;
         this.lines = [];
@@ -928,7 +942,7 @@ class Game {
     if (!this.combat) return;
     this.clearInput();
     this.combat = null;
-    this.player.y = 438;
+    this.player.y = this.currentArea.ground;
     this.player.vy = 0;
     this.player.grounded = true;
     this.sync();
@@ -973,6 +987,7 @@ class Game {
         combat: this.combat,
         aim: this.aim,
         title: !this.started,
+        dt: elapsed,
       });
       this.syncHotspots();
       if (now - this.lastUI > 100) {
@@ -1027,6 +1042,7 @@ class Game {
         dt,
         this.currentArea.width,
         !!this.combat && (this.keys.has('ShiftLeft') || this.keys.has('ShiftRight')),
+        this.currentArea.ground,
       );
     if (Math.abs(this.player.vx) > 20 && this.player.grounded) {
       this.stepTime += dt;

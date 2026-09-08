@@ -141,6 +141,20 @@ export interface Hotspot {
   text?: string;
   requires?: 'deduced' | 'contact';
 }
+/**
+ * A neon sign or practical light. These do not light the plate — that is
+ * painted in — they exist so the wet-rim glow on characters knows what colour
+ * is falling on them and from which side. Positions follow the lit fixtures
+ * visible in each plate.
+ */
+export interface SignLight {
+  x: number;
+  y: number;
+  color: string;
+  intensity: number;
+  /** 0 = a steady lamp, 1 = a tube on its way out. */
+  flicker?: number;
+}
 export interface Area {
   id: AreaId;
   title: string;
@@ -148,6 +162,20 @@ export interface Area {
   width: number;
   spawn: number;
   color: string;
+  /**
+   * How large a standing adult reads against this plate, with the street at 1.
+   * The interior plates were painted from much closer in, so a figure drawn at
+   * the street's size stands about a third of its proper height in a room.
+   */
+  figureScale: number;
+  /**
+   * The surface characters stand on. On the street this is the pavement, not
+   * the kerb line below it — standing on the latter reads as walking in the
+   * gutter.
+   */
+  ground: number;
+  /** Neon and practicals feeding the wet-rim glow. */
+  lights: SignLight[];
   hotspots: Hotspot[];
 }
 export const AREAS: Record<AreaId, Area> = {
@@ -158,6 +186,15 @@ export const AREAS: Record<AreaId, Area> = {
     width: 1800,
     spawn: 440,
     color: '#e6aa62',
+    figureScale: 1,
+    ground: 434,
+    lights: [
+      { x: 240, y: 352, color: '#ffa64d', intensity: 1.5, flicker: 0.3 }, // noodle bar
+      { x: 470, y: 392, color: '#4fb4e8', intensity: 0.9, flicker: 0.5 }, // vending machines
+      { x: 1000, y: 330, color: '#ff3b30', intensity: 1.5, flicker: 0.38 }, // GRAVES
+      { x: 1108, y: 350, color: '#ff2f45', intensity: 0.8, flicker: 0.92 }, // failing kanji tube
+      { x: 1520, y: 300, color: '#4fe6e0', intensity: 1.7, flicker: 0.22 }, // MEMORY DEN
+    ],
     hotspots: [
       {
         id: 'noodles',
@@ -202,6 +239,14 @@ export const AREAS: Record<AreaId, Area> = {
     width: 1500,
     spawn: 140,
     color: '#e6aa62',
+    figureScale: 2.8,
+    ground: 438,
+    lights: [
+      { x: 130, y: 300, color: '#7fd98c', intensity: 0.8, flicker: 0.5 }, // terminal screen
+      { x: 700, y: 120, color: '#ffc271', intensity: 2.1, flicker: 0.55 }, // failing bulb
+      { x: 1390, y: 260, color: '#4fe6e0', intensity: 1.6, flicker: 0.25 }, // neural receiver
+      { x: 60, y: 330, color: '#ffb066', intensity: 0.9 }, // street through the door
+    ],
     hotspots: [
       {
         id: 'street-exit',
@@ -241,6 +286,13 @@ export const AREAS: Record<AreaId, Area> = {
     width: 1500,
     spawn: 140,
     color: '#85d6d0',
+    figureScale: 2.85,
+    ground: 438,
+    lights: [
+      { x: 30, y: 220, color: '#ffb066', intensity: 0.9, flicker: 0.2 }, // stairwell lamp
+      { x: 700, y: 280, color: '#5ef0ea', intensity: 2.4, flicker: 0.18 }, // memory column
+      { x: 1280, y: 260, color: '#4fd6e8', intensity: 1.3, flicker: 0.6 }, // monitor wall
+    ],
     hotspots: [
       {
         id: 'den-exit',
