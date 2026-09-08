@@ -189,11 +189,15 @@ export const AREAS: Record<AreaId, Area> = {
     figureScale: 1,
     ground: 434,
     lights: [
-      { x: 240, y: 352, color: '#ffa64d', intensity: 1.5, flicker: 0.3 }, // noodle bar
-      { x: 470, y: 392, color: '#4fb4e8', intensity: 0.9, flicker: 0.5 }, // vending machines
-      { x: 1000, y: 330, color: '#ff3b30', intensity: 1.5, flicker: 0.38 }, // GRAVES
-      { x: 1108, y: 350, color: '#ff2f45', intensity: 0.8, flicker: 0.92 }, // failing kanji tube
-      { x: 1520, y: 300, color: '#4fe6e0', intensity: 1.7, flicker: 0.22 }, // MEMORY DEN
+      // Positions measured off the frontage plate, taking each sign's densest
+      // row rather than its centroid: the rim glow only needs a direction, but
+      // a flare is drawn at the light, and a centroid drags down toward the
+      // lit shopfront under the sign.
+      { x: 183, y: 262, color: '#ffa64d', intensity: 1.5, flicker: 0.3 }, // noodle bar
+      { x: 420, y: 341, color: '#4fb4e8', intensity: 0.9, flicker: 0.5 }, // vending machines
+      { x: 1008, y: 310, color: '#ff3b30', intensity: 1.5, flicker: 0.38 }, // GRAVES
+      { x: 1259, y: 200, color: '#ff2f45', intensity: 0.8, flicker: 0.92 }, // failing kanji tube
+      { x: 1547, y: 274, color: '#4fe6e0', intensity: 1.7, flicker: 0.22 }, // MEMORY DEN
     ],
     hotspots: [
       {

@@ -8,6 +8,7 @@ import { Crowd } from './pedestrians.ts';
 import { Traffic } from './traffic.ts';
 import { rimAt, flickerOf } from './lighting.ts';
 import { buildSheen } from './sheen.ts';
+import { drawFlare } from './flare.ts';
 export const W = 960,
   H = 540;
 /** Carriages in the elevated train, and how fast it crosses the city. */
@@ -18,6 +19,8 @@ const TRAIN_SPEED = 165;
  * are world positions on the midground plane, so they parallax with it and
  * stay put while the train runs past them.
  */
+/** Half-width of the window in which a carriage catches a mirror, in pixels. */
+const TRAIN_CATCH = 12;
 const TRAIN_MIRRORS = [
   { x: 250, strength: 1 },
   { x: 780, strength: 0.75 },
@@ -172,6 +175,9 @@ export class Renderer {
     }
     c.globalAlpha = 1;
     c.globalCompositeOperation = 'source-over';
+    // The signs get a soft halo but no flare. A tube facing the street is a
+    // diffuse emitter: flares are for specular catches off metal and glass,
+    // and for lamps aimed at the lens.
     // Lamps breathe slowly; light is a cached texture, not a per-frame blur pass.
     c.globalCompositeOperation = 'screen';
     c.globalAlpha = 0.08 + Math.sin(t * 0.6) * 0.018;
@@ -456,18 +462,15 @@ export class Renderer {
         c.globalAlpha = 0.9 * power;
         c.fillRect(x + 2, 177, 66, 1);
 
-        // The hard catch, as a window edge crosses the light. It stutters so
-        // it reads as a caught reflection rather than a lamp of its own.
-        if (gap < 34) {
-          const flick = 0.55 + 0.45 * Math.abs(Math.sin(t * 37 + i * 2.1));
-          const hot = (1 - gap / 34) * mirror.strength * flick;
-          c.globalAlpha = 0.85 * hot;
-          c.fillStyle = '#eaf6ff';
-          c.fillRect(Math.round(mirror.x) - 1, 177, 2, 3);
-          c.globalAlpha = 0.4 * hot;
-          c.drawImage(this.light, mirror.x - 13, 169, 26, 26);
-        }
         c.restore();
+
+        // The catch is binary. A specular is a threshold — the panel's angle
+        // either lines up with the light or it does not — so the flare snaps
+        // on as the carriage arrives and snaps off as it leaves, rather than
+        // swelling and fading like a lamp being dimmed.
+        if (gap < TRAIN_CATCH) {
+          drawFlare(c, mirror.x, 178, 0.15, mirror.strength);
+        }
       }
     }
   }
@@ -628,17 +631,9 @@ export class Renderer {
     c.fillRect(10, 2, 4, 7);
     c.restore();
     if (combat.cooldown > 0.085) {
-      c.save();
-      c.globalCompositeOperation = 'screen';
-      c.globalAlpha = 0.5;
-      c.drawImage(
-        this.light,
-        p.x - cam - 60 * figure,
-        p.y - 100 * figure,
-        120 * figure,
-        120 * figure,
-      );
-      c.restore();
+      // The shot itself flares, and the point it is aimed at takes a smaller
+      // one, so a burst reads across the whole line of fire.
+      drawFlare(c, p.x - cam, p.y - 43 * figure, 0.17 * figure, 1.05);
     }
     const x = v.aim.x - cam,
       y = v.aim.y;

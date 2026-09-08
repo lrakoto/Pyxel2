@@ -1,5 +1,6 @@
 import type { SignLight } from './content.ts';
 import { rimAt, flickerOf } from './lighting.ts';
+import { drawFlare } from './flare.ts';
 import { buildRimMasks, paintRim, type RimMasks } from './rim-mask.ts';
 
 /**
@@ -51,6 +52,8 @@ const CAR_W = 220;
 const CAR_H = 74;
 /** How far either side of a sign the specular catch reaches, in world pixels. */
 const GLINT_RANGE = 260;
+/** How square to a light the bodywork must be before it catches a flare. */
+const CAR_CATCH = 0.4;
 /** Half-length of the moving highlight along the body, in car pixels. */
 const GLINT_WIDTH = 34;
 
@@ -58,20 +61,6 @@ const GLINT_WIDTH = 34;
 const glintBuffer = document.createElement('canvas');
 glintBuffer.width = CAR_W;
 glintBuffer.height = CAR_H;
-
-/** Soft bloom thrown off the roof at the peak of a pass. */
-const flare = (() => {
-  const g = document.createElement('canvas');
-  g.width = g.height = 64;
-  const gc = g.getContext('2d')!;
-  const r = gc.createRadialGradient(32, 32, 0, 32, 32, 32);
-  r.addColorStop(0, '#ffffff');
-  r.addColorStop(0.4, '#ffe9c088');
-  r.addColorStop(1, '#ffe9c000');
-  gc.fillStyle = r;
-  gc.fillRect(0, 0, 64, 64);
-  return g;
-})();
 
 /**
  * A low cyberpunk sedan: cabin set well back over the rear axle, a long hood
@@ -225,9 +214,12 @@ export class Traffic {
     if (!best) return;
     const offset = (best.x - worldX) / GLINT_RANGE;
     if (Math.abs(offset) > 1.6) return;
-    // Peak brightness as the car draws level with the sign.
+    // The rolling band still eases, because that is the light sliding along
+    // the flank. The flare on top of it does not: it is a threshold, on only
+    // while the bodywork is actually square to the light.
     const power = Math.max(0, 1 - Math.abs(offset) / 1.6) ** 2 * Math.min(1, best.intensity);
     if (power < 0.02) return;
+    const caught = Math.abs(offset) < CAR_CATCH;
     const u = CAR_W * (0.5 + Math.max(-0.75, Math.min(0.75, offset * 0.85)) * car.dir);
 
     const sc = glintBuffer.getContext('2d')!;
@@ -249,13 +241,10 @@ export class Traffic {
     c.imageSmoothingEnabled = false;
     c.drawImage(glintBuffer, -CAR_W / 2, -CAR_H);
     c.restore();
-    // A brief bloom off the roof at the peak of the pass.
-    c.save();
-    c.globalCompositeOperation = 'lighter';
-    c.globalAlpha = Math.min(0.5, power * 0.55);
-    const r = (CAR_W * 0.4) / scale;
-    c.drawImage(flare, u - CAR_W / 2 - r / 2, -CAR_H - r * 0.15, r, r * 0.7);
-    c.restore();
+    // A brief flare off the bodywork at the peak of the pass.
+    if (caught) {
+      drawFlare(c, u - CAR_W / 2, -CAR_H * 0.8, 0.25 / scale, 0.9, best.color);
+    }
   }
 
   /** `cam` converts a car's screen x to world x, so the signs light it. */
@@ -294,6 +283,11 @@ export class Traffic {
       c.globalAlpha = 0.22;
       c.drawImage(this.red, tail - w * 0.22, y - h * 0.62, w * 0.44, h * 0.7);
       c.restore();
+
+      // The lamp itself is a point source pointed near the camera, so it
+      // flares; the tail lamp gets a much smaller one in its own red.
+      drawFlare(c, nose, y - h * 0.28, 0.11 * s, 0.7);
+      drawFlare(c, tail, y - h * 0.3, 0.05 * s, 0.26, '#ff5540');
 
       c.save();
       c.translate(x, y);
