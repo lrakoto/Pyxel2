@@ -1,5 +1,15 @@
 import type { SignLight } from './content.ts';
 import { flickerOf } from './lighting.ts';
+import { drawFlare } from './flare.ts';
+
+/** Deterministic per-index noise, so nothing has to carry state. */
+function hash(i: number, salt: number): number {
+  const v = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return v - Math.floor(v);
+}
+
+/** Reused for the soft-edged puddle reflections. */
+const mirror = document.createElement('canvas');
 
 /**
  * Standing and falling water inside a room.
@@ -43,7 +53,16 @@ export interface AreaWater {
   puddles?: Puddle[];
 }
 
-/** Rain seen through a doorway: harder and brighter than the interior air. */
+/**
+ * Rain seen through a doorway.
+ *
+ * The hard part is that it must not read as a sheet of water. Evenly spaced
+ * streaks of equal length and brightness are exactly what a sheet looks like,
+ * and a flat wash over the opening gives the whole thing a rectangle. So the
+ * streaks are scattered by hash rather than by index, their length, speed and
+ * opacity all vary, a few near ones fall much brighter and faster than the
+ * rest, and the wash is a gradient that fades out at the edges of the opening.
+ */
 export function drawOpenings(
   c: CanvasRenderingContext2D,
   cam: number,
@@ -57,21 +76,32 @@ export function drawOpenings(
     c.beginPath();
     c.rect(x, o.y, o.w, o.h);
     c.clip();
-    // A cool wash, so the outside reads colder than the room.
-    c.fillStyle = '#7fa8c022';
+
+    // Cold air in the gap, fading at both ends so the opening has no edge of
+    // its own — the doorway's own frame is already in the plate.
+    const wash = c.createLinearGradient(0, o.y, 0, o.y + o.h);
+    wash.addColorStop(0, '#7fa8c000');
+    wash.addColorStop(0.35, '#7fa8c016');
+    wash.addColorStop(1, '#8fb2c604');
+    c.fillStyle = wash;
     c.fillRect(x, o.y, o.w, o.h);
-    c.strokeStyle = '#cfe4f0';
-    c.lineWidth = 0.9;
-    c.globalAlpha = 0.34;
-    c.beginPath();
-    for (let i = 0; i < 46; i++) {
-      const speed = 300 + (i % 5) * 90;
-      const sx = x + ((i * 53.7) % o.w);
-      const sy = o.y + (((i * 37.1 + t * speed) % (o.h + 40)) - 20);
+
+    c.lineCap = 'round';
+    for (let i = 0; i < 34; i++) {
+      const near = hash(i, 3) > 0.82;
+      const speed = near ? 620 + hash(i, 4) * 220 : 260 + hash(i, 5) * 180;
+      const length = near ? 20 + hash(i, 6) * 12 : 8 + hash(i, 7) * 9;
+      const sx = x + hash(i, 1) * o.w;
+      const span = o.h + length + 30;
+      const sy = o.y - length + ((hash(i, 2) * span + t * speed) % span);
+      c.strokeStyle = '#cfe4f0';
+      c.globalAlpha = (near ? 0.4 : 0.13) + hash(i, 8) * 0.1;
+      c.lineWidth = near ? 1.2 : 0.7;
+      c.beginPath();
       c.moveTo(sx, sy);
-      c.lineTo(sx - 4, sy + 15);
+      c.lineTo(sx - length * 0.26, sy + length);
+      c.stroke();
     }
-    c.stroke();
     c.globalAlpha = 1;
     c.restore();
   }
@@ -129,6 +159,7 @@ export function drawLeaks(
   t: number,
   dt: number,
   leaks: Leak[],
+  lights: SignLight[],
 ): number {
   let landed = 0;
   for (const leak of leaks) {
@@ -151,6 +182,22 @@ export function drawLeaks(
     // Water gathering at the ceiling before it goes.
     c.globalAlpha = 0.4 * (1 - progress);
     c.fillRect(Math.round(x) - 1, leak.from - 2, 3, 3);
+    // Mid-fall catch: as the drop passes a lamp's own height it turns into a
+    // lens for a frame or two. Binary, like every other specular here — the
+    // angle lines up or it does not.
+    let caught: SignLight | null = null;
+    for (const light of lights) {
+      if (Math.abs(light.x - leak.x) > 260) continue;
+      if (Math.abs(drop - light.y) > 9) continue;
+      caught = light;
+      break;
+    }
+    if (caught) {
+      const power = flickerOf(caught, t) * Math.min(1, caught.intensity);
+      c.globalAlpha = 1;
+      drawFlare(c, x, drop, 0.075, 0.85 * power, caught.color);
+    }
+
     // The ring where the last one landed.
     const ring = progress < 0.35 ? progress / 0.35 : 0;
     if (ring > 0) {
@@ -202,12 +249,64 @@ export function drawPuddles(
     oval(
       p.rx,
       (g) => {
-        g.addColorStop(0, 'rgba(9,18,22,0.46)');
-        g.addColorStop(0.7, 'rgba(9,18,22,0.2)');
+        g.addColorStop(0, 'rgba(9,18,22,0.4)');
+        g.addColorStop(0.7, 'rgba(9,18,22,0.18)');
         g.addColorStop(1, 'rgba(9,18,22,0)');
       },
       1,
     );
+
+    // What actually makes a puddle read as one: the room standing in it.
+    //
+    // The slice sampled is deliberately tall — most of the wall above the
+    // water, not the strip directly over it. Sampling just above the surface
+    // only ever finds more floor, which is dark and featureless, and the
+    // reflection disappears. Squashing a tall slice into a shallow band is
+    // also what a real puddle does at this grazing an angle.
+    const band = Math.max(6, Math.round(p.ry * 1.9));
+    const width = Math.round(p.rx * 2);
+    const source = Math.round(Math.min(p.y, 300));
+    if (width > 4 && source > 20) {
+      if (mirror.width !== width || mirror.height !== band) {
+        mirror.width = width;
+        mirror.height = band;
+      }
+      const m = mirror.getContext('2d')!;
+      m.globalCompositeOperation = 'source-over';
+      m.clearRect(0, 0, width, band);
+      m.save();
+      m.translate(0, band);
+      m.scale(1, -1);
+      m.drawImage(
+        c.canvas,
+        Math.round(x - p.rx),
+        Math.round(p.y - source),
+        width,
+        source,
+        Math.round(Math.sin(t * 1.3 + p.x) * 1.5),
+        0,
+        width,
+        band,
+      );
+      m.restore();
+      // Fade at every edge so nothing draws the puddle's boundary.
+      m.globalCompositeOperation = 'destination-in';
+      const mask = m.createRadialGradient(width / 2, band / 2, 0, width / 2, band / 2, width / 2);
+      mask.addColorStop(0, 'rgba(0,0,0,0.95)');
+      mask.addColorStop(0.55, 'rgba(0,0,0,0.55)');
+      mask.addColorStop(1, 'rgba(0,0,0,0)');
+      m.fillStyle = mask;
+      m.fillRect(0, 0, width, band);
+      // Composited additively: a reflection of a dark room drawn normally is
+      // just more dark, and vanishes. Adding it keeps only what is actually
+      // bright up there — the bulb, the lit canvas, the receiver — which is
+      // the part a wet floor would show anyway.
+      c.save();
+      c.globalCompositeOperation = 'lighter';
+      c.globalAlpha = 0.72;
+      c.drawImage(mirror, Math.round(x - p.rx), Math.round(p.y - band * 0.35));
+      c.restore();
+    }
 
     c.globalCompositeOperation = 'lighter';
     for (const light of lights) {
@@ -219,7 +318,7 @@ export function drawPuddles(
       const wobble = Math.sin(t * 1.7 + light.x) * 2;
       const reach = Math.min(p.rx * 0.8, 44);
       c.save();
-      c.globalAlpha = Math.min(0.4, power * 0.28);
+      c.globalAlpha = Math.min(0.55, power * 0.42);
       c.translate(lx + wobble, p.y);
       c.scale(0.55, p.ry / p.rx);
       const g = c.createRadialGradient(0, 0, 0, 0, 0, reach);

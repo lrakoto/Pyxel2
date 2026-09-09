@@ -266,7 +266,7 @@ export class Renderer {
       if (water.openings) drawOpenings(c, cam, t, water.openings);
       if (water.panes) drawPanes(c, cam, t, water.panes);
       if (water.leaks) {
-        const landed = drawLeaks(c, cam, t, v.reducedMotion ? 0 : v.dt, water.leaks);
+        const landed = drawLeaks(c, cam, t, v.reducedMotion ? 0 : v.dt, water.leaks, world.lights);
         for (let i = 0; i < landed; i++) this.cue?.('drip', 1);
       }
     }

@@ -276,10 +276,13 @@ export const AREAS: Record<AreaId, Area> = {
         { x: 300, from: 34, to: 464 },
         { x: 1150, from: 28, to: 474 },
       ],
+      // Water pools under the leaks, and reads where there is something
+      // bright overhead for it to hold: the doorway, the bulb, the receiver.
       puddles: [
-        { x: 250, y: 468, rx: 105, ry: 15 },
-        { x: 640, y: 500, rx: 130, ry: 18 },
-        { x: 1150, y: 478, rx: 95, ry: 14 },
+        { x: 150, y: 458, rx: 105, ry: 16 },
+        { x: 300, y: 464, rx: 112, ry: 17 },
+        { x: 788, y: 472, rx: 152, ry: 22 },
+        { x: 1150, y: 462, rx: 118, ry: 18 },
       ],
     },
     hotspots: [
@@ -340,9 +343,10 @@ export const AREAS: Record<AreaId, Area> = {
         { x: 1290, from: 44, to: 466 },
       ],
       puddles: [
-        { x: 380, y: 470, rx: 120, ry: 16 },
-        { x: 900, y: 495, rx: 150, ry: 18 },
-        { x: 1300, y: 468, rx: 100, ry: 14 },
+        { x: 120, y: 458, rx: 108, ry: 17 },
+        { x: 430, y: 466, rx: 124, ry: 19 },
+        { x: 823, y: 480, rx: 168, ry: 24 },
+        { x: 1250, y: 460, rx: 122, ry: 18 },
       ],
     },
     hotspots: [

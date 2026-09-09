@@ -22,8 +22,8 @@ Covers the lighting, crowd, traffic, flare and interior-air work.
 
 | Payload | September 4 | September 8 |
 | --- | ---: | ---: |
-| JavaScript | 70.02 kB | 95.35 kB |
-| JavaScript, gzip | 24.43 kB | 33.31 kB |
+| JavaScript | 70.02 kB | 96.76 kB |
+| JavaScript, gzip | 24.43 kB | 33.76 kB |
 | CSS | 32.92 kB | 32.92 kB |
 | CSS, gzip | 8.14 kB | 8.14 kB |
 
@@ -64,7 +64,10 @@ its own. Specific behaviours confirmed this way:
 * pedestrians are opaque, grounded, and their legs meet the coat hem;
 * interior light positions land on the painted fixtures;
 * rain shows through the studio doorway, droplets stay inside their panes,
-  and leaks land in the puddles they are aimed at.
+  and leaks land in the puddles they are aimed at;
+* interior puddles measure brighter than the floor beside them — the one
+  under the studio bulb reads about 59% above the floor to its left — which
+  is how their visibility was judged rather than by eye.
 
 Audio was **not** verified by listening. The graph is built from the same
 oscillator and noise primitives already in use, the new cues are wired from
