@@ -269,7 +269,7 @@ export class Renderer {
       if (water.openings) drawOpenings(c, cam, t, water.openings);
       if (water.panes) drawPanes(c, cam, t, water.panes);
       if (water.leaks) {
-        const landed = drawLeaks(c, cam, t, v.reducedMotion ? 0 : v.dt, water.leaks, world.lights);
+        const landed = drawLeaks(c, cam, t, v.reducedMotion ? 0 : v.dt, water.leaks);
         for (let i = 0; i < landed; i++) this.cue?.('drip', 1);
       }
     }
@@ -553,7 +553,7 @@ export class Renderer {
 
     // Dust, lit by whatever it is drifting past.
     c.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < 130; i++) {
+    for (let i = 0; i < 168; i++) {
       const seed = i * 97.3;
       const x = (((i * 137.5 + Math.sin(t * 0.32 + seed) * 26 - cam * 0.6) % W) + W) % W;
       const y = ((i * 61.7 + t * (7 + (i % 5) * 3)) % 430) + 40;
@@ -569,7 +569,7 @@ export class Renderer {
           }
         }
       }
-      c.globalAlpha = Math.min(0.5, lit * 0.34);
+      c.globalAlpha = Math.min(0.55, lit * 0.42);
       c.fillStyle = tone;
       const size = i % 7 === 0 ? 2 : 1;
       c.fillRect(Math.round(x), Math.round(y), size, size);

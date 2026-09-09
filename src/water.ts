@@ -1,6 +1,5 @@
 import type { SignLight } from './content.ts';
 import { flickerOf } from './lighting.ts';
-import { drawFlare } from './flare.ts';
 
 /** Deterministic per-index noise, so nothing has to carry state. */
 function hash(i: number, salt: number): number {
@@ -162,7 +161,6 @@ export function drawLeaks(
   t: number,
   dt: number,
   leaks: Leak[],
-  lights: SignLight[],
 ): number {
   let landed = 0;
   for (const leak of leaks) {
@@ -185,24 +183,6 @@ export function drawLeaks(
     // Water gathering at the ceiling before it goes.
     c.globalAlpha = 0.4 * (1 - progress);
     c.fillRect(Math.round(x) - 1, leak.from - 2, 3, 3);
-    // Mid-fall catch. The reflection point is a fixed height — the one where
-    // the lamp, the drop and the camera line up — so the flash is drawn there
-    // and not on the drop. Painting it at the drop's own position makes the
-    // glint appear to ride the water down, which is the one thing a
-    // stationary light cannot do. The window is a couple of frames wide.
-    let caught: SignLight | null = null;
-    for (const light of lights) {
-      if (Math.abs(light.x - leak.x) > 260) continue;
-      if (Math.abs(drop - light.y) > 4) continue;
-      caught = light;
-      break;
-    }
-    if (caught) {
-      const power = flickerOf(caught, t) * Math.min(1, caught.intensity);
-      c.globalAlpha = 1;
-      drawFlare(c, x, caught.y, 0.07, 0.9 * power, caught.color);
-    }
-
     // The ring where the last one landed.
     const ring = progress < 0.35 ? progress / 0.35 : 0;
     if (ring > 0) {
@@ -268,9 +248,13 @@ export function drawPuddles(
     // only ever finds more floor, which is dark and featureless, and the
     // reflection disappears. Squashing a tall slice into a shallow band is
     // also what a real puddle does at this grazing an angle.
-    const band = Math.max(6, Math.round(p.ry * 1.9));
+    // Compression is a balance: too little and the reflection is a mirror,
+    // too much and whatever is standing in it is squashed into a smear. A
+    // shallow band holding most of the wall was doing the latter, so the band
+    // is deeper and the slice it samples is shorter.
+    const band = Math.max(8, Math.round(p.ry * 3.4));
     const width = Math.round(p.rx * 2);
-    const source = Math.round(Math.min(p.y, 300));
+    const source = Math.round(Math.min(p.y, 210));
     if (width > 4 && source > 20) {
       if (mirror.width !== width || mirror.height !== band) {
         mirror.width = width;
@@ -294,13 +278,23 @@ export function drawPuddles(
         band,
       );
       m.restore();
-      // Fade at every edge so nothing draws the puddle's boundary.
+      // Fade on both axes so nothing draws the puddle's boundary. A radial
+      // alone leaves a hard cut across a band this wide and shallow, because
+      // its falloff is set by the width and never reaches the top or bottom.
       m.globalCompositeOperation = 'destination-in';
-      const mask = m.createRadialGradient(width / 2, band / 2, 0, width / 2, band / 2, width / 2);
-      mask.addColorStop(0, 'rgba(0,0,0,0.95)');
-      mask.addColorStop(0.55, 'rgba(0,0,0,0.55)');
-      mask.addColorStop(1, 'rgba(0,0,0,0)');
-      m.fillStyle = mask;
+      const across = m.createLinearGradient(0, 0, width, 0);
+      across.addColorStop(0, 'rgba(0,0,0,0)');
+      across.addColorStop(0.35, 'rgba(0,0,0,0.95)');
+      across.addColorStop(0.65, 'rgba(0,0,0,0.95)');
+      across.addColorStop(1, 'rgba(0,0,0,0)');
+      m.fillStyle = across;
+      m.fillRect(0, 0, width, band);
+      // Strongest at the water line and fading with distance from it.
+      const down = m.createLinearGradient(0, 0, 0, band);
+      down.addColorStop(0, 'rgba(0,0,0,0.95)');
+      down.addColorStop(0.55, 'rgba(0,0,0,0.6)');
+      down.addColorStop(1, 'rgba(0,0,0,0)');
+      m.fillStyle = down;
       m.fillRect(0, 0, width, band);
       // Composited additively: a reflection of a dark room drawn normally is
       // just more dark, and vanishes. Adding it keeps only what is actually
@@ -309,7 +303,7 @@ export function drawPuddles(
       c.save();
       c.globalCompositeOperation = 'lighter';
       c.globalAlpha = 0.72;
-      c.drawImage(mirror, Math.round(x - p.rx), Math.round(p.y - band * 0.35));
+      c.drawImage(mirror, Math.round(x - p.rx), Math.round(p.y - band * 0.22));
       c.restore();
     }
 
