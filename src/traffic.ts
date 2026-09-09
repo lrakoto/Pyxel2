@@ -161,8 +161,13 @@ export class Traffic {
     return g;
   }
 
-  /** Cars live in screen space: a pass is over before the camera moves far. */
-  step(dt: number, viewWidth: number) {
+  /**
+   * Cars live in screen space: a pass is over before the camera moves far.
+   * Returns the lane scale of any car that crossed the middle of the frame
+   * this step, so the caller can sound it without the renderer knowing that
+   * audio exists.
+   */
+  step(dt: number, viewWidth: number): number[] {
     this.next -= dt;
     if (this.next <= 0) {
       this.next = GAP_MIN + Math.random() * (GAP_MAX - GAP_MIN);
@@ -181,8 +186,15 @@ export class Traffic {
         tint,
       });
     }
-    for (const car of this.cars) car.x += car.dir * car.speed * dt;
+    const passed: number[] = [];
+    const middle = viewWidth / 2;
+    for (const car of this.cars) {
+      const before = car.x;
+      car.x += car.dir * car.speed * dt;
+      if (before < middle !== car.x < middle) passed.push(LANES[car.lane].scale);
+    }
     this.cars = this.cars.filter((car) => car.x > -460 && car.x < viewWidth + 460);
+    return passed;
   }
 
   /**

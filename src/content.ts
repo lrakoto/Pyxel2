@@ -1,3 +1,4 @@
+import type { AreaWater } from './water.ts';
 export type AreaId = 'street' | 'studio' | 'den';
 export type ClueId =
   | 'camera'
@@ -182,6 +183,8 @@ export interface Area {
   ground: number;
   /** Neon and practicals feeding the wet-rim glow. */
   lights: SignLight[];
+  /** Rain, leaks and standing water. Positions measured off the plate. */
+  water?: AreaWater;
   hotspots: Hotspot[];
 }
 export const AREAS: Record<AreaId, Area> = {
@@ -261,6 +264,24 @@ export const AREAS: Record<AreaId, Area> = {
       { x: 1251, y: 236, color: '#4fe6e0', intensity: 1.6, flicker: 0.25, flare: 0.22 }, // neural receiver
       { x: 60, y: 330, color: '#ffb066', intensity: 0.9 }, // street through the door
     ],
+    water: {
+      // The doorway at the far left looks out on the wet street.
+      openings: [{ x: 20, y: 40, w: 78, h: 380 }],
+      // The two slatted windows high on the back wall.
+      panes: [
+        { x: 500, y: 46, w: 120, h: 92 },
+        { x: 1010, y: 48, w: 175, h: 95 },
+      ],
+      leaks: [
+        { x: 300, from: 34, to: 464 },
+        { x: 1150, from: 28, to: 474 },
+      ],
+      puddles: [
+        { x: 250, y: 468, rx: 105, ry: 15 },
+        { x: 640, y: 500, rx: 130, ry: 18 },
+        { x: 1150, y: 478, rx: 95, ry: 14 },
+      ],
+    },
     hotspots: [
       {
         id: 'street-exit',
@@ -307,6 +328,23 @@ export const AREAS: Record<AreaId, Area> = {
       { x: 823, y: 201, color: '#5ef0ea', intensity: 2.4, flicker: 0.18, flare: 0.34 }, // memory column
       { x: 1196, y: 195, color: '#4fd6e8', intensity: 1.3, flicker: 0.6 }, // monitor wall
     ],
+    // Below the grid, so nothing to see out of: the weather gets in as
+    // condensation on the archive glass and as leaks from the pipe runs.
+    water: {
+      panes: [
+        { x: 570, y: 130, w: 200, h: 258 },
+        { x: 960, y: 130, w: 190, h: 250 },
+      ],
+      leaks: [
+        { x: 430, from: 40, to: 452 },
+        { x: 1290, from: 44, to: 466 },
+      ],
+      puddles: [
+        { x: 380, y: 470, rx: 120, ry: 16 },
+        { x: 900, y: 495, rx: 150, ry: 18 },
+        { x: 1300, y: 468, rx: 100, ry: 14 },
+      ],
+    },
     hotspots: [
       {
         id: 'den-exit',

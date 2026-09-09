@@ -146,6 +146,13 @@ class Game {
       this.syncHotspots();
     });
     this.resizeObserver.observe($('stage'));
+    // The renderer reports what happens in the scene; the audio engine
+    // decides what it sounds like.
+    this.renderer.cue = (kind, strength) => {
+      if (kind === 'traffic') this.audio.traffic(strength);
+      else if (kind === 'drip') this.audio.drip();
+      else this.audio.train();
+    };
     this.renderer
       .load()
       .then(() => {

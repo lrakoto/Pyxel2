@@ -22,14 +22,16 @@ Covers the lighting, crowd, traffic, flare and interior-air work.
 
 | Payload | September 4 | September 8 |
 | --- | ---: | ---: |
-| JavaScript | 70.02 kB | 89.38 kB |
-| JavaScript, gzip | 24.43 kB | 31.35 kB |
+| JavaScript | 70.02 kB | 95.35 kB |
+| JavaScript, gzip | 24.43 kB | 33.31 kB |
 | CSS | 32.92 kB | 32.92 kB |
 | CSS, gzip | 8.14 kB | 8.14 kB |
 
-Roughly 19 kB of uncompressed JavaScript for six new modules: `lighting`,
-`rim-mask`, `flare`, `scarf`, `pedestrians`, `traffic` and `sheen`. No new art
-assets were added; the environment plates are unchanged.
+Roughly 25 kB of uncompressed JavaScript for eight new modules: `lighting`,
+`rim-mask`, `flare`, `scarf`, `pedestrians`, `traffic`, `sheen` and `water`.
+No new art or audio assets were added — the environment plates are unchanged,
+and the new sound is synthesised from the ambience graph's existing noise
+buffer rather than shipped as samples.
 
 ### Render cost
 
@@ -60,7 +62,15 @@ its own. Specific behaviours confirmed this way:
 * both catches are binary, confirmed across consecutive frames — full
   brightness on one, nothing on the next;
 * pedestrians are opaque, grounded, and their legs meet the coat hem;
-* interior light positions land on the painted fixtures.
+* interior light positions land on the painted fixtures;
+* rain shows through the studio doorway, droplets stay inside their panes,
+  and leaks land in the puddles they are aimed at.
+
+Audio was **not** verified by listening. The graph is built from the same
+oscillator and noise primitives already in use, the new cues are wired from
+renderer events, and the drip cue was confirmed to fire twice in four seconds
+of studio time — but no one has heard any of it. The mix balance between the
+crowd bed, traffic rumble, train pass and footsteps is unproven.
 
 ### Not re-validated
 

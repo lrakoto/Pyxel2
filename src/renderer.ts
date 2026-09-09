@@ -9,6 +9,7 @@ import { Traffic } from './traffic.ts';
 import { rimAt, flickerOf } from './lighting.ts';
 import { buildSheen } from './sheen.ts';
 import { drawFlare } from './flare.ts';
+import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
 export const W = 960,
   H = 540;
 /** Carriages in the elevated train, and how fast it crosses the city. */
@@ -55,6 +56,13 @@ export class Renderer {
   /** Warm bloom sprite reused for every lit window in the middle distance. */
   private windowGlow = this.radial('#ffcf8a', 32);
   private scarf = new Scarf();
+  /**
+   * Scene events worth hearing. The renderer knows when a car crosses the
+   * frame or the train arrives; it should not know what a speaker is, so it
+   * reports and lets the caller decide.
+   */
+  cue: ((kind: 'traffic' | 'train' | 'drip', strength: number) => void) | null = null;
+  private trainHead = 0;
   private crowd = new Crowd(CROWD, AREAS.street.width);
   private traffic = new Traffic();
   private lastArea: AreaId | null = null;
@@ -201,6 +209,8 @@ export class Renderer {
     }
     c.globalCompositeOperation = 'source-over';
     c.globalAlpha = 1;
+    if (world.water?.puddles && area !== 'street')
+      drawPuddles(c, cam, t, world.water.puddles, world.lights);
     if (area === 'street') {
       if (!v.reducedMotion) this.crowd.step(v.dt);
       this.crowd.draw(c, cam, t, world.ground);
@@ -251,8 +261,18 @@ export class Renderer {
     }
     if (area === 'street') this.weather(c, t, cam, v.reducedMotion);
     else this.interiorAir(c, cam, t, world.lights);
+    const water = world.water;
+    if (water && area !== 'street') {
+      if (water.openings) drawOpenings(c, cam, t, water.openings);
+      if (water.panes) drawPanes(c, cam, t, water.panes);
+      if (water.leaks) {
+        const landed = drawLeaks(c, cam, t, v.reducedMotion ? 0 : v.dt, water.leaks);
+        for (let i = 0; i < landed; i++) this.cue?.('drip', 1);
+      }
+    }
     if (area === 'street') {
-      if (!v.reducedMotion) this.traffic.step(v.dt, W);
+      if (!v.reducedMotion)
+        for (const strength of this.traffic.step(v.dt, W)) this.cue?.('traffic', strength);
       this.traffic.draw(c, cam, world.lights, t);
     }
     // Near-camera architecture moves faster than the street, making depth legible.
@@ -425,6 +445,10 @@ export class Renderer {
   private drawTrain(c: CanvasRenderingContext2D, cam: number, t: number) {
     const width = c.canvas.width;
     const head = ((t * TRAIN_SPEED + 190) % 2900) - 700 - cam * PARALLAX.midground;
+    // Sound the pass once, as the head reaches the middle of the frame.
+    const middle = width / 2;
+    if (this.trainHead < middle && head >= middle) this.cue?.('train', 1);
+    this.trainHead = head;
     const mirrors = TRAIN_MIRRORS.map((mirror) => ({
       x: mirror.x - cam * PARALLAX.midground,
       strength: mirror.strength,
@@ -526,7 +550,7 @@ export class Renderer {
 
     // Dust, lit by whatever it is drifting past.
     c.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 130; i++) {
       const seed = i * 97.3;
       const x = (((i * 137.5 + Math.sin(t * 0.32 + seed) * 26 - cam * 0.6) % W) + W) % W;
       const y = ((i * 61.7 + t * (7 + (i % 5) * 3)) % 430) + 40;
