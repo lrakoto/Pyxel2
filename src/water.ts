@@ -129,7 +129,7 @@ export function drawPanes(c: CanvasRenderingContext2D, cam: number, t: number, p
     for (let i = 0; i < 16; i++) {
       const seed = i * 127.3 + p.x * 0.31;
       const runner = i % 4 === 0;
-      const period = runner ? 6 + (seed % 5) : 26 + (seed % 17);
+      const period = runner ? 3.2 + (seed % 3) : 22 + (seed % 15);
       const phase = (((t + seed) % period) + period) % period;
       const progress = (phase / period) ** (runner ? 2 : 1.2);
       const dx = x + ((seed * 37.7) % p.w);
@@ -166,7 +166,10 @@ export function drawLeaks(
   for (const leak of leaks) {
     const x = leak.x - cam;
     if (x < -20 || x > c.canvas.width + 20) continue;
-    const period = 2.4 + (leak.x % 13) * 0.1;
+    // Water falls fast. A drop crossing a room-height gap over two and a half
+    // seconds averages well under walking pace, which is what reads as floaty
+    // however hard the easing works.
+    const period = 1.05 + (leak.x % 13) * 0.055;
     const offset = leak.x * 0.017;
     const now = (t + offset) / period;
     if (Math.floor(now) !== Math.floor((t - dt + offset) / period)) landed++;
@@ -176,7 +179,7 @@ export function drawLeaks(
     c.save();
     c.globalCompositeOperation = 'lighter';
     // The drop, stretched by how fast it is going.
-    const stretch = 2 + progress * 6;
+    const stretch = 2 + progress * 9;
     c.fillStyle = '#cfe4f0';
     c.globalAlpha = 0.65;
     c.fillRect(Math.round(x), Math.round(drop), 1, stretch);
