@@ -87,16 +87,19 @@ export function drawOpenings(
     c.fillRect(x, o.y, o.w, o.h);
 
     c.lineCap = 'round';
-    for (let i = 0; i < 34; i++) {
-      const near = hash(i, 3) > 0.82;
-      const speed = near ? 620 + hash(i, 4) * 220 : 260 + hash(i, 5) * 180;
-      const length = near ? 20 + hash(i, 6) * 12 : 8 + hash(i, 7) * 9;
+    // Fine droplets rather than streaks: seen through a doorway across a
+    // street, rain is a spatter of small marks, and long strokes read as a
+    // downpour running down the glass of the camera instead.
+    for (let i = 0; i < 54; i++) {
+      const near = hash(i, 3) > 0.86;
+      const speed = near ? 560 + hash(i, 4) * 200 : 250 + hash(i, 5) * 160;
+      const length = near ? 7 + hash(i, 6) * 4 : 2.5 + hash(i, 7) * 3;
       const sx = x + hash(i, 1) * o.w;
       const span = o.h + length + 30;
       const sy = o.y - length + ((hash(i, 2) * span + t * speed) % span);
       c.strokeStyle = '#cfe4f0';
-      c.globalAlpha = (near ? 0.4 : 0.13) + hash(i, 8) * 0.1;
-      c.lineWidth = near ? 1.2 : 0.7;
+      c.globalAlpha = (near ? 0.34 : 0.12) + hash(i, 8) * 0.09;
+      c.lineWidth = near ? 0.85 : 0.5;
       c.beginPath();
       c.moveTo(sx, sy);
       c.lineTo(sx - length * 0.26, sy + length);
@@ -182,20 +185,22 @@ export function drawLeaks(
     // Water gathering at the ceiling before it goes.
     c.globalAlpha = 0.4 * (1 - progress);
     c.fillRect(Math.round(x) - 1, leak.from - 2, 3, 3);
-    // Mid-fall catch: as the drop passes a lamp's own height it turns into a
-    // lens for a frame or two. Binary, like every other specular here — the
-    // angle lines up or it does not.
+    // Mid-fall catch. The reflection point is a fixed height — the one where
+    // the lamp, the drop and the camera line up — so the flash is drawn there
+    // and not on the drop. Painting it at the drop's own position makes the
+    // glint appear to ride the water down, which is the one thing a
+    // stationary light cannot do. The window is a couple of frames wide.
     let caught: SignLight | null = null;
     for (const light of lights) {
       if (Math.abs(light.x - leak.x) > 260) continue;
-      if (Math.abs(drop - light.y) > 9) continue;
+      if (Math.abs(drop - light.y) > 4) continue;
       caught = light;
       break;
     }
     if (caught) {
       const power = flickerOf(caught, t) * Math.min(1, caught.intensity);
       c.globalAlpha = 1;
-      drawFlare(c, x, drop, 0.075, 0.85 * power, caught.color);
+      drawFlare(c, x, caught.y, 0.07, 0.9 * power, caught.color);
     }
 
     // The ring where the last one landed.

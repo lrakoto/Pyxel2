@@ -209,8 +209,6 @@ export class Renderer {
     }
     c.globalCompositeOperation = 'source-over';
     c.globalAlpha = 1;
-    if (world.water?.puddles && area !== 'street')
-      drawPuddles(c, cam, t, world.water.puddles, world.lights);
     if (area === 'street') {
       if (!v.reducedMotion) this.crowd.step(v.dt);
       this.crowd.draw(c, cam, t, world.ground);
@@ -245,6 +243,11 @@ export class Renderer {
     if (v.combat) {
       this.drawCombat(c, v, figure, world.ground);
     }
+    // Puddles come after the actors, so what is standing over them lands in
+    // them. They sit below the interior floor line, so nothing they draw can
+    // cover the figure casting the reflection.
+    if (world.water?.puddles && area !== 'street')
+      drawPuddles(c, cam, t, world.water.puddles, world.lights);
     if (area === 'street') this.drawReflections(c, cam, t);
     if (v.scan && !v.title) {
       c.fillStyle = '#7ad2c205';
