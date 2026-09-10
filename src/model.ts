@@ -120,6 +120,56 @@ export class CaseModel {
     if (match && !this.save.deductions.includes(match.id)) this.save.deductions.push(match.id);
     return match ?? null;
   }
+
+  /**
+   * Why a pairing failed, in Cole's voice.
+   *
+   * A single flat rejection for all thirty-six pairs teaches the player
+   * nothing and leaves brute force as the only strategy, which is a poor
+   * showing for a game about deduction. This grades the miss instead:
+   *
+   *  - `spent` — one of the two is already accounted for, so the player is
+   *    re-treading rather than reasoning;
+   *  - `warm` — exactly one of them belongs to a conclusion still open. The
+   *    partner is never named, so this rewards a half-right idea without
+   *    handing over the answer;
+   *  - `kind` — both records are the same category, and a conclusion has to
+   *    bridge two different sorts of evidence;
+   *  - `cold` — neither leads anywhere.
+   */
+  explain(a: ClueId, b: ClueId): { reason: 'spent' | 'warm' | 'kind' | 'cold'; text: string } {
+    const open = DEDUCTIONS.filter((d) => !this.save.deductions.includes(d.id));
+    const solvedWith = (id: ClueId) =>
+      DEDUCTIONS.some((d) => this.save.deductions.includes(d.id) && d.pair.includes(id));
+    const live = (id: ClueId) => open.some((d) => d.pair.includes(id));
+
+    if (solvedWith(a) || solvedWith(b))
+      return {
+        reason: 'spent',
+        text: 'One of these has already given up what it had. Try the records that have not.',
+      };
+
+    const liveA = live(a);
+    const liveB = live(b);
+    if (liveA !== liveB) {
+      const carries = CLUES[liveA ? a : b].title.toLowerCase();
+      return {
+        reason: 'warm',
+        text: `“${carries}” is going to matter. Not with this, though. Keep it and find the other half.`,
+      };
+    }
+
+    if (CLUES[a].category === CLUES[b].category)
+      return {
+        reason: 'kind',
+        text: 'Two records of the same kind. A conclusion has to bridge one sort of evidence to another.',
+      };
+
+    return {
+      reason: 'cold',
+      text: 'Nothing holds these two together. Read them again and look for what one explains about the other.',
+    };
+  }
 }
 export const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 export interface Body {

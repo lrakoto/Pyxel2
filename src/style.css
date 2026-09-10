@@ -1213,6 +1213,21 @@ button {
 .deduction.solved > span {
   color: var(--teal);
 }
+/* The two records a solved theory was drawn from, so the board reads back
+   as reasoning rather than as a list of unlocked text. */
+.deduction-pair {
+  display: block;
+  margin-top: 10px;
+  font: 10px var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6f877a;
+}
+.deduction-pair i {
+  color: var(--teal);
+  font-style: normal;
+  padding: 0 4px;
+}
 .deduction.solved h3 {
   color: #d4dfce;
 }

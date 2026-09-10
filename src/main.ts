@@ -732,7 +732,12 @@ class Game {
       .join('');
     const deductions = DEDUCTIONS.map((d, i) => {
       const solved = this.model.save.deductions.includes(d.id);
-      return `<article class="deduction ${solved ? 'solved' : ''}"><span>${solved ? '✓' : String(i + 1).padStart(2, '0')}</span><div><h3>${solved ? d.title : ['What happened to Marlon?', 'What is inside the painting?', 'Who is the first one?'][i]}</h3><p>${solved ? d.conclusion : ['Compare the machine with what it left behind.', 'Look for a personal account of the faces.', 'His last words point to something he painted.'][i]}</p></div></article>`;
+      // A solved theory records the two records that made it, so the board
+      // reads back as reasoning rather than as a list of unlocked text.
+      const workings = solved
+        ? `<span class="deduction-pair">${d.pair.map((id) => CLUES[id].title).join(' <i>↔</i> ')}</span>`
+        : '';
+      return `<article class="deduction ${solved ? 'solved' : ''}"><span>${solved ? '✓' : String(i + 1).padStart(2, '0')}</span><div><h3>${solved ? d.title : d.question}</h3><p>${solved ? d.conclusion : d.hint}</p>${workings}</div></article>`;
     }).join('');
     this.panel(
       'The Graves case',
@@ -857,10 +862,11 @@ class Game {
           this.renderBoard(d.conclusion);
           if (!wasDeduced && this.model.deduced)
             this.toast('THE CASE HAS A NEW LEAD', 'Someone is waiting outside the Memory Den.');
-        } else
-          this.renderBoard(
-            'Not enough to support a conclusion. Compare the details in the records and try another pair.',
-          );
+        } else {
+          const miss = this.model.explain(a, b);
+          this.audio.tone(miss.reason === 'warm' ? 196 : 147, 0.18, 0.05, 'sine');
+          this.renderBoard(miss.text);
+        }
         break;
       }
       case 'new':

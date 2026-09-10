@@ -107,12 +107,22 @@ export interface Deduction {
   pair: [ClueId, ClueId];
   title: string;
   conclusion: string;
+  /**
+   * What the board asks while the theory is open, and the nudge under it.
+   * These used to be positional arrays indexed alongside DEDUCTIONS in the
+   * board markup, which meant reordering the deductions silently attached
+   * each question to the wrong theory.
+   */
+  question: string;
+  hint: string;
 }
 export const DEDUCTIONS: Deduction[] = [
   {
     id: 'harvest',
     pair: ['device', 'residue'],
     title: 'A mind was harvested',
+    question: 'What happened to Marlon?',
+    hint: 'Compare the machine with what it left behind.',
     conclusion:
       'The receiver and the residue tell the same story. Marlon’s creative patterns were extracted through his implants. His death was the cost, not the purpose.',
   },
@@ -120,6 +130,8 @@ export const DEDUCTIONS: Deduction[] = [
     id: 'voices',
     pair: ['painting', 'diary'],
     title: 'The painting holds witnesses',
+    question: 'What is inside the painting?',
+    hint: 'Look for a personal account of the faces.',
     conclusion:
       'The voices in the diary belong to the faces in the painting. Marlon made an archive of the people inside him. His last work is evidence.',
   },
@@ -127,6 +139,8 @@ export const DEDUCTIONS: Deduction[] = [
     id: 'first',
     pair: ['writing', 'portrait'],
     title: 'Find archive zero-zero-one',
+    question: 'Who is the first one?',
+    hint: 'His last words point to something he painted.',
     conclusion:
       '“The first one” is the woman in the earliest portrait, numbered 001. Someone who deals in memories might still know where to find hers.',
   },

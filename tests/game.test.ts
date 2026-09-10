@@ -51,6 +51,47 @@ test('clues grant once and deductions require two collected, matching pieces', (
   m.connect('painting', 'diary');
   assert.deepEqual(m.save.deductions, ['voices']);
 });
+test('a failed connection is graded, and a warm miss never names the partner', () => {
+  const m = new CaseModel();
+  (Object.keys(CLUES) as ClueId[]).forEach((id) => m.collect(id));
+  const [live, partner] = DEDUCTIONS[0].pair;
+
+  // Exactly one half of an open conclusion: warm, and it must name only the
+  // record the player already holds — never the one they still have to find.
+  const inert = (Object.keys(CLUES) as ClueId[]).find(
+    (id) => !DEDUCTIONS.some((d) => d.pair.includes(id)),
+  )!;
+  const warm = m.explain(live, inert);
+  assert.equal(warm.reason, 'warm');
+  assert.ok(warm.text.includes(CLUES[live].title.toLowerCase()));
+  assert.ok(!warm.text.toLowerCase().includes(CLUES[partner].title.toLowerCase()));
+
+  // Same category, neither live: rejected on kind rather than on content.
+  const pairs: [ClueId, ClueId][] = [];
+  const ids = (Object.keys(CLUES) as ClueId[]).filter(
+    (id) => !DEDUCTIONS.some((d) => d.pair.includes(id)),
+  );
+  for (const a of ids)
+    for (const b of ids) if (a !== b && CLUES[a].category === CLUES[b].category) pairs.push([a, b]);
+  if (pairs.length) assert.equal(m.explain(...pairs[0]).reason, 'kind');
+
+  // Once a conclusion is drawn, its records report as spent.
+  m.connect(live, partner);
+  assert.equal(m.explain(live, inert).reason, 'spent');
+});
+
+test('every deduction carries its own question and hint', () => {
+  // These were positional arrays in the board markup; reordering DEDUCTIONS
+  // used to silently attach each question to the wrong theory.
+  for (const d of DEDUCTIONS) {
+    assert.ok(d.question.length > 0, `${d.id} has no question`);
+    assert.ok(d.hint.length > 0, `${d.id} has no hint`);
+    assert.notEqual(d.question, d.title);
+  }
+  const questions = new Set(DEDUCTIONS.map((d) => d.question));
+  assert.equal(questions.size, DEDUCTIONS.length);
+});
+
 test('all six discovery orders lead to the same case objective', () => {
   for (const order of [
     [0, 1, 2],
