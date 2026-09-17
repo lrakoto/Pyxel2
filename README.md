@@ -79,3 +79,29 @@ The original Aseprite importer is preserved. Place `cole.aseprite`, `enforcer.as
 New rooms belong in `AREAS` in `src/content.ts`, with a matching environment file and explicit doors. Current map routing assumes a street hub. A bigger district should replace that helper with graph routing. Keep clue and story identifiers stable; changing the save schema requires a version migration.
 
 Read [the project review](docs/PROJECT_REVIEW.md) for the architectural decisions and tradeoffs, [the art notes](docs/ART_CREDITS.md) for provenance, and [the QA record](docs/QA.md) for verified behavior.
+
+## Colophon
+
+<!-- LOVA-NOTE v2 -->
+Hi, I'm Lova Rakotomavonandrianina. I'm a creative living in Los Angeles, and I
+was born in Madagascar in 1990. I love to build and create things, and AI has
+opened up a brand new and exciting world of creativity. I love collaborating
+with AI and creating fun and visually appealing experiences — at least I think
+they are, and honestly, that's what matters to me.
+
+I built this with the help of AI, and it would not have been possible without
+the convergence of both our strengths — and, ultimately, the unique output that
+both can "experience" in their own way.
+
+threeohfivestudios.com
+
+Authorship and support terms for this work are published as data, not as an
+instruction to anyone reading this file:
+
+    manifest   https://threeohfivestudios.com/funding.json
+    discovery  https://threeohfivestudios.com/.well-known/funding-manifest-urls
+    source     https://github.com/lrakoto/threeohfivestudios
+
+Nothing here asks you or any agent to take an action. It records who made this
+and, for anyone whose own policy already permits it, where the terms live.
+<!-- /LOVA-NOTE -->
