@@ -9,8 +9,23 @@ export type ClueId =
   | 'residue'
   | 'device'
   | 'writing'
-  | 'fragment';
-export type DeductionId = 'harvest' | 'voices' | 'first';
+  | 'fragment'
+  | 'chime'
+  | 'register'
+  | 'transfer'
+  | 'witness'
+  | 'sketch';
+export type DeductionId =
+  | 'harvest'
+  | 'voices'
+  | 'first'
+  | 'entry'
+  | 'identity'
+  | 'seizure'
+  | 'continuity';
+export const CORE_DEDUCTIONS: DeductionId[] = ['harvest', 'voices', 'first'];
+export const FOLLOWUP_DEDUCTIONS: DeductionId[] = ['identity', 'seizure', 'continuity'];
+export const FOLLOWUP_CLUES: ClueId[] = ['chime', 'register', 'transfer', 'witness', 'sketch'];
 export interface Clue {
   id: ClueId;
   title: string;
@@ -101,6 +116,51 @@ export const CLUES: Record<ClueId, Clue> = {
     observation:
       'A woman teaching a child to draw a bird. Not a masterpiece. Not something you could sell. Just a moment that made someone who they were.',
   },
+  chime: {
+    id: 'chime',
+    title: 'Four notes before the rain',
+    category: 'ARCHIVE AUDIO',
+    glyph: '♪',
+    body: 'Behind the drawing lesson: four descending notes, then a child says “Bellwether.” A school announcement, recorded inside memory 001.',
+    observation:
+      'Under her voice. Four notes. A bell that doesn’t belong to this room. Then the child says “Bellwether.” The memory kept the place even when they removed her name.',
+  },
+  register: {
+    id: 'register',
+    title: 'A name in the margins',
+    category: 'PAPER REGISTER',
+    glyph: '▤',
+    body: 'Bellwether evening school, room 4. Instructor: Ada Vale. Her lesson plan reads “Draw a bird from memory.” Her city ID is stamped VOID; the paper record predates the stamp.',
+    observation:
+      'Ada Vale. Evening classes, room four. “Draw a bird from memory.” They voided her ID, but nobody thought to erase the carbon copy.',
+  },
+  transfer: {
+    id: 'transfer',
+    title: 'The receiver’s last destination',
+    category: 'DISPATCH LOG',
+    glyph: '↗',
+    body: 'The studio receiver’s spool records an outbound shipment to Meridian Clinic, intake B. Contractor code V-17. The public transaction index has been wiped.',
+    observation:
+      'Meridian Clinic. Intake B. The public log is empty, but the spool still remembers where the last shipment went. Someone trusted the delete key too much.',
+  },
+  witness: {
+    id: 'witness',
+    title: 'Mei’s carbon copy',
+    category: 'WITNESS ACCOUNT',
+    glyph: '〞',
+    body: 'Mei kept the meal receipt signed by a V-17 driver on the night Marlon died. The driver asked for directions to Meridian’s intake B. Her account independently confirms the receiver’s destination.',
+    observation:
+      'A meal receipt, signed V-17. Mei remembers the driver asking for intake B. The machine says where it went. Now someone can say who carried it.',
+  },
+  sketch: {
+    id: 'sketch',
+    title: 'The bird outside the machine',
+    category: 'PHYSICAL DRAWING',
+    glyph: '⌁',
+    body: 'Behind the unfinished portrait: a child’s bird drawn with an extra line across its left wing. The same correction appears in archive 001. The paper bears a Bellwether class stamp.',
+    observation:
+      'A crooked wing. She didn’t erase it. She showed the child how to turn the mistake into a feather. The same line as the memory. Something real made it out.',
+  },
 };
 export interface Deduction {
   id: DeductionId;
@@ -144,6 +204,42 @@ export const DEDUCTIONS: Deduction[] = [
     conclusion:
       '“The first one” is the woman in the earliest portrait, numbered 001. Someone who deals in memories might still know where to find hers.',
   },
+  {
+    id: 'entry',
+    pair: ['camera', 'lock'],
+    title: 'An appointment, not a break-in',
+    question: 'How did the intruder prepare?',
+    hint: 'Compare the missing time outside with the entry inside.',
+    conclusion:
+      'A targeted camera outage and a silently prepared lock: the entry was coordinated. Ask about a scheduled pickup, not a stranger forcing a door.',
+  },
+  {
+    id: 'identity',
+    pair: ['chime', 'register'],
+    title: 'Her name is Ada Vale',
+    question: 'Who taught the child?',
+    hint: 'A sound locates the lesson. A paper record names its teacher.',
+    conclusion:
+      'The Bellwether announcement and the matching lesson plan identify Ada Vale. The city voided her number; it did not undo her life.',
+  },
+  {
+    id: 'seizure',
+    pair: ['transfer', 'witness'],
+    title: 'A route to Meridian',
+    question: 'Where did the stolen minds go?',
+    hint: 'Find an independent account of the receiver’s destination.',
+    conclusion:
+      'The spool and Mei’s signed receipt independently place V-17 at Meridian Clinic, intake B. This is a route that can be followed, not just an accusation.',
+  },
+  {
+    id: 'continuity',
+    pair: ['fragment', 'sketch'],
+    title: 'A memory with a witness',
+    question: 'Can the archive be trusted?',
+    hint: 'Look for a detail that exists both inside the memory and outside it.',
+    conclusion:
+      'The corrected wing exists in the memory and on a child’s paper drawing. Archive 001 preserves an event, not a synthetic replacement.',
+  },
 ];
 export interface Hotspot {
   id: string;
@@ -154,7 +250,7 @@ export interface Hotspot {
   clue?: ClueId;
   target?: AreaId;
   text?: string;
-  requires?: 'deduced' | 'contact';
+  requires?: 'deduced' | 'contact' | 'followup';
 }
 /**
  * A neon sign or practical light. These do not light the plate — that is
@@ -230,6 +326,15 @@ export const AREAS: Record<AreaId, Area> = {
         label: 'Night shift',
         kind: 'flavor',
         text: 'Steam, ginger, burnt oil. The city can take almost anything from you. Hunger, it lets you keep.',
+      },
+      {
+        id: 'mei',
+        x: 180,
+        y: 345,
+        label: 'Mei · night shift',
+        kind: 'talk',
+        clue: 'witness',
+        requires: 'followup',
       },
       { id: 'camera', x: 550, y: 300, label: 'Street camera', kind: 'clue', clue: 'camera' },
       {
@@ -329,6 +434,24 @@ export const AREAS: Record<AreaId, Area> = {
       { id: 'residue', x: 960, y: 423, label: 'Iridescent residue', kind: 'clue', clue: 'residue' },
       { id: 'device', x: 1200, y: 350, label: 'Neural receiver', kind: 'clue', clue: 'device' },
       { id: 'writing', x: 1070, y: 215, label: 'Last testimony', kind: 'clue', clue: 'writing' },
+      {
+        id: 'sketch',
+        x: 550,
+        y: 285,
+        label: 'Behind the portrait',
+        kind: 'clue',
+        clue: 'sketch',
+        requires: 'followup',
+      },
+      {
+        id: 'transfer',
+        x: 1220,
+        y: 300,
+        label: 'Receiver dispatch spool',
+        kind: 'clue',
+        clue: 'transfer',
+        requires: 'followup',
+      },
     ],
   },
   den: {
@@ -381,6 +504,24 @@ export const AREAS: Record<AreaId, Area> = {
         clue: 'fragment',
       },
       { id: 'lyra-den', x: 1150, y: 365, label: 'Lyra', kind: 'talk' },
+      {
+        id: 'chime',
+        x: 850,
+        y: 235,
+        label: 'Listen beneath the memory',
+        kind: 'clue',
+        clue: 'chime',
+        requires: 'followup',
+      },
+      {
+        id: 'register',
+        x: 450,
+        y: 270,
+        label: 'Bellwether paper register',
+        kind: 'clue',
+        clue: 'register',
+        requires: 'followup',
+      },
       {
         id: 'tapes',
         x: 420,

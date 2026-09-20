@@ -149,6 +149,16 @@ export class Traffic {
   private glow = Traffic.radial('#ffe6b8');
   private red = Traffic.radial('#ff5540');
 
+  /** Positions derive from the actual passing cars, not a separate lighting timer. */
+  headlights(camera: number): SignLight[] {
+    return this.cars.map((car) => ({
+      x: camera + car.x + car.dir * 90 * LANES[car.lane].scale,
+      y: 410,
+      color: '#d6e0cc',
+      intensity: 1.25,
+    }));
+  }
+
   private static radial(color: string): HTMLCanvasElement {
     const g = document.createElement('canvas');
     g.width = g.height = 64;

@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { execFile } from 'node:child_process';
 import { resolve } from 'node:path';
 export default defineConfig({
+  base: process.env.GITHUB_PAGES === 'true' ? '/Pyxel2/' : '/',
   plugins: [
     {
       name: 'aseprite-art',

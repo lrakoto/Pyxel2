@@ -79,3 +79,39 @@ The original Aseprite importer is preserved. Place `cole.aseprite`, `enforcer.as
 New rooms belong in `AREAS` in `src/content.ts`, with a matching environment file and explicit doors. Current map routing assumes a street hub. A bigger district should replace that helper with graph routing. Keep clue and story identifiers stable; changing the save schema requires a version migration.
 
 Read [the project review](docs/PROJECT_REVIEW.md) for the architectural decisions and tradeoffs, [the art notes](docs/ART_CREDITS.md) for provenance, and [the QA record](docs/QA.md) for verified behavior.
+
+## Investigation expansion — September 19
+
+After the first chapter, choose **Continue · The first one**, or open the next case from Lyra’s channel or the case board. Return to the Den, revisit the studio, and speak to Mei at the noodle bar. Five new records support three deductions and a saved choice about preserving Ada Vale’s identity. Meridian Clinic is the next lead; its interior is not part of this build.
+
+Previously examined objects now offer ten conditional observations when related evidence is found. Amber **REVISIT** markers identify unread observations, which become permanent field notes. The camera and lock also form an optional deduction that changes Lyra’s dialogue and opens a direct witness approach. Neither is required to finish the first case or earn Mei’s evidence.
+
+Cole has dedicated exploration frames for breathing, walking, turning, examination, and conversation. Lyra has a larger, animated pixel design. See [the character study](docs/character-study.png). These are authored procedural frames; imported Aseprite sheets remain supported. Combat mechanics and combat frame selection are unchanged by this expansion.
+
+## Visual pass
+
+Mei now works behind the noodle-bar counter. Cole’s exploration coat has additional tailoring and face detail, and nearby lights cast a soft colour wash across Cole and Lyra. Interior easels, cables and equipment move on a foreground plane and can occlude the player. Footsteps on wet ground create short-lived splashes, rings and local street-reflection disturbances.
+
+Six illustrated records appear beside examination dialogue and on the case board: the drawing, register, receipt, dispatch spool, archive audio and memory fragment. Examination adds a restrained camera reframing and local light; the archive reveals the bird inside its projection. Reduced motion disables camera reframing, splash animation and illustration entrance motion.
+
+[Evidence illustrations](docs/evidence-study.png) · [Studio render](docs/visual-studio.png) · [Street render](docs/visual-street.png) · [Den render](docs/visual-den.png). Scene images were rendered directly from the Canvas renderer and exclude the HTML interface.
+
+The illustrated-evidence treatment now covers all fourteen clues across both cases, including first-case examination close-ups. The [evidence study](docs/evidence-study.png) shows the complete set.
+
+## Recovery and accessibility
+
+The previous distinct checkpoint is retained locally as a fallback if the main save becomes unreadable. Interrupted object conversations restart from the relevant interaction on Continue; already collected clues and deductions remain saved. Starting a new investigation deliberately replaces both checkpoint slots. Storage failures remain visible in the checkpoint indicator.
+
+The case board’s **Need a lead?** disclosure suggests a location or a question supported by records you already hold. Dialogue provides complete lines to assistive technology independently of the visual typewriter. Coarse-pointer controls have larger minimum targets. World rendering stops behind modal panels and resumes when they close; resizing or changing reduced motion refreshes the paused image.
+
+### Ambient life
+
+Rain thins beneath awnings and collects at gutter edges; the studio doorway catches warm streaks. Passing headlights wash over the street and Cole, while elevated train windows cast faint light below. Walkers occasionally shelter, Mei wipes her counter, and silhouettes pass behind upstairs glass. Studio pigment dust and receiver pulses contrast with the Den's projection scans and monitor activity. These effects respect reduced motion.
+
+## Online preview — GitHub Pages
+
+Play at **https://lrakoto.github.io/Pyxel2/**.
+
+The `Publish playable preview` workflow deploys pushes to `feat/case-board`, the current development branch. It installs locked dependencies, checks formatting, runs tests, builds, and publishes `dist` through GitHub Pages. Repository Settings → Pages must use **GitHub Actions** as its source. To move releases to another branch later, update the workflow's push filter.
+
+The workflow sets `GITHUB_PAGES=true` to build with `/Pyxel2/` as the base path. Ordinary local builds keep `/`, so a future host can use the same project without the Pages setting. Saves remain local to each browser and origin; localhost progress does not transfer to the online preview.

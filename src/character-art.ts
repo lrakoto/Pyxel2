@@ -94,7 +94,14 @@ export const COLE_PALETTE: Record<string, string> = {
   B: '#0e1013', // boots and gloves
 };
 
-type ColePose = { stride?: number; crouch?: number; airborne?: boolean };
+type ColePose = {
+  stride?: number;
+  crouch?: number;
+  airborne?: boolean;
+  gesture?: number;
+  turn?: boolean;
+  detail?: boolean;
+};
 
 /**
  * Fresh 32x64 Cole art: every pose is drawn independently at native pixel
@@ -106,6 +113,9 @@ function makeColeFrame({
   stride = 0,
   crouch = 0,
   airborne = false,
+  gesture = 0,
+  turn = false,
+  detail = false,
 }: ColePose = {}): HTMLCanvasElement {
   const K = COLE_PALETTE;
   return canvasTexture(COLE_W, COLE_H, (ctx) => {
@@ -263,6 +273,76 @@ function makeColeFrame({
     ]);
     rect(K.E, 21 - arm, 34, 3, 2);
     rect(K.B, 21 - arm, 36, 4, 4);
+    if (detail) {
+      // Native-pixel tailoring: collar seam, pocket, rain edges and boot welt.
+      rect('#7c858b', 13, 24, 1, 5);
+      rect('#24292e', 11, 28, 4, 1);
+      rect('#525e65', 11, 29, 3, 1);
+      rect('#9f7957', 18, 33, 2, 1);
+      rect('#69747b', 10, 39, 1, 3);
+      rect('#343d46', 16 + front, 62, 7, 1);
+      rect('#ac8060', 22, 18, 1, 1);
+      // Lapel, double-stitched cuff, brass fasteners and broken rain highlights.
+      rect('#899096', 12, 24, 1, 3);
+      rect('#4c555c', 15, 27, 1, 13);
+      rect('#242a30', 16, 28, 1, 12);
+      rect('#b39b71', 17, 30, 1, 1);
+      rect('#927d60', 17, 36, 1, 1);
+      rect('#6a777b', 22 - arm, 33, 2, 1);
+      rect('#7e8e91', 11, 32, 1, 2);
+      rect('#606e75', 12, 36, 1, 1);
+      rect('#a08169', 22, 19, 2, 1);
+      rect('#3c3331', 21, 20, 2, 1);
+      // A broken hat highlight, shaded cheek, rain-worn sleeve and moving coat vents.
+      rect('#555c60', 15, 6, 3, 1);
+      rect('#343b41', 10, 11, 12, 1);
+      rect('#9b785c', 21, 17, 2, 2);
+      rect('#24272b', 19, 16, 5, 1);
+      rect('#809a98', 22, 16, 1, 1);
+      rect('#544132', 23, 19, 1, 1);
+      poly('#343e45', [
+        [11, 32],
+        [14, 34],
+        [14, 43],
+        [10 + Math.round(stride), 44],
+      ]);
+      poly('#121c24', [
+        [17, 35],
+        [19, 37],
+        [21 + Math.round(stride * 2), 44],
+        [17, 43],
+      ]);
+      rect('#677175', 12, 41, 2, 1);
+      rect('#435059', 19, 40, 1, 2);
+      rect('#667179', 10 + back, 57, 1, 2);
+      rect('#39444d', 18 + front, 57, 1, 3);
+      rect('#5a646a', 22 - arm, 36, 2, 1);
+    }
+    if (gesture) {
+      // A bent elbow and small cyan notebook. The final frame is held while reading.
+      rect(K.D, 21, 32, 5, 9);
+      poly(K.L, [
+        [21, 27],
+        [24, 28],
+        [26, 33 - gesture],
+        [29, 31 - gesture],
+        [30, 34 - gesture],
+        [25, 37 - gesture],
+        [21, 33],
+      ]);
+      rect(K.B, 27, 31 - gesture, 4, 3);
+      rect('#121e25', 26, 27 - gesture, 5, 5);
+      rect('#8db9b6', 27, 28 - gesture, 3, 3);
+      rect('#cee3cf', 27, 28 - gesture, 2, 1);
+    }
+    if (turn) {
+      rect(K.H, 21, 7, 2, 4);
+      rect(K.f, 16, 15, 8, 6);
+      rect(K.S, 17, 17, 2, 3);
+      rect('#846249', 21, 17, 2, 3);
+      rect(K.b, 16, 16, 7, 1);
+      rect(K.G2, 14, 22, 8, 2);
+    }
   });
 }
 
@@ -277,6 +357,17 @@ export const COLE_FRAMES: {
     makeColeFrame({ stride: 0.45, airborne: true }),
     makeColeFrame({ stride: 0.15, crouch: 1 }),
   ],
+};
+
+/** Additional hand-authored exploration frames; original combat frames stay intact. */
+export const COLE_STORY_FRAMES: Record<string, HTMLCanvasElement[]> = {
+  breathe: [0, 0, 1, 1, 0, 0].map((crouch) => makeColeFrame({ crouch, detail: true })),
+  stride: [0, 0.7, 1, 0.7, 0, -0.7, -1, -0.7].map((stride) =>
+    makeColeFrame({ stride, detail: true }),
+  ),
+  turn: [makeColeFrame({ turn: true, detail: true }), makeColeFrame({ detail: true })],
+  examine: [0, 1, 2, 3].map((gesture) => makeColeFrame({ gesture, detail: true })),
+  listen: [0, 0, 1, 0].map((crouch) => makeColeFrame({ crouch, detail: true })),
 };
 
 /** Mirrors each row left-to-right (used by the compact NPC fallback art). */
@@ -624,3 +715,137 @@ const LYRA_IDLE = [
 export function makeLyraFrame(): HTMLCanvasElement {
   return framesFromRows(LYRA_W, [LYRA_IDLE], LYRA_PALETTE)[0];
 }
+
+/** 32×64 exploration sheet: a hood, layered cloak, hands and a face within the light. */
+function lyraPortrait(phase: number, talking: boolean): HTMLCanvasElement {
+  return canvasTexture(32, 64, (c) => {
+    const r = (color: string, x: number, y: number, w: number, h: number) => {
+      c.fillStyle = color;
+      c.fillRect(x, y, w, h);
+    };
+    const p = (color: string, points: number[][]) => {
+      c.fillStyle = color;
+      c.beginPath();
+      points.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+      c.closePath();
+      c.fill();
+    };
+    const lift = phase === 2 ? 1 : 0;
+    r('#111a22', 10, 48, 5, 14);
+    r('#202b36', 18, 48, 4, 14);
+    r('#080e14', 8, 60, 8, 4);
+    r('#080e14', 18, 60, 7, 4);
+    r('#41515b', 9, 62, 6, 1);
+    r('#41515b', 19, 62, 5, 1);
+    p('#0b121c', [
+      [8, 21],
+      [23, 21],
+      [27, 32],
+      [26, 54],
+      [19, 57],
+      [16, 48],
+      [12, 57],
+      [5, 54],
+      [6, 32],
+    ]);
+    p('#24303d', [
+      [9, 22],
+      [16, 24],
+      [15, 45],
+      [11, 54],
+      [7, 52],
+      [9, 35],
+    ]);
+    p('#18232f', [
+      [17, 23],
+      [23, 24],
+      [25, 37],
+      [24, 53],
+      [19, 54],
+      [17, 43],
+    ]);
+    p('#56304b', [
+      [17, 31],
+      [19, 34],
+      [19, 51],
+      [16, 47],
+    ]);
+    r('#607a83', 9, 26, 1, 11);
+    r('#3d5663', 7, 42, 1, 10);
+    r('#4b6673', 23, 30, 1, 12);
+    r('#121923', 11, 34, 11, 2);
+    r('#93bab7', 15, 27, 2, 2);
+    r('#344e59', 12, 29, 3, 1);
+    p('#0c1420', [
+      [8, 20 + lift],
+      [8, 10 + lift],
+      [12, 4 + lift],
+      [19, 3 + lift],
+      [24, 10 + lift],
+      [25, 21 + lift],
+      [19, 26 + lift],
+      [12, 25 + lift],
+    ]);
+    p('#344853', [
+      [9, 17 + lift],
+      [10, 10 + lift],
+      [14, 6 + lift],
+      [20, 6 + lift],
+      [23, 12 + lift],
+      [23, 20 + lift],
+      [19, 24 + lift],
+      [11, 22 + lift],
+    ]);
+    p('#101e2a', [
+      [12, 11 + lift],
+      [16, 8 + lift],
+      [20, 10 + lift],
+      [22, 17 + lift],
+      [19, 22 + lift],
+      [14, 21 + lift],
+      [11, 17 + lift],
+    ]);
+    r('#3b6773', 14, 12 + lift, 6, 7);
+    r('#75a6aa', 15, 13 + lift, 5, 5);
+    r('#213744', 14, 11 + lift, 3, 3);
+    r('#457780', 14, 16 + lift, 2, 3);
+    r('#a0c2b8', 18, 16 + lift, 2, 1);
+    r('#28434e', 17, 18 + lift, 2, 1);
+    r('#c9ebe0', 15, 14 + lift, 2, 1);
+    r('#d3f5ed', 19, 14 + lift, 2, 1);
+    if (phase === 3) r('#366878', 15, 14 + lift, 6, 1);
+    r('#4c8e9b', 18, 15 + lift, 1, 3);
+    r('#9cd8d1', 16, 19 + lift, 3, 1);
+    r('#79b3bb', 10, 11 + lift, 1, 5);
+    r('#486774', 22, 10 + lift, 1, 3);
+    r('#839896', 12, 7 + lift, 2, 1);
+    r('#416070', 21, 21 + lift, 1, 2);
+    r('#445663', 11, 36, 1, 10);
+    r('#2e3d4c', 20, 40, 2, 10);
+    r('#956c83', 18, 38, 1, 8);
+    r('#637677', 8, 51, 3, 1);
+    r('#728382', 21, 52, 2, 1);
+    r('#97a597', 15, 30, 1, 1);
+
+    const hand = talking ? [0, 2, 3, 1][phase] : 0;
+    p('#304451', [
+      [22, 26],
+      [25, 29],
+      [26, 35 - hand],
+      [29, 33 - hand],
+      [29, 36 - hand],
+      [24, 39],
+      [21, 33],
+    ]);
+    r('#91bdbc', 26, 34 - hand, 4, 2);
+    r('#497889', 26, 36 - hand, 2, 1);
+    r('#172533', 6, 29, 3, 12);
+    r('#66858b', 6, 40, 3, 3);
+    r('#596576', 10, 51, 1, 2);
+    r('#806079', 18, 48, 1, 3);
+  });
+}
+export const LYRA_STORY_FRAMES: Record<string, HTMLCanvasElement[]> = {
+  idle: [0, 1, 2, 3].map((phase) => lyraPortrait(phase, false)),
+  listen: [0, 1, 2, 3].map((phase) => lyraPortrait(phase, true)),
+};

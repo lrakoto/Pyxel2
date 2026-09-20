@@ -1,10 +1,27 @@
 # Validation record
 
-Two passes are recorded below. The September 8 pass covers the scene
+The passes below distinguish automated checks from browser verification. The September 8 pass covers the scene
 atmosphere work and is deliberately narrower than the September 4 one: it
 re-ran the automated checks and verified rendering, but did **not** repeat the
 manual playthrough. Treat the September 4 playthrough as the last full
 gameplay validation.
+
+## September 19, 2026 — resume the final encounter
+
+Continuing from `c286543` on `feat/case-board`, fixed a checkpoint gap:
+starting a saved game on the street after recruiting Lyra now reopens the
+unfinished ambush choice. Its objective describes the encounter instead of
+asking Cole to leave the Den again. Area transitions and checkpoint resumes
+use the same derived condition; no save-format migration is needed.
+
+* `npm test`: **18 passed, 0 failed**, including a checkpoint regression that
+  distinguishes an unfinished street encounter from interiors, a fresh case,
+  and a completed chapter.
+* `npm run build`: strict TypeScript check and production build passed.
+* `git diff --check`: passed; changed TypeScript files formatted with Prettier.
+* Browser verification was blocked: the in-app browser was unavailable and
+  native Chrome access remained pending macOS Accessibility/Screen Recording
+  permissions. No new visual or end-to-end playthrough claim is made.
 
 ## September 8, 2026 — scene atmosphere
 
@@ -143,3 +160,63 @@ The final production build was separately opened on port 4174. Starting the chap
 ### Practical limits
 
 Real-device multitouch, controller input, Safari, Firefox, low-end hardware performance, and long-session memory profiling were not tested. Imported Aseprite content falls back cleanly when absent; no new hand-drawn sheets were authored for this rebuild. The game is a playable chapter, with further production art and campaign work explicitly outside this slice.
+
+## September 19 — noncombat investigation expansion
+
+- Production build and TypeScript check pass. All 25 tests pass.
+- Added coverage for both second-case resolutions, optional evidence paths, old save compatibility, rejected unearned progress, all ten conditional observations, reactive Lyra topics, witness routing, and exploration pose timing.
+- Inspected a contact sheet rendered directly from the actual character frame module (`character-study.png`).
+- Combat implementation has no changes. Existing combat simulations still pass.
+- Live browser playtesting of this expansion remains pending: the browser control surface is unavailable and native Chrome control reports pending macOS Accessibility / Screen Recording permissions. Earlier browser checks above apply to the earlier build, not this expansion.
+- Manual follow-up: exercise both Mei conversation paths, select both case tabs on a narrow viewport, read amber revisit observations, resolve the second case in the Den, then reload and ask Lyra how the archive was preserved.
+
+## September 19 — visual integration pass
+
+- Added character cloth lighting/detail, Mei’s serving-window presence, parallax interior foregrounds, six local SVG evidence illustrations, examination framing/light, archive bird projection, and distance-driven water footsteps.
+- 29 automated tests pass, including footfall consistency at 30/60/120 Hz, dry/stopped/teleport suppression, reduced motion, expiry and area resets. Production build and formatting checked.
+- Rendered all three scenes directly through `Renderer.draw` using a standalone Canvas implementation and the real environment assets. Inspected the resulting images, adjusted Mei into the counter opening, moved the archive image into the projection, and refined foreground easel placement. This checks drawing execution and composition, not browser CSS or interactive input.
+- Rechecked computer-use availability: no browser surface is connected. HTML close-up layout, narrow-screen overlays and interactive camera feel still need a live browser playthrough.
+- No combat module or combat frame changes. New water and interior foreground effects are disabled during combat, and the cloth-light pass applies only to exploration frames and Lyra.
+
+### Evidence presentation follow-up
+
+All fourteen clues now have individual local vector illustrations, including the first case’s camera, lock, diary, paintings, polymer sample, receiver and wall writing. Paper records have subtle wear. Inspected the complete rendered evidence contact sheet; 29 tests and the production build pass. Directly attempting the requested in-app browser returned “Browser is not available: iab”; interactive verification remains pending.
+
+### Record reader and character ground contact
+
+- Added a full-size record reader from each case-board card, with earned field notes and established connections. Selection and scroll state are preserved on return; Escape and the close control return to the board. The layout stacks on narrow screens.
+- Evidence thumbnails now retain the illustrations’ native aspect ratio rather than compressing them into 100px strips.
+- Exploration uses a cached character silhouette projected away from the dominant light plus a soft contact shadow. Combat retains its original shadow rendering.
+- Build, formatting and 29 existing tests pass. Re-rendered and inspected the studio composition. Browser-only follow-up: open a record with two clues selected, return with Escape, verify focus/scroll preservation, and test the reader at a narrow viewport.
+
+## Recovery, investigation clarity, touch and paused rendering
+
+- Added backup checkpoint recovery, deduplicated autosave writes, and validated interaction-resume markers. Resume replays the current interaction rather than serializing callbacks or restoring a partial sentence.
+- Added state-dependent case-board hints that avoid naming unearned conclusions.
+- Fixed deferred dialog-close events clearing a newly opened panel’s mode, and touch release cancelling an action still held by another finger.
+- Added full-line screen-reader dialogue announcements and larger coarse-pointer targets. Paused modal scenes avoid redundant renderer calls; resize and reduced-motion changes invalidate the cached image.
+- 34 tests pass, covering damaged primary recovery, backup quota failure, identical autosaves, intentional restart, invalid resume markers and hints. Build and formatting pass.
+- Browser-only checks remain pending: screen-reader announcement behaviour, real-device multitouch, panel close/open focus, and reload during each conversation. No claim of live browser verification.
+
+## September 20 — live browser visual pass
+
+Browser access restored through the Chrome extension. Verified the current development build in the actual browser at its normal desktop viewport, 390×844 and 844×390; restored the normal viewport afterward.
+
+- Walked from the street into the studio and examined the journal. The saved clue and interrupted examination survived a development reload.
+- Corrected a broad `.record-reader svg` rule that enlarged the return-button icon. Verified the full-size record reader at desktop and phone width.
+- Selected the journal, opened its reader, and returned using Escape: selection remained active and focus returned to its Inspect button.
+- Removed duplicated quote punctuation in record observations.
+- Hid the objective, arrival card and interaction controls during dialogue, preventing them from competing with the evidence close-up.
+- Added a side-by-side dialogue/record layout for short landscape viewports after observing the close-up cover dialogue text. Verified the corrected landscape and portrait layouts.
+- Replaced the foreground easel’s placeholder drawing with painted texture sampled at runtime from the existing studio artwork, retaining parallax and occlusion.
+- Captured browser console contained no warnings or errors at the check. All 34 automated tests and the production build pass. These checks do not cover the complete second-case playthrough or real-device multitouch.
+
+## Coordinated atmosphere pass
+
+- Added shelter-aware pavement rain, awning-edge runoff and warm rain streaks across the studio doorway. Foreground rain remains visible for depth.
+- Passing car lights now tint pavement, storefronts and Cole; elevated train windows cast a faint moving spill.
+- Added occasional upstairs silhouettes, sheltered pauses for walkers without umbrellas, and Mei wiping the counter with a connected arm pose.
+- Refined exploration-only Cole coat/face detail and Lyra's face, hood seams and cloak. Combat mechanics and Cole's original combat frames are unchanged.
+- Studio pigment motes and intermittent receiver light contrast with the Den's restrained projection scans and monitor activity. Reduced motion freezes or suppresses the new movement.
+- Reloaded the current build in Chrome, continued the saved investigation and walked from the studio to the street. Inspected the Den through a direct render of the actual drawing modules, not a live Den playthrough. Refreshed scene and character study images.
+- Production build, formatting and all 36 tests pass, including shelter boundaries and ambient-event timing. A complete second-case playthrough remains outside this visual check.

@@ -1,0 +1,44 @@
+import type { ClueId } from './content.ts';
+
+const bird = `<path d="M124 122 Q147 80 179 106 L222 72 207 115 Q235 114 249 128 L220 134 Q185 166 155 135 L120 151 132 130 98 111 147 120 M151 119 Q171 102 198 119 M156 124 L181 111 M166 129 L190 118" fill="none" stroke="#48473c" stroke-width="2.4" stroke-linecap="round"/><circle cx="211" cy="120" r="2" fill="#48473c"/>`;
+const ruled = Array.from(
+  { length: 8 },
+  (_, i) => `<path d="M77 ${75 + i * 14}H282" stroke="#5d746347"/>`,
+).join('');
+const drawings: Partial<Record<ClueId, string>> = {
+  camera: `<path d="M102 69H235L261 90V140H102Z" fill="#45565a" stroke="#7c8d8c"/><path d="M89 73H108V139H89Z" fill="#243638"/><circle cx="229" cy="108" r="24" fill="#14272d" stroke="#80948e"/><circle cx="229" cy="108" r="13" fill="#34505a"/><circle cx="226" cy="103" r="4" fill="#92b7b5"/><path d="M164 141V164H211" fill="none" stroke="#526465" stroke-width="9"/><circle cx="124" cy="91" r="3" fill="#bc6047"/><text x="91" y="194" fill="#adc3b8" font-size="12">02:14 — 02:25 / SIGNAL ABSENT</text>`,
+  lock: `<path d="M104 26H257V207H104Z" fill="#303934"/><path d="M113 26V207M245 26V207" stroke="#646451"/><rect x="141" y="53" width="83" height="126" rx="5" fill="#8c805e" stroke="#b1a079"/><circle cx="183" cy="103" r="26" fill="#635b45" stroke="#c2ac7b"/><circle cx="183" cy="101" r="7" fill="#202823"/><path d="M181 102 176 119H191L186 102" fill="#202823"/><path d="M199 83l11-4m-9 9 13-3m-45 45-10 5" stroke="#d0b986"/><path d="M219 148Q227 170 222 177Q214 173 219 148" fill="#c3a86f" opacity=".6"/>`,
+  diary: `<path d="M48 51Q113 28 181 50Q242 31 310 51V192Q242 173 181 192Q113 173 48 192Z" fill="#b6aa86" stroke="#6d644b" stroke-width="3"/><path d="M181 51V190" stroke="#686148"/>${Array.from({ length: 8 }, (_, i) => `<path d="M63 ${68 + i * 13}Q117 ${59 + i * 13} 164 ${69 + i * 13}M195 ${69 + i * 13}Q245 ${59 + i * 13} 293 ${70 + i * 13}" fill="none" stroke="#7b795f"/>`).join('')}<text x="69" y="103" fill="#363e35" font-size="12">The fragments.</text><text x="69" y="123" fill="#363e35" font-size="12">In the work.</text><text x="202" y="145" fill="#4c3c30" font-size="21" font-style="italic">In me.</text>`,
+  painting: `<rect x="63" y="24" width="234" height="187" fill="#716047" stroke="#ac8b53" stroke-width="4"/><rect x="74" y="35" width="212" height="165" fill="#25302b"/>${Array.from(
+    { length: 24 },
+    (_, i) => {
+      const x = 86 + (i % 6) * 34,
+        y = 50 + Math.floor(i / 6) * 38;
+      return `<path d="M${x} ${y}q12-11 23 2l-3 24-12 8-10-12Z" fill="${['#806248', '#a17e50', '#354b46', '#625849'][i % 4]}"/><path d="M${x + 3} ${y + 9}h5m6 0h5m-9 1v9l4 1" stroke="#202c29" fill="none"/><circle cx="${x + 17}" cy="${y + 9}" r="1.5" fill="#8dc4af"/>`;
+    },
+  ).join('')}`,
+  portrait: `<rect x="101" y="20" width="160" height="198" fill="#695b46"/><rect x="111" y="30" width="140" height="178" fill="#334139"/><path d="M137 190Q139 145 180 140Q216 145 229 190M149 66Q181 33 210 68L205 118 181 146 153 120Z" fill="#a89770"/><path d="M156 91q9-7 17 0m15 0q9-7 17 0" stroke="#303e36" stroke-width="3" fill="none"/><circle cx="165" cy="91" r="2" fill="#bad2ba"/><circle cx="196" cy="91" r="2" fill="#bad2ba"/>${Array.from({ length: 18 }, (_, i) => `<rect x="${181 + (i % 4) * 17}" y="${44 + i * 8}" width="${12 + (i % 3) * 7}" height="5" fill="#334139" opacity=".8"/>`).join('')}<text x="113" y="203" fill="#a8b7a0" font-size="10">001</text>`,
+  residue: `<path d="M64 45 292 35 311 187 80 203Z" fill="#536562" opacity=".35" stroke="#8ca19a"/><path d="M118 104Q98 59 156 77Q181 54 217 96Q268 100 239 147Q215 177 169 145Q119 163 118 104Z" fill="#507c76" opacity=".7"/><path d="M126 105Q173 76 214 109M130 124Q179 151 234 119" fill="none" stroke="#acb091" stroke-width="3"/><path d="M141 90Q160 127 215 142" fill="none" stroke="#937994" stroke-width="3"/><text x="100" y="186" fill="#bfd0b9" font-size="10">POLYMER / SAMPLE 07–031</text>`,
+  device: `<path d="M104 195H261V180H104ZM133 59H232V177H133Z" fill="#3a4e4c" stroke="#72827b"/><rect x="151" y="64" width="64" height="102" fill="#173638" stroke="#88b3a1"/><path d="M169 69V161M197 69V161" stroke="#84c7b5" stroke-width="5"/><path d="M172 119q14-32 23 0t-23 0" stroke="#c1d5ae" fill="none"/><rect x="125" y="44" width="115" height="16" fill="#5d6d62"/><path d="M134 164Q68 132 91 201M232 102Q282 149 267 203" fill="none" stroke="#62786e" stroke-width="4"/><circle cx="235" cy="161" r="12" fill="#1e302e" stroke="#9b9274"/><path d="M235 161l7-6" stroke="#c9805f" stroke-width="2"/>`,
+  writing: `<rect x="57" y="42" width="252" height="151" fill="#5a6153"/>${Array.from({ length: 5 }, (_, i) => `<path d="M57 ${53 + i * 29}H309" stroke="#343e36"/><path d="M${i % 2 ? 111 : 155} ${42 + i * 29}v29m82-29v29" stroke="#343e36"/>`).join('')}<path d="M81 62 283 53 291 177 74 182Z" fill="#b3ad89" opacity=".72"/><g transform="rotate(-3 180 120)" fill="#28312a" font-family="monospace" font-weight="bold"><text x="104" y="104" font-size="23">FIND THE</text><text x="89" y="140" font-size="25">FIRST ONE</text></g>`,
+  sketch: `<path d="M70 37 285 45 278 201 65 193Z" fill="#c9bd92"/>${bird}<text x="94" y="176" fill="#706c53" font-size="9">a wing can be a feather</text><rect x="226" y="158" width="44" height="23" fill="none" stroke="#747960"/><text x="229" y="172" font-size="7" fill="#747960">BELLWETHER</text>`,
+  register: `<path d="M61 32H294V203H61Z" fill="#b6b398"/><path d="M65 34H73V202H65" fill="#756e54"/>${ruled}<text x="86" y="57" fill="#394b45" font-size="12">BELLWETHER / EVENING SCHOOL</text><text x="88" y="97" fill="#303c38" font-size="14">Ada Vale</text><text x="88" y="124" fill="#48534a" font-size="10">Room 4 · Draw a bird from memory</text><g transform="rotate(-12 245 156)"><rect x="216" y="141" width="63" height="26" fill="none" stroke="#984f42" stroke-width="2"/><text x="221" y="160" fill="#984f42" font-size="18">VOID</text></g>`,
+  witness: `<path d="M107 26 116 30 126 26 137 30 147 26 158 30 169 26 180 30 191 26 201 30 212 26 224 30 237 26V207L224 203 212 207 201 203 190 207 179 203 168 207 157 203 146 207 135 203 124 207 113 203 107 207Z" fill="#c9bc95"/><text x="128" y="55" fill="#574d3c" font-size="11">NIGHT SHIFT</text><path d="M121 65H221M121 139H221" stroke="#86755a" stroke-dasharray="3 3"/><text x="124" y="90" fill="#4b483d" font-size="10">02:19 / TWO MEALS</text><text x="124" y="112" fill="#4b483d" font-size="10">PAID — CARBON COPY</text><text x="135" y="168" fill="#4b483d" font-size="25" font-style="italic">V-17</text><text x="122" y="190" fill="#4b483d" font-size="9">Meridian · intake B</text>`,
+  transfer: `<rect x="54" y="54" width="242" height="124" rx="5" fill="#34484a" stroke="#79928b"/><rect x="66" y="66" width="110" height="100" fill="#16282b"/>${[96, 145].map((x) => `<circle cx="${x}" cy="116" r="23" fill="#7e8a7b"/><circle cx="${x}" cy="116" r="9" fill="#1a2e30"/>`).join('')}<path d="M95 139H146" stroke="#ba9868"/><rect x="188" y="70" width="96" height="86" fill="#b7b296"/><text x="195" y="89" fill="#394a43" font-size="10">DISPATCH / V-17</text><text x="195" y="112" fill="#394a43" font-size="11">MERIDIAN</text><text x="195" y="128" fill="#394a43" font-size="11">INTAKE B →</text><path d="M195 142H271" stroke="#75846d"/>`,
+  chime: `<rect x="49" y="43" width="260" height="150" fill="#102d31" stroke="#648c83"/><text x="66" y="66" fill="#a6cdbb" font-size="11">ARCHIVE 001 / ROOM TONE</text><path d="M65 118H293" stroke="#3c655c"/>${Array.from(
+    { length: 60 },
+    (_, i) => {
+      const h = 4 + Math.abs(Math.sin(i * 2.8) * Math.sin(i * 0.21)) * 54;
+      return `<path d="M${66 + i * 3.8} ${118 - h / 2}v${h}" stroke="#8db9a1"/>`;
+    },
+  ).join(
+    '',
+  )}<text x="69" y="177" fill="#a6cdbb" font-size="12">♪   ♪   ♪   ♪     BELLWETHER</text>`,
+  fragment: `<rect x="54" y="31" width="251" height="177" fill="#193e40" stroke="#629b90"/><g opacity=".65">${bird.replaceAll('#48473c', '#97d5bd')}</g><path d="M66 49h29m-29 0v25M292 49h-29m29 0v25M66 189h29m-29 0v-25M292 189h-29m29 0v-25" stroke="#9bbca1" fill="none"/><text x="77" y="67" fill="#9bbca1" font-size="10">001 / MEMORY RETAINED</text>`,
+};
+/** Local vector illustrations shared by close-up inspection and evidence cards. */
+export function evidenceArt(id: ClueId): string {
+  const art = drawings[id];
+  if (!art) return '';
+  return `<svg viewBox="0 0 360 235" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="record-illustration"><rect width="360" height="235" fill="#122127"/><path d="M0 221 360 204M0 227 360 210" stroke="#23363b"/>${art}${['sketch', 'register', 'witness', 'diary'].includes(id) ? `<g opacity=".12" stroke="#514d39">${Array.from({ length: 32 }, (_, i) => `<path d="M${80 + ((i * 43) % 196)} ${48 + ((i * 31) % 140)}h${2 + (i % 6)}"/>`).join('')}</g>` : ''}<path d="M12 12h22m-22 0v22M348 223h-22m22 0v-22" stroke="#506a68" fill="none"/></svg>`;
+}

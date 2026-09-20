@@ -1,3 +1,4 @@
+import { SHELTERS } from './atmosphere.ts';
 import { makePedFrames, mixHex, NIGHT_AIR } from './character-art.ts';
 
 /**
@@ -21,6 +22,8 @@ export interface Walker {
   frames: HTMLCanvasElement[];
   umbrella: string | null;
   phase: number;
+  resting: number;
+  restCooldown: number;
 }
 
 /** Coat tones, before the distance haze that each lane adds. */
@@ -72,12 +75,28 @@ export class Crowd {
         frames: makePedFrames(hash(i, 7) < 0.5 ? 'coat' : 'hood', coat, haze),
         umbrella: hash(i, 8) < 0.45 ? mixHex(pick(UMBRELLAS, hash(i, 9)), NIGHT_AIR, haze) : null,
         phase: hash(i, 10) * 6,
+        resting: 0,
+        restCooldown: 8 + i * 3,
       });
     }
   }
 
   step(dt: number) {
     for (const w of this.walkers) {
+      w.restCooldown = Math.max(0, w.restCooldown - dt);
+      if (w.resting > 0) {
+        w.resting = Math.max(0, w.resting - dt);
+        continue;
+      }
+      if (
+        !w.umbrella &&
+        w.restCooldown === 0 &&
+        SHELTERS.some((s) => Math.abs(w.x - (s.left + 25)) < 3)
+      ) {
+        w.resting = 3 + w.phase;
+        w.restCooldown = 45;
+        continue;
+      }
       w.x += w.dir * w.speed * dt;
       if (w.x < -60) w.x = this.width + 60;
       else if (w.x > this.width + 60) w.x = -60;
@@ -101,7 +120,8 @@ export class Crowd {
       c.fill();
       c.restore();
 
-      const frame = w.frames[Math.floor((time + w.phase) * 9) % w.frames.length];
+      const frame =
+        w.frames[w.resting > 0 ? 2 : Math.floor((time + w.phase) * 9) % w.frames.length];
       const fw = (height * frame.width) / frame.height;
       c.save();
       c.translate(x, y);

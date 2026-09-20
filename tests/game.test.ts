@@ -111,6 +111,24 @@ test('all six discovery orders lead to the same case objective', () => {
     assert.equal(m.objective, 'Find the woman outside the Memory Den.');
   }
 });
+test('an unfinished street encounter resumes from its checkpoint but never inside or after completion', () => {
+  const m = new CaseModel();
+  for (const id of Object.keys(CLUES) as ClueId[]) m.collect(id);
+  for (const d of DEDUCTIONS) m.connect(...d.pair);
+  m.save.contact = true;
+  m.save.companion = true;
+  const restored = new CaseModel(parseSave(JSON.stringify(m.save)));
+  assert.equal(restored.awaitingAmbush, true);
+  assert.match(restored.objective, /enforcers/);
+  for (const area of ['studio', 'den'] as const) {
+    restored.save.area = area;
+    assert.equal(restored.awaitingAmbush, false);
+  }
+  restored.save.area = 'street';
+  restored.save.escaped = true;
+  assert.equal(restored.awaitingAmbush, false);
+  assert.equal(new CaseModel().awaitingAmbush, false);
+});
 test('complete chapter survives a serialized checkpoint and keeps Lyra across areas', () => {
   const m = new CaseModel();
   for (const id of Object.keys(CLUES) as ClueId[]) m.collect(id);

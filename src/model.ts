@@ -2,11 +2,15 @@ import {
   AREAS,
   CLUES,
   DEDUCTIONS,
+  CORE_DEDUCTIONS,
+  FOLLOWUP_DEDUCTIONS,
+  FOLLOWUP_CLUES,
   type AreaId,
   type ClueId,
   type DeductionId,
   type Hotspot,
 } from './content.ts';
+import { INSIGHTS } from './narrative.ts';
 export interface SaveData {
   version: 1;
   area: AreaId;
@@ -16,6 +20,10 @@ export interface SaveData {
   contact: boolean;
   companion: boolean;
   escaped: boolean;
+  followup: boolean;
+  insights: string[];
+  resumeHotspot: string | null;
+  resolution: 'protect' | 'testify' | null;
 }
 export const SAVE_KEY = 'everybody-nobody:fragments:v1';
 /** The district is a hub: interior-to-interior routes pass through the street. */
@@ -35,6 +43,10 @@ export function freshSave(): SaveData {
     contact: false,
     companion: false,
     escaped: false,
+    followup: false,
+    insights: [],
+    resumeHotspot: null,
+    resolution: null,
   };
 }
 export function parseSave(raw: string | null): SaveData {
@@ -43,18 +55,40 @@ export function parseSave(raw: string | null): SaveData {
     if (!d || typeof d !== 'object') return freshSave();
     const s = d as Partial<SaveData>;
     if (s.version !== 1 || !s.area || !Object.hasOwn(AREAS, s.area)) return freshSave();
-    const clues = [
+    let clues = [
       ...new Set(
         (Array.isArray(s.clues) ? s.clues : []).filter(
           (id): id is ClueId => typeof id === 'string' && Object.hasOwn(CLUES, id),
         ),
       ),
     ];
-    const deductions = DEDUCTIONS.filter(
-      (d) => s.deductions?.includes(d.id) && d.pair.every((id) => clues.includes(id)),
+    let deductions = DEDUCTIONS.filter(
+      (d) =>
+        Array.isArray(s.deductions) &&
+        s.deductions.includes(d.id) &&
+        d.pair.every((id) => clues.includes(id)),
     ).map((d) => d.id);
-    const contact = s.contact === true && deductions.length === 3;
+    const contact = s.contact === true && CORE_DEDUCTIONS.every((id) => deductions.includes(id));
     const companion = s.companion === true && contact && clues.includes('fragment');
+    const escaped = companion && s.escaped === true;
+    const followup = escaped && s.followup === true;
+    if (!followup) {
+      clues = clues.filter((id) => !FOLLOWUP_CLUES.includes(id));
+      deductions = deductions.filter((id) => !FOLLOWUP_DEDUCTIONS.includes(id));
+    }
+    const insights = INSIGHTS.filter(
+      (i) =>
+        Array.isArray(s.insights) &&
+        s.insights.includes(i.id) &&
+        clues.includes(i.clue) &&
+        i.requires.every((id) => clues.includes(id)),
+    ).map((i) => i.id);
+    const resolution =
+      followup &&
+      FOLLOWUP_DEDUCTIONS.every((id) => deductions.includes(id)) &&
+      (s.resolution === 'protect' || s.resolution === 'testify')
+        ? s.resolution
+        : null;
     const area = s.area === 'den' && !contact ? 'street' : s.area;
     return {
       version: 1,
@@ -67,7 +101,21 @@ export function parseSave(raw: string | null): SaveData {
       deductions,
       contact,
       companion,
-      escaped: companion && s.escaped === true,
+      escaped,
+      followup,
+      insights,
+      resolution,
+      resumeHotspot:
+        typeof s.resumeHotspot === 'string' &&
+        AREAS[area].hotspots.some(
+          (h) =>
+            h.id === s.resumeHotspot &&
+            (h.kind === 'talk' || h.kind === 'clue') &&
+            (h.requires !== 'followup' || followup) &&
+            (h.requires !== 'deduced' || CORE_DEDUCTIONS.every((id) => deductions.includes(id))),
+        )
+          ? s.resumeHotspot
+          : null,
     };
   } catch {
     return freshSave();
@@ -76,10 +124,38 @@ export function parseSave(raw: string | null): SaveData {
 export class CaseModel {
   constructor(public save: SaveData = freshSave()) {}
   get deduced() {
-    return this.save.deductions.length === 3;
+    return CORE_DEDUCTIONS.every((id) => this.save.deductions.includes(id));
+  }
+  get followupSolved() {
+    return (
+      this.save.followup && FOLLOWUP_DEDUCTIONS.every((id) => this.save.deductions.includes(id))
+    );
+  }
+  startFollowup() {
+    if (!this.save.escaped || this.save.followup) return false;
+    this.save.followup = true;
+    return true;
+  }
+  resolveFollowup(choice: 'protect' | 'testify') {
+    if (!this.followupSolved || this.save.resolution) return false;
+    this.save.resolution = choice;
+    return true;
+  }
+  get awaitingAmbush() {
+    return this.save.area === 'street' && this.save.companion && !this.save.escaped;
   }
   get objective() {
+    if (this.save.resolution) return 'Ada Vale is remembered. The trail leads to Meridian Clinic.';
+    if (this.followupSolved)
+      return 'Return to Lyra in the Den. Decide how to preserve Ada’s story.';
+    if (this.save.followup)
+      return this.save.clues.filter((id) => FOLLOWUP_CLUES.includes(id)).length ===
+        FOLLOWUP_CLUES.length
+        ? 'Connect the records. Recover a name, verify the memory, trace the shipment.'
+        : 'Revisit the archive, the studio and Mei’s night shift. Find who the first woman was.';
     if (this.save.escaped) return 'Find who erased the first one.';
+    if (this.awaitingAmbush)
+      return 'Protect the memory. Face the enforcers or take Lyra’s escape route.';
     if (this.save.companion) return 'Leave the Den. Keep the memory safe.';
     if (this.save.clues.includes('fragment')) return 'Speak to Lyra about the first memory.';
     if (this.save.contact) return 'Enter the Memory Den. Recover archive 001.';
@@ -94,15 +170,21 @@ export class CaseModel {
     return 'Investigate Marlon Graves’ studio.';
   }
   get chapter() {
-    return this.save.escaped
-      ? 'THE FIRST ONE'
-      : this.save.contact
-        ? 'THE MEMORY KEEPER'
-        : this.deduced
-          ? 'SOMEONE IS WATCHING'
-          : 'THE LAST WORK';
+    return this.save.resolution
+      ? 'A NAME KEPT SAFE'
+      : this.save.followup
+        ? 'THE FIRST ONE'
+        : this.save.escaped
+          ? 'THE FIRST ONE'
+          : this.save.contact
+            ? 'THE MEMORY KEEPER'
+            : this.deduced
+              ? 'SOMEONE IS WATCHING'
+              : 'THE LAST WORK';
   }
   available(h: Hotspot) {
+    if (h.requires === 'followup') return this.save.followup;
+    if (h.id === 'noodles' && this.save.followup) return false;
     if (h.id === 'lyra' && this.save.companion) return false;
     return !h.requires || (h.requires === 'deduced' ? this.deduced : true);
   }
@@ -110,6 +192,7 @@ export class CaseModel {
     return h.requires !== 'contact' || this.save.contact;
   }
   collect(id: ClueId) {
+    if (FOLLOWUP_CLUES.includes(id) && !this.save.followup) return false;
     if (this.save.clues.includes(id)) return false;
     this.save.clues.push(id);
     return true;
@@ -117,6 +200,7 @@ export class CaseModel {
   connect(a: ClueId, b: ClueId) {
     if (a === b || !this.save.clues.includes(a) || !this.save.clues.includes(b)) return null;
     const match = DEDUCTIONS.find((d) => d.pair.includes(a) && d.pair.includes(b));
+    if (match && FOLLOWUP_DEDUCTIONS.includes(match.id) && !this.save.followup) return null;
     if (match && !this.save.deductions.includes(match.id)) this.save.deductions.push(match.id);
     return match ?? null;
   }
@@ -138,12 +222,16 @@ export class CaseModel {
    *  - `cold` — neither leads anywhere.
    */
   explain(a: ClueId, b: ClueId): { reason: 'spent' | 'warm' | 'kind' | 'cold'; text: string } {
-    const open = DEDUCTIONS.filter((d) => !this.save.deductions.includes(d.id));
+    const open = DEDUCTIONS.filter(
+      (d) =>
+        !this.save.deductions.includes(d.id) &&
+        (this.save.followup || !FOLLOWUP_DEDUCTIONS.includes(d.id)),
+    );
     const solvedWith = (id: ClueId) =>
       DEDUCTIONS.some((d) => this.save.deductions.includes(d.id) && d.pair.includes(id));
     const live = (id: ClueId) => open.some((d) => d.pair.includes(id));
 
-    if (solvedWith(a) || solvedWith(b))
+    if ((solvedWith(a) && !live(a)) || (solvedWith(b) && !live(b)))
       return {
         reason: 'spent',
         text: 'One of these has already given up what it had. Try the records that have not.',

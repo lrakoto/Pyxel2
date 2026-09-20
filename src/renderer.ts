@@ -1,4 +1,11 @@
-import { AREAS, type AreaId, type SignLight } from './content.ts';
+import {
+  underShelter,
+  drawGutters,
+  drawWindowLife,
+  drawInteriorMood,
+  drawPassingLight,
+} from './atmosphere.ts';
+import { AREAS, type AreaId, type ClueId, type SignLight } from './content.ts';
 import type { Body, CaseModel } from './model.ts';
 import type { Combat } from './combat.ts';
 import { Sprites } from './sprites.ts';
@@ -10,6 +17,8 @@ import { rimAt, flickerOf } from './lighting.ts';
 import { buildSheen } from './sheen.ts';
 import { drawFlare } from './flare.ts';
 import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
+import { FootWater, drawInteriorForeground, drawMei } from './visual-details.ts';
+import { CharacterMotion } from './character-motion.ts';
 export const W = 960,
   H = 540;
 /** Carriages in the elevated train, and how fast it crosses the city. */
@@ -42,6 +51,9 @@ interface View {
   combat: Combat | null;
   aim: { x: number; y: number };
   title: boolean;
+  examining: boolean;
+  discovery: { id: ClueId; x: number; y: number } | null;
+  speaker: string | null;
   /** Wall-clock seconds since the last frame, for the scarf's cloth sim. */
   dt: number;
 }
@@ -50,6 +62,9 @@ export class Renderer {
   private plates = new Map<AreaId, HTMLCanvasElement>();
   private sheens = new Map<AreaId, HTMLCanvasElement>();
   private sprites = new Sprites();
+  private characterMotion = new CharacterMotion();
+  private footWater = new FootWater();
+  private discoveryLight = 0;
   private skyline: HTMLCanvasElement | null = null;
   private frontage: HTMLCanvasElement | null = null;
   private midground = buildMidground();
@@ -69,6 +84,7 @@ export class Renderer {
   private reflection = document.createElement('canvas');
   private reflectionContext = this.reflection.getContext('2d', { alpha: false })!;
   private foregroundGlow = this.radial('#65acb5', 128);
+  private contactShadow = this.radial('#020a0c', 64);
   /** One soft halo texture per sign colour, built on first use. */
   private halos = new Map<string, HTMLCanvasElement>();
   private mist: HTMLCanvasElement;
@@ -111,7 +127,7 @@ export class Renderer {
       ...(Object.keys(AREAS) as AreaId[]).map(async (id) => {
         if (id === 'street') return;
         const image = new Image();
-        image.src = `/env/${id}.webp`;
+        image.src = `${import.meta.env.BASE_URL}env/${id}.webp`;
         await image.decode();
         const plate = document.createElement('canvas');
         plate.width = AREAS[id].width;
@@ -134,11 +150,18 @@ export class Renderer {
       cam = Math.round(v.camera),
       figure = world.figureScale,
       t = v.reducedMotion ? 0 : v.time;
+    if (area === 'street' && !v.reducedMotion)
+      for (const strength of this.traffic.step(v.dt, W)) this.cue?.('traffic', strength);
+    const movingLights =
+      area === 'street' && !v.combat && !v.reducedMotion ? this.traffic.headlights(cam) : [];
+    const actorLights = movingLights.length ? [...world.lights, ...movingLights] : world.lights;
     // The neon falling on Cole drives his wet rim and the scarf's edge glow.
-    const rim = rimAt(world.lights, v.player.x, v.player.y - 40 * figure, v.player.facing, t);
+    const rim = rimAt(actorLights, v.player.x, v.player.y - 40 * figure, v.player.facing, t);
     if (this.lastArea !== area) {
       this.lastArea = area;
       this.scarf.reset();
+      this.footWater.reset();
+      this.discoveryLight = 0;
     }
     c.globalAlpha = 1;
     c.globalCompositeOperation = 'source-over';
@@ -209,21 +232,78 @@ export class Renderer {
     }
     c.globalCompositeOperation = 'source-over';
     c.globalAlpha = 1;
+    if (!v.combat) {
+      drawPassingLight(c, cam, movingLights);
+      if (area === 'street' && !v.reducedMotion) drawWindowLife(c, cam, t);
+      drawInteriorMood(c, area, cam, t);
+    }
     if (area === 'street') {
+      drawMei(c, cam, t, v.speaker === 'MEI');
       if (!v.reducedMotion) this.crowd.step(v.dt);
       this.crowd.draw(c, cam, t, world.ground);
     }
     if (v.model.deduced && !v.model.save.companion && area === 'street')
-      this.drawLyra(c, 1280, cam, t, figure, world.lights);
-    if (area === 'den') this.drawLyra(c, 1150, cam, t, figure, world.lights);
+      this.drawLyra(
+        c,
+        1280,
+        cam,
+        t,
+        figure,
+        world.lights,
+        v.speaker === 'LYRA',
+        v.player.x < 1280 ? -1 : 1,
+      );
+    if (area === 'den')
+      this.drawLyra(
+        c,
+        1150,
+        cam,
+        t,
+        figure,
+        world.lights,
+        v.speaker === 'LYRA',
+        v.player.x < 1150 ? -1 : 1,
+      );
     const p = v.player,
       tag = !p.grounded ? 'jump' : Math.abs(p.vx) > 8 ? 'walk' : 'idle';
-    c.globalAlpha = 0.4;
-    c.fillStyle = '#000';
-    c.beginPath();
-    c.ellipse(p.x - cam, world.ground + 2, 22 * figure, 4 * figure, 0, 0, Math.PI * 2);
-    c.fill();
-    c.globalAlpha = 1;
+    const motion = this.characterMotion.update(
+      v.dt,
+      p.facing,
+      p.vx,
+      v.examining,
+      !!v.speaker,
+      v.reducedMotion,
+    );
+    if (!v.combat) {
+      this.sprites.drawGroundShadow(
+        c,
+        motion.tag,
+        motion.time,
+        p.x - cam,
+        world.ground,
+        p.facing,
+        73 * figure,
+        (rim?.dirX ?? 0.3) * p.facing,
+        Math.abs(p.y - world.ground),
+      );
+      c.save();
+      c.globalAlpha = 0.32;
+      c.drawImage(
+        this.contactShadow,
+        p.x - cam - 20 * figure,
+        world.ground - 3 * figure,
+        40 * figure,
+        8 * figure,
+      );
+      c.restore();
+    } else {
+      c.globalAlpha = v.combat ? 0.4 : Math.max(0.12, 0.48 - Math.abs(p.y - world.ground) * 0.004);
+      c.fillStyle = '#000';
+      c.beginPath();
+      c.ellipse(p.x - cam, world.ground + 2, 22 * figure, 4 * figure, 0, 0, Math.PI * 2);
+      c.fill();
+      c.globalAlpha = 1;
+    }
     // The scarf hangs from his neck and is simulated in world space, so it
     // keeps its momentum through a turn instead of snapping with the mirror.
     // Anchored over the coat's front edge rather than his centre line, so
@@ -237,9 +317,34 @@ export class Renderer {
     );
     if (!v.combat || v.combat.invulnerable <= 0 || Math.floor(t * 18) % 2 === 0) {
       // The coat's original pixel silhouette and red scarf remain recognizable.
-      this.sprites.draw(c, 'cole', tag, t, p.x - cam, p.y, p.facing, 73 * figure, rim);
+      this.sprites.draw(
+        c,
+        'cole',
+        v.combat ? tag : motion.tag,
+        v.combat ? t : motion.time,
+        p.x - cam,
+        p.y,
+        p.facing,
+        73 * figure,
+        rim,
+      );
       this.scarf.draw(c, cam, rim);
     }
+    if (!v.combat) {
+      const wet =
+        area === 'street' ||
+        !!world.water?.puddles?.some(
+          (w) => Math.abs(w.x - p.x) < w.rx && Math.abs(w.y - world.ground) < w.ry + 25,
+        );
+      this.footWater.step(
+        v.dt,
+        p.x,
+        world.ground + 7,
+        wet,
+        p.grounded && Math.abs(p.vx) > 8,
+        v.reducedMotion,
+      );
+    } else this.footWater.reset();
     if (v.combat) {
       this.drawCombat(c, v, figure, world.ground);
     }
@@ -249,6 +354,7 @@ export class Renderer {
     if (world.water?.puddles && area !== 'street')
       drawPuddles(c, cam, t, world.water.puddles, world.lights);
     if (area === 'street') this.drawReflections(c, cam, t);
+    if (!v.combat) this.footWater.draw(c, cam);
     if (v.scan && !v.title) {
       c.fillStyle = '#7ad2c205';
       c.fillRect(0, 0, W, H);
@@ -274,8 +380,6 @@ export class Renderer {
       }
     }
     if (area === 'street') {
-      if (!v.reducedMotion)
-        for (const strength of this.traffic.step(v.dt, W)) this.cue?.('traffic', strength);
       this.traffic.draw(c, cam, world.lights, t);
     }
     // Near-camera architecture moves faster than the street, making depth legible.
@@ -308,6 +412,40 @@ export class Renderer {
       c.globalAlpha = 1;
       c.globalCompositeOperation = 'source-over';
     }
+    if (!v.combat) drawInteriorForeground(c, area, cam, t, this.plates.get(area));
+    this.discoveryLight +=
+      ((v.discovery ? 1 : 0) - this.discoveryLight) *
+      (v.reducedMotion ? 1 : 1 - Math.exp(-v.dt * 3));
+    if (v.discovery && !v.combat) {
+      const dx = v.discovery.x - cam,
+        dy = v.discovery.y;
+      c.save();
+      c.globalCompositeOperation = 'screen';
+      c.globalAlpha = 0.12 * this.discoveryLight;
+      c.drawImage(this.light, dx - 100, dy - 80, 200, 160);
+      c.restore();
+      if (v.discovery.id === 'fragment' || v.discovery.id === 'chime') {
+        c.save();
+        c.translate(dx - 22, dy + 50);
+        c.strokeStyle = '#a2d9c5';
+        c.lineWidth = 1.5;
+        c.globalAlpha = 0.65 * this.discoveryLight;
+        c.beginPath();
+        c.moveTo(-32, 7);
+        c.quadraticCurveTo(-12, -28, 8, -5);
+        c.lineTo(35, -27);
+        c.lineTo(24, 0);
+        c.quadraticCurveTo(41, 0, 47, 10);
+        c.lineTo(25, 14);
+        c.quadraticCurveTo(0, 38, -18, 14);
+        c.lineTo(-41, 24);
+        c.lineTo(-30, 9);
+        c.stroke();
+        c.globalAlpha = 0.15 * this.discoveryLight;
+        for (let y = -32; y < 40; y += 4) c.fillRect(-50, y, 105, 1);
+        c.restore();
+      }
+    }
     const bottom = c.createLinearGradient(0, 462, 0, H);
     bottom.addColorStop(0, '#060c0e00');
     bottom.addColorStop(1, '#060c0ee0');
@@ -318,8 +456,8 @@ export class Renderer {
   private async loadDepthLayers() {
     const sky = new Image(),
       front = new Image();
-    sky.src = '/env/skyline.webp';
-    front.src = '/env/street-front.webp';
+    sky.src = `${import.meta.env.BASE_URL}env/skyline.webp`;
+    front.src = `${import.meta.env.BASE_URL}env/street-front.webp`;
     await Promise.all([sky.decode(), front.decode()]);
     this.skyline = document.createElement('canvas');
     this.skyline.width = 1700;
@@ -461,6 +599,14 @@ export class Renderer {
       const x = Math.round(head + i * 74);
       if (x < -90 || x > width + 90) continue;
 
+      c.save();
+      c.globalCompositeOperation = 'screen';
+      const spill = c.createLinearGradient(0, 210, 0, 285);
+      spill.addColorStop(0, '#b49c5720');
+      spill.addColorStop(1, '#b49c5700');
+      c.fillStyle = spill;
+      for (let window = 0; window < 6; window++) c.fillRect(x + 6 + window * 10, 210, 5, 75);
+      c.restore();
       c.fillStyle = '#22363d';
       c.fillRect(x, 177, 71, 17);
       c.fillStyle = '#0c2029';
@@ -619,6 +765,28 @@ export class Renderer {
         2,
       );
     }
+    // Local wavefronts distort only the patch beneath each foot, keeping distant mirrors still.
+    for (const foot of this.footWater.ripples) {
+      const radius = 5 + foot.age * 34;
+      c.globalAlpha = (1 - foot.age / 0.85) * 0.42;
+      for (let row = -2; row <= 2; row++) {
+        const y = Math.round(foot.y + foot.age * 10 + row * 2);
+        const sy = reflectionSourceY(438, Math.max(0, y - 442));
+        const x = Math.round(foot.x - cam - radius);
+        const width = Math.round(radius * 2);
+        c.drawImage(
+          this.reflection,
+          x,
+          sy,
+          width,
+          2,
+          x + Math.sin(foot.age * 28 + row) * 2,
+          y,
+          width,
+          2,
+        );
+      }
+    }
     c.globalAlpha = 0.08;
     c.fillStyle = '#517d7e';
     c.fillRect(0, 442, c.canvas.width, 90);
@@ -631,6 +799,8 @@ export class Renderer {
     t: number,
     figure: number,
     lights: SignLight[],
+    speaking = false,
+    facing = 1,
   ) {
     const x = worldX - cam,
       y = 438;
@@ -639,23 +809,30 @@ export class Renderer {
     c.globalAlpha = 0.13 + Math.sin(t * 2) * 0.025;
     c.drawImage(this.mist, x - 55 * figure, y - 100 * figure, 110 * figure, 120 * figure);
     c.restore();
-    const rim = rimAt(lights, worldX, y - 40 * figure, 1, t);
-    this.sprites.draw(c, 'lyra', 'idle', t, x, y, 1, 70 * figure, rim);
+    const rim = rimAt(lights, worldX, y - 40 * figure, facing, t);
+    this.sprites.draw(c, 'lyra', speaking ? 'listen' : 'idle', t, x, y, facing, 70 * figure, rim);
   }
   private weather(c: CanvasRenderingContext2D, t: number, cam: number, reduced: boolean) {
     const W = this.canvas.width;
     if (!reduced) {
-      c.strokeStyle = '#aad3d440';
       c.lineWidth = 0.65;
-      c.beginPath();
-      for (const r of this.rain) {
-        const x = (((r.x - t * 48 * r.s - cam * 0.12) % W) + W) % W,
-          y = (r.y + t * 330 * r.s) % H;
-        c.moveTo(x, y);
-        c.lineTo(x - 3 * r.s, y + 12 * r.s);
+      // Batch the cool rain and the streaks crossing the studio's warm doorway.
+      for (const warm of [false, true]) {
+        c.strokeStyle = warm ? '#edc88e78' : '#aad3d440';
+        c.beginPath();
+        for (const [index, r] of this.rain.entries()) {
+          const x = (((r.x - t * 48 * r.s - cam * 0.12) % W) + W) % W,
+            y = (r.y + t * 330 * r.s) % H;
+          if (index % 3 !== 0 && underShelter(x + cam, y)) continue;
+          const inDoorLight = Math.abs(x + cam - 1008) < 34 && y > 332 && y < 441;
+          if (inDoorLight !== warm) continue;
+          c.moveTo(x, y);
+          c.lineTo(x - 3 * r.s, y + 12 * r.s);
+        }
+        c.stroke();
       }
-      c.stroke();
     }
+    if (!reduced) drawGutters(c, cam, t);
     c.strokeStyle = '#a5c7c036';
     c.lineWidth = 0.6;
     for (let i = 0; i < 24; i++) {

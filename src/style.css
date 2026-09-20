@@ -2367,3 +2367,430 @@ button {
     font-size: 11px;
   }
 }
+
+/* Investigation files and companion conversations. */
+.case-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.case-tabs button {
+  padding: 10px 14px;
+  border: 1px solid #435457;
+  background: #111c21;
+  color: #acbec2;
+  text-align: left;
+}
+.case-tabs button[aria-pressed='true'] {
+  color: #b9eee2;
+  border-color: #83c5b4;
+  background: #1b3434;
+}
+.topic-list {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.topic-intro {
+  color: #b6c7c9;
+  font-style: italic;
+  margin-bottom: 24px;
+}
+.topic-list > button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 20px;
+  width: 100%;
+  text-align: left;
+  padding: 20px;
+  margin: 10px 0;
+  background: #142227;
+  border: 1px solid #374c51;
+  color: #dbe9e7;
+}
+.topic-list > button strong {
+  font-size: 16px;
+  font-weight: 500;
+}
+.topic-list > button span {
+  grid-column: 1;
+  color: #a4b9bc;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.topic-list > button svg {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+}
+.topic-list > button:hover,
+.case-tabs button:hover {
+  border-color: #b1dacb;
+  background: #24383b;
+}
+.field-notes {
+  margin-top: 30px;
+  border-top: 1px solid #374c51;
+  padding-top: 22px;
+}
+.field-notes article {
+  padding: 12px 0;
+}
+.field-notes h3 {
+  color: #c1dcd4;
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+.field-notes p {
+  color: #acbec2;
+  font-size: 14px;
+  line-height: 1.7;
+  max-width: 75ch;
+}
+.deductions h3 small {
+  display: block;
+  color: #8fa6a9;
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin-top: 6px;
+}
+.hotspot.new-insight .hotspot-dot {
+  color: #ffe1a4;
+  border-color: #e5bf7c;
+  box-shadow: 0 0 14px #e5bf7c55;
+}
+.hotspot.new-insight .hotspot-label {
+  color: #ffe1a4;
+}
+@media (max-width: 650px) {
+  .case-tabs {
+    gap: 6px;
+  }
+  .case-tabs button {
+    flex: 1;
+    font-size: 11px;
+  }
+  .topic-list > button {
+    padding: 15px;
+  }
+}
+
+/* A physical record accompanies the observation, without taking over input. */
+.evidence-closeup {
+  position: absolute;
+  right: 4%;
+  top: 16%;
+  width: min(34%, 360px);
+  pointer-events: none;
+  background: #142328f5;
+  border: 1px solid #64766b;
+  box-shadow: 0 14px 45px #0009;
+  transform: rotate(1deg);
+  padding: 8px 8px 14px;
+  z-index: 12;
+  animation: record-arrive 0.5s ease-out;
+}
+.evidence-closeup[hidden] {
+  display: none;
+}
+.evidence-closeup svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.evidence-closeup > span {
+  display: block;
+  margin: 10px 10px 5px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #9db9ad;
+}
+.evidence-closeup > strong {
+  display: block;
+  margin: 0 10px;
+  color: #e0e4ce;
+  font-size: 15px;
+  font-weight: 500;
+}
+.evidence-art > .record-illustration {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@keyframes record-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px) rotate(0deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(1deg);
+  }
+}
+@media (max-width: 650px) {
+  .evidence-closeup {
+    top: 18%;
+    right: 4%;
+    width: 46%;
+    padding: 4px 4px 8px;
+  }
+  .evidence-closeup > strong {
+    font-size: 11px;
+  }
+  .evidence-closeup > span {
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+}
+@media (max-height: 500px) and (min-width: 651px) {
+  .evidence-closeup {
+    top: 12%;
+    width: 23%;
+  }
+  .evidence-closeup > span {
+    display: none;
+  }
+  .evidence-closeup > strong {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .evidence-closeup {
+    animation: none;
+    transform: none;
+  }
+}
+.reduced-motion .evidence-closeup {
+  animation: none;
+  transform: none;
+}
+
+/* Records can be studied without disturbing the pair selected on the board. */
+.evidence-entry {
+  min-width: 0;
+}
+.inspect-record {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid #46564d;
+  border-top: 0;
+  color: #b8cdbb;
+  background: #14221f;
+  font: 11px var(--mono);
+}
+.inspect-record:hover {
+  color: #edf0d8;
+  background: #263a31;
+}
+.evidence-entry .evidence-art {
+  height: auto;
+  aspect-ratio: 360 / 235;
+  background: #122127;
+}
+.evidence-entry .evidence-art:after {
+  opacity: 0.35;
+  pointer-events: none;
+}
+.evidence-entry .record-illustration {
+  display: block;
+}
+.record-reader {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 36px;
+  padding: 32px 34px 40px;
+  align-items: start;
+}
+.record-reader figure {
+  margin: 0;
+  position: sticky;
+  top: 18px;
+  border: 1px solid #536456;
+  background: #122127;
+  box-shadow: 0 14px 34px #0004;
+}
+.record-reader figure > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.record-reader figcaption {
+  padding: 14px 18px;
+  border-top: 1px solid #394c43;
+  color: #9fb09b;
+  font: 10px var(--mono);
+  letter-spacing: 1.2px;
+}
+.record-body {
+  color: #d8dfc8;
+  font-size: 17px;
+  line-height: 1.75;
+  margin: 12px 0 24px;
+}
+.record-reader blockquote {
+  margin: 0 0 30px;
+  padding: 0 0 0 18px;
+  border-left: 2px solid #8c9472;
+  color: #b4c1ad;
+  font:
+    italic 17px/1.8 Georgia,
+    serif;
+}
+.record-reader cite {
+  display: block;
+  margin-top: 12px;
+  font: 11px var(--mono);
+  color: #879b8e;
+}
+.record-note {
+  border-top: 1px solid #3e5146;
+  padding: 22px 0;
+}
+.record-note h3 {
+  margin: 8px 0;
+  font-size: 17px;
+  font-weight: 500;
+  color: #d3dec8;
+}
+.record-note p {
+  color: #aabbad;
+  line-height: 1.75;
+  font-size: 14px;
+}
+@media (max-width: 850px) {
+  .record-reader {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 24px;
+  }
+  .record-reader figure {
+    position: static;
+    max-width: 560px;
+    width: 100%;
+    margin: auto;
+  }
+}
+@media (max-width: 450px) {
+  .record-body {
+    font-size: 15px;
+  }
+  .record-reader {
+    padding: 16px;
+  }
+}
+.case-hint {
+  margin: 0 34px 12px;
+  border: 1px solid #45594d;
+  background: #15241f;
+  color: #b9c9b5;
+}
+.case-hint summary {
+  padding: 14px 16px;
+  cursor: pointer;
+  font: 12px var(--mono);
+}
+.case-hint p {
+  padding: 0 16px 16px;
+  margin: 0;
+  line-height: 1.7;
+  font-size: 14px;
+  max-width: 75ch;
+}
+@media (pointer: coarse) {
+  .inspect-record,
+  .case-tabs button,
+  .text-button,
+  .icon-button,
+  .focus-button {
+    min-height: 44px;
+  }
+  .hotspot {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .case-hint summary {
+    min-height: 44px;
+  }
+}
+@media (max-width: 650px) {
+  .case-hint {
+    margin: 0 16px 12px;
+  }
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+summary:focus-visible {
+  outline: 2px solid #b8d7b6;
+  outline-offset: 3px;
+}
+
+/* During examination the record and the spoken observation own the frame. */
+.in-dialogue .objective {
+  visibility: hidden;
+  pointer-events: none;
+}
+.in-dialogue .location h1 {
+  font-size: 28px;
+}
+.in-dialogue .location-rule {
+  width: 28px;
+  opacity: 0.45;
+}
+.in-dialogue .location .eyebrow {
+  opacity: 0.6;
+}
+.in-dialogue .companion {
+  visibility: hidden;
+}
+@media (max-width: 650px) {
+  .in-dialogue .location h1 {
+    font-size: 21px;
+  }
+}
+
+.in-dialogue .area-card {
+  visibility: hidden;
+}
+.in-dialogue .hotspots,
+.in-dialogue .touch-controls {
+  visibility: hidden;
+}
+@media (max-height: 500px) and (min-width: 651px) {
+  .in-dialogue .dialogue {
+    left: 3%;
+    right: auto;
+    width: 65%;
+    bottom: 5%;
+    padding: 14px 18px;
+  }
+  .in-dialogue .portrait-mark {
+    display: none;
+  }
+  .in-dialogue .dialogue p {
+    font-size: 12px;
+    line-height: 1.65;
+    min-height: 3.3em;
+  }
+  .in-dialogue .evidence-closeup {
+    width: 24%;
+    right: 3%;
+    top: 12%;
+  }
+}
+@media (pointer: coarse) {
+  .dialogue-bottom button {
+    min-height: 44px;
+  }
+}
