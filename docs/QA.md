@@ -284,3 +284,9 @@ All new effects are excluded from combat; reduced motion freezes atmospheric tim
 Added two near-plane street vents with cached feathered vapor, world-anchored drift and independent parallax. Existing foreground railings now catch restrained wet highlights from nearby scene/headlights and shed sparse droplets. Culled offscreen vents; vapor uses a single 128×64 cached texture and bounded draws. Reduced motion retains static mist and disables falling drops. Excluded from combat.
 
 Reviewed the actual-renderer street capture; Pages build and formatting pass. No physical-device performance run in this pass.
+
+## Interior glass and projection finish
+
+Added subtle frame-edge condensation and stationary beads to existing interior glass, faint tapered window slats behind studio furniture, and an 18-second localized scan inside the Den archive projection. Existing rain runners remain responsible for moving water. All additions are behind characters and excluded from combat; reduced motion retains static glass/light and suppresses the scan.
+
+Reviewed actual-renderer studio and Den captures and refreshed both images. Pages production build and formatting pass. No live browser or physical-device review in this pass.

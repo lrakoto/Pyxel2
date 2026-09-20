@@ -1,3 +1,4 @@
+import { interiorFinish } from './interior-finish.ts';
 import { NearWeather } from './near-weather.ts';
 import { evidenceLight, edgeLight, roomVeil, dampAsphalt } from './world-polish.ts';
 import {
@@ -279,6 +280,7 @@ export class Renderer {
       drawInteriorMood(c, area, cam, t);
     }
     if (!v.combat) {
+      interiorFinish(c, area, cam, t);
       roomVeil(c, area, cam, t);
       if (!v.title) evidenceLight(c, v.model, cam);
       if (area === 'street') edgeLight(c, cam, movingLights);
