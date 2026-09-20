@@ -262,3 +262,9 @@ Darkened the page surround to charcoal/olive cloth and paper, with readable chal
 Preserved the olive design as annotated tag `checkpoint-olive-case-jacket` at `1f1dfac`. The leather study adds dark walnut stock, an authored tiled leather-grain SVG, saddle stitching, burnished edges, and a debossed monogram. Reviewed desktop and 390×844 browser layouts.
 
 Touch-control descendants now disable selection (including WebKit selection) and iOS touch callouts; the control strip also cancels contextmenu. Existing pointer capture/release behavior stays intact, and notebook text remains selectable. Verified the browser context menu is suppressed on the movement control and computed user-select/touch-action are none. A physical iPhone long-press retest is still needed. Pages build and formatting pass.
+
+## Fullscreen and rotation
+
+Added an accessible fullscreen toggle in the retained top control strip. Requests document fullscreen so modal notebooks remain available; unsupported/denied requests retain an immersive viewport layout, with the same visible exit button. Escape exits the fallback when no dialog is open. Dynamic viewport height and safe-area padding adapt to orientation/browser chrome; existing ResizeObserver updates the camera and render dimensions.
+
+Browser checked enter/exit, portrait 390×844, landscape 844×390, and notebook open/return while immersive. Pages build and formatting pass. Physical iPhone native fullscreen availability and notch/browser chrome behavior remain device checks; fallback cannot hide browser chrome.

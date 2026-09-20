@@ -1,6 +1,8 @@
 import './style.css';
 import './notebook.css';
 import './desk.css';
+import './fullscreen.css';
+import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint, writeCheckpoint } from './checkpoint.ts';
 import { evidenceArt } from './evidence-art.ts';
@@ -33,6 +35,7 @@ const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getEleme
 const icon = (name: string) => {
   const paths: Record<string, string> = {
     case: '<path d="M5 3h15v18H5zM8 3v18M3 7h4M3 12h4M3 17h4M11 8h6M11 12h6"/>',
+    fullscreen: '<path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/>',
     pause: '<path d="M8 5v14M16 5v14"/>',
     sound: '<path d="M11 4 5 9H2v6h3l6 5zM15 8q6 4 0 8M18 4q10 8 0 16"/>',
     map: '<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/>',
@@ -60,6 +63,7 @@ document.getElementById('app')!.innerHTML = `
     <button class="nav-button" id="board-btn" aria-label="Investigation notebook">${icon('case')}<span>Notebook</span><kbd>J</kbd><b id="clue-count">00</b></button>
     <button class="icon-button" id="map-btn" aria-label="District map" title="District map [M]">${icon('map')}</button>
     <button class="icon-button" id="sound-btn" aria-label="Mute sound" aria-pressed="false" title="Toggle sound">${icon('sound')}</button>
+    <button class="icon-button" id="fullscreen-btn" aria-label="Enter fullscreen view" aria-pressed="false" title="Fullscreen view">${icon('fullscreen')}</button>
     <button class="icon-button" id="pause-btn" aria-label="Pause and settings" title="Pause [Esc]">${icon('pause')}</button>
    </nav>
   </header>
@@ -212,6 +216,7 @@ class Game {
   }
   bind() {
     const s = { signal: this.events.signal };
+    bindFullscreen($<HTMLButtonElement>('fullscreen-btn'), this.events.signal);
     $('begin-btn').addEventListener(
       'click',
       () => {
