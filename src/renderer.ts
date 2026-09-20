@@ -162,10 +162,21 @@ export class Renderer {
       for (const strength of this.traffic.step(v.dt, W)) this.cue?.('traffic', strength);
     const movingLights =
       area === 'street' && !v.combat && !v.reducedMotion ? this.traffic.headlights(cam) : [];
+    const lyraX =
+      area === 'den'
+        ? 1150
+        : area === 'street' && v.model.deduced && !v.model.save.companion
+          ? 1280
+          : null;
+    const lyraLight: SignLight | null =
+      !v.combat && lyraX !== null
+        ? { x: lyraX, y: world.ground - 36 * figure, color: '#83c9ff', intensity: 1.3 }
+        : null;
+    const sceneLights = lyraLight ? [...world.lights, lyraLight] : world.lights;
     const actorLights =
       !v.combat && area === 'street'
-        ? [...world.lights, ...movingLights, { x: 1008, y: 386, color: '#ecc18a', intensity: 0.75 }]
-        : world.lights;
+        ? [...sceneLights, ...movingLights, { x: 1008, y: 386, color: '#ecc18a', intensity: 0.75 }]
+        : sceneLights;
     // The neon falling on Cole drives his wet rim and the scarf's edge glow.
     const rim = rimAt(actorLights, v.player.x, v.player.y - 40 * figure, v.player.facing, t);
     if (this.lastArea !== area) {
@@ -244,6 +255,21 @@ export class Renderer {
     }
     c.globalCompositeOperation = 'source-over';
     c.globalAlpha = 1;
+    if (lyraLight) {
+      // Broad reflected light on the room and a flattened pool on the floor.
+      // The captured live scene carries both into the water reflection.
+      let glow = this.halos.get(lyraLight.color);
+      if (!glow) this.halos.set(lyraLight.color, (glow = this.radial(lyraLight.color, 128)));
+      const x = lyraLight.x - cam;
+      const radius = 48 + 28 * figure;
+      c.save();
+      c.globalCompositeOperation = 'screen';
+      c.globalAlpha = 0.16;
+      c.drawImage(glow, x - radius, lyraLight.y - radius, radius * 2, radius * 2);
+      c.globalAlpha = 0.25;
+      c.drawImage(glow, x - radius, world.ground - 13, radius * 2, 42);
+      c.restore();
+    }
     if (!v.combat) {
       drawPassingLight(c, cam, movingLights);
       if (area === 'street' && !v.reducedMotion) drawWindowLife(c, cam, t);
@@ -388,7 +414,7 @@ export class Renderer {
     // them. They sit below the interior floor line, so nothing they draw can
     // cover the figure casting the reflection.
     if (world.water?.puddles && area !== 'street')
-      drawPuddles(c, cam, t, world.water.puddles, world.lights);
+      drawPuddles(c, cam, t, world.water.puddles, sceneLights);
     if (area === 'street') this.drawReflections(c, cam, t, !v.combat);
     if (!v.combat) this.footWater.draw(c, cam);
     if (v.scan && !v.title) {
@@ -405,7 +431,7 @@ export class Renderer {
       c.fillRect(sx - 65, 0, 65, H);
     }
     if (area === 'street') this.weather(c, t, cam, v.reducedMotion);
-    else this.interiorAir(c, cam, t, world.lights);
+    else this.interiorAir(c, cam, t, sceneLights);
     const water = world.water;
     if (water && area !== 'street') {
       if (water.openings) drawOpenings(c, cam, t, water.openings);
@@ -416,7 +442,7 @@ export class Renderer {
       }
     }
     if (area === 'street') {
-      this.traffic.draw(c, cam, world.lights, t);
+      this.traffic.draw(c, cam, sceneLights, t);
     }
     // Near-camera architecture moves faster than the street, making depth legible.
     if (area === 'street') {

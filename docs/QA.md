@@ -236,3 +236,7 @@ Browser access restored through the Chrome extension. Verified the current devel
 Replaced Lyra's hooded exploration silhouette with an original blue-violet holographic avatar inspired by the requested Cortana direction: cropped hair, uncovered face, a structured high-collar suit, memory traces, and an open-hand listening pose. Added a faint projection footprint and a blue signal accent in her notebook dialogue. Story, voice text, clue gates, and combat remain unchanged. No Halo assets were imported.
 
 Inspected the actual renderer's Den capture with Cole and Lyra together and regenerated the character study. All 38 tests, formatting, and the Pages production build pass. This verification used renderer captures, not a live playthrough to Lyra's gated encounter.
+
+## Lyra light emission
+
+Lyra now supplies a scene light only when her avatar is present outside combat. Its blue contribution reaches Cole's existing cloth/rim-light and shadow-direction calculations, nearby interior dust, and puddle highlights. Soft screen-blended wall/floor spill is captured by live reflections. The light stays steady with reduced motion and does not alter the baked sign-sheen exposure. Verified the Den renderer capture; all 38 tests, formatting, and the Pages build pass.
