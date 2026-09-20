@@ -1,4 +1,5 @@
 import './style.css';
+import './notebook.css';
 import { readCheckpoint, writeCheckpoint } from './checkpoint.ts';
 import { evidenceArt } from './evidence-art.ts';
 import {
@@ -29,7 +30,7 @@ import {
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const icon = (name: string) => {
   const paths: Record<string, string> = {
-    case: '<rect x="3" y="6" width="18" height="15" rx="1"/><path d="M8 6V3h8v3M3 12h18M10 12v3h4v-3"/>',
+    case: '<path d="M5 3h15v18H5zM8 3v18M3 7h4M3 12h4M3 17h4M11 8h6M11 12h6"/>',
     pause: '<path d="M8 5v14M16 5v14"/>',
     sound: '<path d="M11 4 5 9H2v6h3l6 5zM15 8q6 4 0 8M18 4q10 8 0 16"/>',
     map: '<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zM9 3v16M15 5v16"/>',
@@ -51,10 +52,10 @@ const hasSave = model.save.clues.length > 0 || model.save.x !== 440 || model.sav
 document.getElementById('app')!.innerHTML = `
  <main class="shell" id="shell">
   <header class="topbar">
-   <a class="monogram" href="#" id="brand" aria-label="Pause Everybody Nobody">E<span>/</span>N<span class="brand-dot">®</span></a>
-   <div class="edition"><span>EVERYBODY / NOBODY</span><strong>ISSUE 01 <i>—</i> FRAGMENTS</strong></div>
+   <a class="monogram" href="#" id="brand" aria-label="Pause Everybody Nobody">E<span>/</span>N</a>
+   <div class="edition"><span>DETECTIVE COLE · FIELD NOTES</span><strong>CASE 07–031 <i>/</i> FRAGMENTS</strong></div>
    <nav aria-label="Game controls">
-    <button class="nav-button" id="board-btn" aria-label="Case board">${icon('case')}<span>Case board</span><kbd>J</kbd><b id="clue-count">00</b></button>
+    <button class="nav-button" id="board-btn" aria-label="Investigation notebook">${icon('case')}<span>Notebook</span><kbd>J</kbd><b id="clue-count">00</b></button>
     <button class="icon-button" id="map-btn" aria-label="District map" title="District map [M]">${icon('map')}</button>
     <button class="icon-button" id="sound-btn" aria-label="Mute sound" aria-pressed="false" title="Toggle sound">${icon('sound')}</button>
     <button class="icon-button" id="pause-btn" aria-label="Pause and settings" title="Pause [Esc]">${icon('pause')}</button>
@@ -63,9 +64,9 @@ document.getElementById('app')!.innerHTML = `
   <section class="game-wrap" aria-label="Playable investigation">
    <div class="scene-meta"><span><i class="live-dot"></i> <span id="district-label">NEW ANGELES</span></span><span id="scene-clock">04 SEP 2077 <b>·</b> 02:37 AM</span></div>
    <div id="stage" class="stage">
-    <canvas id="world" aria-label="Side-scrolling game world. Use A and D to walk, E to examine, I to highlight evidence, and J to open the case board."></canvas>
+    <canvas id="world" aria-label="Side-scrolling game world. Use A and D to walk, E to examine, I to highlight evidence, and J to open the notebook."></canvas>
     <div class="vignette" aria-hidden="true"></div><div class="scanlines" aria-hidden="true"></div>
-    <div class="scene-hud" id="scene-hud"><div class="location"><span class="eyebrow" id="location-subtitle"></span><h1 id="location-title"></h1><span class="location-rule"></span></div><button id="objective-btn" class="objective"><span class="eyebrow"><i class="red-square"></i> CURRENT LEAD</span><span id="objective-text"></span><small id="objective-hint">OPEN CASE BOARD ↗</small></button></div>
+    <div class="scene-hud" id="scene-hud"><div class="location"><span class="eyebrow" id="location-subtitle"></span><h1 id="location-title"></h1><span class="location-rule"></span></div><button id="objective-btn" class="objective"><span class="eyebrow"><i class="red-square"></i> FOLLOW UP</span><span id="objective-text"></span><small id="objective-hint">OPEN NOTEBOOK ↗</small></button></div>
     <div id="hotspots" class="hotspots" aria-label="Nearby places and evidence"></div>
     <div id="focus-status" class="focus-status" hidden><i></i> FOCUS ACTIVE <span>Follow what the city leaves behind.</span></div>
     <div id="destination" class="destination" hidden>⌄</div>
@@ -80,7 +81,7 @@ document.getElementById('app')!.innerHTML = `
    </div>
    <div class="scene-footer"><span id="chapter-label"><i>01</i> THE LAST WORK</span><span id="save-status"><i class="save-dot"></i> LOCAL CHECKPOINT</span><span>RAIN EXPECTED <i>↙</i> 17°C</span></div>
   </section>
-  <footer class="bottom-bar"><div class="controls-hint" id="controls-hint"><span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span></div><button id="focus-btn" class="focus-button" aria-pressed="false">${icon('focus')}<span>Focus mode</span><kbd>I</kbd></button><span class="build-label">A NEW ANGELES STORY <b>/</b> 01</span></footer>
+  <footer class="bottom-bar"><div class="controls-hint" id="controls-hint"><span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span></div><button id="focus-btn" class="focus-button" aria-pressed="false">${icon('focus')}<span>Focus mode</span><kbd>I</kbd></button><span class="build-label">PRIVATE NOTES <b>/</b> C. COLE</span></footer>
  </main>
  <dialog id="panel" class="panel" aria-labelledby="panel-title"><div id="panel-content"></div></dialog>
  <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -595,7 +596,7 @@ class Game {
           ) {
             this.toast(
               'THE ROOM HAS GIVEN UP ITS SECRETS',
-              'Open the case board [J] to connect the evidence.',
+              'Open the notebook [J] to connect the evidence.',
             );
           }
         },
@@ -778,6 +779,7 @@ class Game {
   panel(title: string, eyebrow: string, body: string, mode: string) {
     this.clearInput();
     this.panelMode = mode;
+    $('panel').dataset.mode = mode;
     $('panel-content').innerHTML =
       `<header class="panel-header"><div><span class="eyebrow">${eyebrow}</span><h2 id="panel-title">${title}</h2></div><button class="icon-button" data-action="close" aria-label="Close panel">${icon('close')}</button></header>${body}`;
     const d = $<HTMLDialogElement>('panel');
@@ -825,7 +827,7 @@ class Game {
     this.panel(
       second ? 'The first one' : 'The Graves case',
       second ? 'CASE FILE 07–032 · ARCHIVE 001' : 'CASE FILE 07–031 · MARLON GRAVES',
-      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${theories.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${theories.length} CONNECTIONS</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="board-layout"><div><div class="section-label">COLLECTED EVIDENCE <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">WORKING THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
+      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${theories.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${theories.length} CONNECTIONS</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
       'board',
     );
     const notes = INSIGHTS.filter(
@@ -861,7 +863,7 @@ class Game {
     this.panel(
       clue.title,
       `EVIDENCE RECORD · ${clue.category}`,
-      `<div class="record-reader"><figure>${evidenceArt(id)}<figcaption>RECORD ${String(Object.keys(CLUES).indexOf(id) + 1).padStart(2, '0')} · COLE’S CASE FILE</figcaption></figure><section><span class="eyebrow">RECORDED OBSERVATION</span><p class="record-body">${clue.body}</p><blockquote>${clue.observation}<cite>— Cole</cite></blockquote>${notes.map((i) => `<div class="record-note"><span class="eyebrow">RE-EXAMINATION</span><h3>${i.title}</h3><p>${i.text}</p></div>`).join('')}${links.map((d) => `<div class="record-note"><span class="eyebrow">ESTABLISHED CONNECTION</span><h3>${d.title}</h3><p>${d.conclusion}</p></div>`).join('')}<button class="primary" data-action="record-back">Return to case board ${icon('arrow')}</button></section></div>`,
+      `<div class="record-reader"><figure>${evidenceArt(id)}<figcaption>RECORD ${String(Object.keys(CLUES).indexOf(id) + 1).padStart(2, '0')} · COLE’S CASE FILE</figcaption></figure><section><span class="eyebrow">RECORDED OBSERVATION</span><p class="record-body">${clue.body}</p><blockquote>${clue.observation}<cite>— Cole</cite></blockquote>${notes.map((i) => `<div class="record-note"><span class="eyebrow">RE-EXAMINATION</span><h3>${i.title}</h3><p>${i.text}</p></div>`).join('')}${links.map((d) => `<div class="record-note"><span class="eyebrow">ESTABLISHED CONNECTION</span><h3>${d.title}</h3><p>${d.conclusion}</p></div>`).join('')}<button class="primary" data-action="record-back">Return to notebook ${icon('arrow')}</button></section></div>`,
       'record',
     );
     $('panel').scrollTop = 0;
@@ -901,7 +903,7 @@ class Game {
     this.panel(
       this.started ? 'A moment in the rain.' : 'Before you step outside.',
       'EVERYBODY / NOBODY',
-      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Case board / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Continue into The First One after the Graves case.</p></div>`,
+      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Notebook / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Continue into The First One after the Graves case.</p></div>`,
       'pause',
     );
   }

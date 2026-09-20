@@ -220,3 +220,13 @@ Browser access restored through the Chrome extension. Verified the current devel
 - Studio pigment motes and intermittent receiver light contrast with the Den's restrained projection scans and monitor activity. Reduced motion freezes or suppresses the new movement.
 - Reloaded the current build in Chrome, continued the saved investigation and walked from the studio to the street. Inspected the Den through a direct render of the actual drawing modules, not a live Den playthrough. Refreshed scene and character study images.
 - Production build, formatting and all 36 tests pass, including shelter boundaries and ambient-event timing. A complete second-case playthrough remains outside this visual check.
+
+## Spatial depth and field-notebook presentation
+
+- Added bounded camera-relative relief to storefront doors, windows and awning fascia using crops from the authored frontage, plus a projecting sign edge. Corrected upper-window coordinates against the source plate during visual review.
+- Added a service-passage view behind the street fence, with receding pavement, walls, haze and an occasional distant silhouette. It is scenery, not a new traversable area.
+- Added near-plane fire escapes, dripping edges and railings; interiors now have separate hanging lamps and middle-plane furniture alongside the existing foreground easels, cables and racks. Cabinet faces reuse the room artwork.
+- Added smooth shelter shading, warm studio-door light and short wall silhouettes for Cole. Street water combines a faint stretched environment reflection with the live near-scene mirror and irregular puddle boundaries. Combat mechanics and original character art remain unchanged.
+- Redesigned the surrounding interface, notebook, evidence reader, dialogue, map and settings around cloth, warm paper, ink, tabs and annotations. Existing keyboard controls and record-selection behavior are retained. Phone evidence cards use a single column.
+- Browser checks: entered the studio from the street, re-examined the saved journal, inspected the dialogue/evidence layout, notebook and full record at desktop and 390×844, and inspected the map. Inspected studio/Den scene captures from the actual renderer. No complete Den/story playthrough or physical-device touch/performance check in this pass.
+- All 38 tests, formatting, and the GitHub Pages production build pass. New tests cover bounded relief across viewport sizes and smooth shelter-light boundaries.

@@ -1,4 +1,11 @@
 import {
+  drawRelief,
+  drawAlley,
+  drawNearArchitecture,
+  drawRoomFurniture,
+  shelterShade,
+} from './spatial.ts';
+import {
   underShelter,
   drawGutters,
   drawWindowLife,
@@ -59,6 +66,7 @@ interface View {
 }
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
+  private distantReflection = document.createElement('canvas');
   private plates = new Map<AreaId, HTMLCanvasElement>();
   private sheens = new Map<AreaId, HTMLCanvasElement>();
   private sprites = new Sprites();
@@ -154,7 +162,10 @@ export class Renderer {
       for (const strength of this.traffic.step(v.dt, W)) this.cue?.('traffic', strength);
     const movingLights =
       area === 'street' && !v.combat && !v.reducedMotion ? this.traffic.headlights(cam) : [];
-    const actorLights = movingLights.length ? [...world.lights, ...movingLights] : world.lights;
+    const actorLights =
+      !v.combat && area === 'street'
+        ? [...world.lights, ...movingLights, { x: 1008, y: 386, color: '#ecc18a', intensity: 0.75 }]
+        : world.lights;
     // The neon falling on Cole drives his wet rim and the scarf's edge glow.
     const rim = rimAt(actorLights, v.player.x, v.player.y - 40 * figure, v.player.facing, t);
     if (this.lastArea !== area) {
@@ -174,6 +185,7 @@ export class Renderer {
     }
     if (area === 'street' && this.frontage && this.skyline) {
       this.drawDepth(c, cam, t);
+      if (!v.combat) drawRelief(c, this.frontage, cam);
     } else {
       const plate = this.plates.get(area);
       if (plate) c.drawImage(plate, -cam, 0);
@@ -237,6 +249,14 @@ export class Renderer {
       if (area === 'street' && !v.reducedMotion) drawWindowLife(c, cam, t);
       drawInteriorMood(c, area, cam, t);
     }
+    if (!v.combat) drawRoomFurniture(c, area, cam, this.plates.get(area));
+    if (area === 'street' && !v.combat) {
+      if (this.distantReflection.width !== W) {
+        this.distantReflection.width = W;
+        this.distantReflection.height = H;
+      }
+      this.distantReflection.getContext('2d')!.drawImage(this.canvas, 0, 0);
+    }
     if (area === 'street') {
       drawMei(c, cam, t, v.speaker === 'MEI');
       if (!v.reducedMotion) this.crowd.step(v.dt);
@@ -275,6 +295,21 @@ export class Renderer {
       v.reducedMotion,
     );
     if (!v.combat) {
+      const againstWall =
+        area !== 'street' || (p.x > 70 && p.x < 500) || (p.x > 800 && p.x < 1140) || p.x > 1400;
+      if (againstWall)
+        this.sprites.drawGroundShadow(
+          c,
+          motion.tag,
+          motion.time,
+          p.x - cam,
+          world.ground,
+          p.facing,
+          73 * figure,
+          (rim?.dirX ?? 0.3) * p.facing,
+          0,
+          true,
+        );
       this.sprites.drawGroundShadow(
         c,
         motion.tag,
@@ -327,6 +362,7 @@ export class Renderer {
         p.facing,
         73 * figure,
         rim,
+        !v.combat && area === 'street' ? shelterShade(p.x) : 0,
       );
       this.scarf.draw(c, cam, rim);
     }
@@ -353,7 +389,7 @@ export class Renderer {
     // cover the figure casting the reflection.
     if (world.water?.puddles && area !== 'street')
       drawPuddles(c, cam, t, world.water.puddles, world.lights);
-    if (area === 'street') this.drawReflections(c, cam, t);
+    if (area === 'street') this.drawReflections(c, cam, t, !v.combat);
     if (!v.combat) this.footWater.draw(c, cam);
     if (v.scan && !v.title) {
       c.fillStyle = '#7ad2c205';
@@ -412,6 +448,7 @@ export class Renderer {
       c.globalAlpha = 1;
       c.globalCompositeOperation = 'source-over';
     }
+    if (!v.combat) drawNearArchitecture(c, area, cam, t);
     if (!v.combat) drawInteriorForeground(c, area, cam, t, this.plates.get(area));
     this.discoveryLight +=
       ((v.discovery ? 1 : 0) - this.discoveryLight) *
@@ -518,6 +555,7 @@ export class Renderer {
     this.drawWindowBloom(c, mid, t);
     this.drawFog(c, cam, t);
     this.drawTrain(c, cam, t);
+    drawAlley(c, cam, t);
     c.drawImage(this.frontage!, -cam, 0);
   }
   /**
@@ -723,7 +761,7 @@ export class Renderer {
     c.restore();
   }
 
-  private drawReflections(c: CanvasRenderingContext2D, cam: number, t: number) {
+  private drawReflections(c: CanvasRenderingContext2D, cam: number, t: number, layered: boolean) {
     if (this.reflection.width !== c.canvas.width) {
       this.reflection.width = c.canvas.width;
       this.reflection.height = H;
@@ -742,10 +780,34 @@ export class Renderer {
     ];
     for (const p of puddles) {
       const x = p.x - cam;
-      c.moveTo(x + p.w / 2, p.y);
-      c.ellipse(x, p.y, p.w / 2, p.h, 0, 0, Math.PI * 2);
+      for (let i = 0; i <= 48; i++) {
+        const a = (i / 48) * Math.PI * 2;
+        const edge = 1 + Math.sin(i * 2.7 + p.x) * 0.025;
+        const px = x + ((Math.cos(a) * p.w) / 2) * edge;
+        const py = p.y + Math.sin(a) * p.h * edge + Math.sin(i * 1.7) * 1.5;
+        if (i === 0) c.moveTo(px, py);
+        else c.lineTo(px, py);
+      }
+      c.closePath();
     }
     c.clip();
+    // Distant facades stretch through the water more than nearby figures.
+    if (layered && this.distantReflection.width === c.canvas.width) {
+      for (let depth = 0; depth < 91; depth += 3) {
+        c.globalAlpha = 0.13 * (1 - depth / 120);
+        c.drawImage(
+          this.distantReflection,
+          0,
+          Math.max(0, reflectionSourceY(438, depth, 0.25)),
+          c.canvas.width,
+          3,
+          Math.sin(depth * 0.15 + t) * 2,
+          442 + depth,
+          c.canvas.width,
+          3,
+        );
+      }
+    }
     for (let depth = 0; depth < 91; depth += 2) {
       const y = 442 + depth,
         sy = reflectionSourceY(438, depth);

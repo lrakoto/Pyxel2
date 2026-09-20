@@ -132,6 +132,7 @@ export class Sprites {
     height: number,
     lightDirection: number,
     lift: number,
+    wall = false,
   ) {
     const frame = this.resolve('cole', tag, time);
     let silhouette = this.shadows.get(frame.key);
@@ -149,8 +150,15 @@ export class Sprites {
     const scale = height / frame.cellH;
     ctx.save();
     ctx.translate(Math.round(x), floor + 2);
-    ctx.transform(facing, 0, lightDirection * 0.28, -0.11, 0, 0);
-    ctx.globalAlpha = Math.max(0.06, 0.24 - lift * 0.002);
+    ctx.transform(
+      facing,
+      0,
+      lightDirection * (wall ? 0.12 : 0.28),
+      wall ? 0.83 : -0.11,
+      wall ? -lightDirection * 7 : 0,
+      wall ? -4 : 0,
+    );
+    ctx.globalAlpha = wall ? 0.16 : Math.max(0.06, 0.24 - lift * 0.002);
     ctx.drawImage(silhouette, -frame.pivotX * scale, -height, frame.sw * scale, frame.sh * scale);
     ctx.restore();
   }
@@ -164,6 +172,7 @@ export class Sprites {
     facing = 1,
     height = 70,
     rim: RimLight | null = null,
+    shade = 0,
   ) {
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
@@ -175,6 +184,24 @@ export class Sprites {
     const dw = frame.sw * scale;
     const dh = frame.sh * scale;
     ctx.drawImage(frame.src, frame.sx, frame.sy, frame.sw, frame.sh, dx, dy, dw, dh);
+    if (shade > 0) {
+      const mask = this.clothLight;
+      if (mask.width !== frame.sw || mask.height !== frame.sh) {
+        mask.width = frame.sw;
+        mask.height = frame.sh;
+      }
+      const mc = mask.getContext('2d')!;
+      mc.globalCompositeOperation = 'source-over';
+      mc.clearRect(0, 0, mask.width, mask.height);
+      mc.drawImage(frame.src, frame.sx, frame.sy, frame.sw, frame.sh, 0, 0, frame.sw, frame.sh);
+      mc.globalCompositeOperation = 'source-in';
+      mc.fillStyle = '#07151c';
+      mc.fillRect(0, 0, mask.width, mask.height);
+      ctx.save();
+      ctx.globalAlpha = shade;
+      ctx.drawImage(mask, dx, dy, dw, dh);
+      ctx.restore();
+    }
     // Broad, low-energy light across cloth; combat keeps the established edge-only pass.
     if (rim && ((id === 'cole' && tag in COLE_STORY_FRAMES) || id === 'lyra')) {
       const wash = this.clothLight;

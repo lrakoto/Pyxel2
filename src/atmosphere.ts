@@ -44,8 +44,8 @@ export function drawGutters(c: CanvasRenderingContext2D, cam: number, time: numb
 export function drawWindowLife(c: CanvasRenderingContext2D, cam: number, time: number) {
   c.save();
   for (const [i, w] of [
-    { x: 154, y: 122, w: 29, h: 35 },
-    { x: 367, y: 37, w: 23, h: 32 },
+    { x: 154, y: 155, w: 70, h: 45 },
+    { x: 367, y: 50, w: 13, h: 31 },
   ].entries()) {
     const phase = (time + i * 17) % 43;
     if (phase > 7) continue;

@@ -115,3 +115,9 @@ Play at **https://lrakoto.github.io/Pyxel2/**.
 The `Publish playable preview` workflow deploys pushes to `feat/case-board`, the current development branch. It installs locked dependencies, checks formatting, runs tests, builds, and publishes `dist` through GitHub Pages. Repository Settings → Pages must use **GitHub Actions** as its source. To move releases to another branch later, update the workflow's push filter.
 
 The workflow sets `GITHUB_PAGES=true` to build with `/Pyxel2/` as the base path. Ordinary local builds keep `/`, so a future host can use the same project without the Pages setting. Saves remain local to each browser and origin; localhost progress does not transfer to the online preview.
+
+### Spatial depth and notebook
+
+Doorways and windows have shallow camera-relative recesses, awnings project from the frontage, and a service passage recedes behind the street fence. Near-camera railings and fire escapes, hanging interior lamps, furniture and foreground easels create changing overlaps while walking. Shelter shade, doorway light, short wall shadows and two reflection treatments help ground Cole in the scene. These are layered Canvas effects, not a replacement 3D engine.
+
+The interface now follows Cole's field notebook: cloth cover, paper case tabs, pasted exhibits, ink-blue theory notes, a map insert and paper observation slips. Press **J** to open the notebook; all investigation controls and saves remain compatible.
