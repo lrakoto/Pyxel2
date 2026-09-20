@@ -1,3 +1,4 @@
+import { evidenceLight, edgeLight, roomVeil, dampAsphalt } from './world-polish.ts';
 import {
   drawRelief,
   drawAlley,
@@ -275,6 +276,11 @@ export class Renderer {
       if (area === 'street' && !v.reducedMotion) drawWindowLife(c, cam, t);
       drawInteriorMood(c, area, cam, t);
     }
+    if (!v.combat) {
+      roomVeil(c, area, cam, t);
+      if (!v.title) evidenceLight(c, v.model, cam);
+      if (area === 'street') edgeLight(c, cam, movingLights);
+    }
     if (!v.combat) drawRoomFurniture(c, area, cam, this.plates.get(area));
     if (area === 'street' && !v.combat) {
       if (this.distantReflection.width !== W) {
@@ -348,7 +354,7 @@ export class Renderer {
         Math.abs(p.y - world.ground),
       );
       c.save();
-      c.globalAlpha = 0.32;
+      c.globalAlpha = p.grounded ? 0.45 : 0.2;
       c.drawImage(
         this.contactShadow,
         p.x - cam - 20 * figure,
@@ -377,6 +383,12 @@ export class Renderer {
       73 * figure,
     );
     if (!v.combat || v.combat.invulnerable <= 0 || Math.floor(t * 18) % 2 === 0) {
+      c.save();
+      if (!v.combat && motion.lean) {
+        c.translate(p.x - cam, p.y);
+        c.transform(1, 0, motion.lean, 1, 0, 0);
+        c.translate(-(p.x - cam), -p.y);
+      }
       // The coat's original pixel silhouette and red scarf remain recognizable.
       this.sprites.draw(
         c,
@@ -390,6 +402,7 @@ export class Renderer {
         rim,
         !v.combat && area === 'street' ? shelterShade(p.x) : 0,
       );
+      c.restore();
       this.scarf.draw(c, cam, rim);
     }
     if (!v.combat) {
@@ -415,7 +428,10 @@ export class Renderer {
     // cover the figure casting the reflection.
     if (world.water?.puddles && area !== 'street')
       drawPuddles(c, cam, t, world.water.puddles, sceneLights);
-    if (area === 'street') this.drawReflections(c, cam, t, !v.combat);
+    if (area === 'street') {
+      if (!v.combat) dampAsphalt(c, cam, sceneLights);
+      this.drawReflections(c, cam, t, !v.combat);
+    }
     if (!v.combat) this.footWater.draw(c, cam);
     if (v.scan && !v.title) {
       c.fillStyle = '#7ad2c205';
@@ -840,7 +856,10 @@ export class Renderer {
       const ripple =
         Math.sin(depth * 0.81 + t * 2.7) * (0.4 + depth * 0.025) +
         Math.sin(depth * 0.19 - t * 1.4) * 1.4;
-      c.globalAlpha = 0.58 * (1 - depth / 120);
+      c.globalAlpha =
+        (layered ? 0.62 : 0.58) *
+        (1 - depth / 120) *
+        (layered ? 0.88 + 0.12 * Math.cos(depth * 0.63) : 1);
       c.drawImage(
         this.reflection,
         0,
@@ -900,6 +919,9 @@ export class Renderer {
     const rim = rimAt(lights, worldX, y - 40 * figure, facing, t);
     c.save();
     c.globalAlpha = 0.9;
+    c.translate(x, y);
+    c.transform(1, 0, speaking ? Math.sin(t * 1.2) * 0.008 * facing : 0, 1, 0, 0);
+    c.translate(-x, -y);
     this.sprites.draw(c, 'lyra', speaking ? 'listen' : 'idle', t, x, y, facing, 70 * figure, rim);
     c.restore();
     // A restrained projector footprint replaces the weight of a physical shadow.

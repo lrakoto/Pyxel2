@@ -8,14 +8,18 @@ export interface FootRipple {
 /** Distance-based emission stays independent of refresh rate; bounded transient storage. */
 export class FootWater {
   ripples: FootRipple[] = [];
+  footprints: FootRipple[] = [];
+  private foot = 1;
   private previous: number | null = null;
   private distance = 0;
   reset() {
     this.ripples = [];
+    this.footprints = [];
     this.previous = null;
     this.distance = 0;
   }
   step(dt: number, x: number, ground: number, wet: boolean, moving: boolean, reduced: boolean) {
+    this.footprints = this.footprints.filter((r) => (r.age += Math.max(0, dt)) < 3.2);
     this.ripples = this.ripples.filter((r) => (r.age += Math.max(0, dt)) < 0.85);
     if (reduced) {
       this.reset();
@@ -31,11 +35,19 @@ export class FootWater {
     if (this.distance >= 25) {
       this.distance %= 25;
       this.ripples.push({ x, y: ground + 5, age: 0 });
+      this.foot *= -1;
+      this.footprints.push({ x, y: ground - 5 + this.foot * 2, age: 0 });
+      if (this.footprints.length > 20) this.footprints.shift();
       if (this.ripples.length > 12) this.ripples.shift();
     }
   }
   draw(c: CanvasRenderingContext2D, cam: number) {
     c.save();
+    c.fillStyle = '#0b1b1b';
+    for (const f of this.footprints) {
+      c.globalAlpha = 0.22 * (1 - f.age / 3.2);
+      c.fillRect(f.x - cam - 3, f.y, 6, 2);
+    }
     c.strokeStyle = '#a3c9c0';
     c.lineWidth = 1;
     for (const r of this.ripples) {

@@ -272,3 +272,9 @@ Browser checked enter/exit, portrait 390×844, landscape 844×390, and notebook 
 ## Olive patina and responsive notes
 
 Added area-tinted edge spill (studio amber, Den blue, street teal), localized corner/tab wear, short notebook opening and exhibit-settling animations, and a margin inscription derived from earned case progress. The objective recedes while walking and restores on stopping, hover, keyboard focus, dialogue, or a modal. Both system and in-game reduced-motion settings suppress new transforms/transitions. Reviewed the studio surround and earned two-record margin note in the browser. Build and formatting pass; no new story gates or combat changes.
+
+## World integration graphics pass
+
+Added bounded fading wet footprints alongside the existing distance-based splashes, stronger grounded contact shadows, a short exploration-only settling lean for Cole, and a restrained Lyra speaking lean. Street damp grit receives small broken color highlights separately from puddle mirrors; live reflections now vary slightly by depth. Passing headlights catch authored awning/door edges at separate world positions. Low street haze and warm/cool room particles distinguish locations, while broad lighting gently emphasizes available evidence and dims after collection.
+
+All new effects are excluded from combat; reduced motion freezes atmospheric time, suppresses character lean and clears wet prints. Reviewed live studio dialogue and actual-renderer street/Den captures; refreshed all three scene captures. All 40 tests, Pages build and formatting pass. New tests cover footprint storage/expiry/reduced-motion clearing and finite stop settling. No physical-device performance or complete case playthrough was performed in this pass.

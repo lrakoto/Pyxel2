@@ -4,6 +4,8 @@ export class CharacterMotion {
   private turn = 0;
   private previousTag = '';
   private clock = 0;
+  private previousSpeed = 0;
+  private settle = 0;
   update(
     dt: number,
     facing: number,
@@ -12,6 +14,10 @@ export class CharacterMotion {
     speaking: boolean,
     reduced: boolean,
   ) {
+    if (Math.abs(this.previousSpeed) > 8 && Math.abs(speed) <= 8) this.settle = 0.45;
+    this.previousSpeed = speed;
+    this.settle = Math.max(0, this.settle - Math.max(0, dt));
+    const lean = reduced ? 0 : Math.sin((this.settle / 0.45) * Math.PI) * 0.016 * facing;
     if (facing !== this.facing) {
       this.facing = facing;
       this.turn = 0.16;
@@ -32,7 +38,7 @@ export class CharacterMotion {
     if (!reduced || tag === 'stride')
       this.clock += Math.max(0, dt) * (tag === 'stride' ? Math.min(1.4, Math.abs(speed) / 145) : 1);
     this.turn = Math.max(0, this.turn - Math.max(0, dt));
-    return { tag, time: reduced && tag !== 'stride' ? 0 : this.clock };
+    return { lean, tag, time: reduced && tag !== 'stride' ? 0 : this.clock };
   }
 }
 
