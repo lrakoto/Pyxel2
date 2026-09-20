@@ -268,3 +268,7 @@ Touch-control descendants now disable selection (including WebKit selection) and
 Added an accessible fullscreen toggle in the retained top control strip. Requests document fullscreen so modal notebooks remain available; unsupported/denied requests retain an immersive viewport layout, with the same visible exit button. Escape exits the fallback when no dialog is open. Dynamic viewport height and safe-area padding adapt to orientation/browser chrome; existing ResizeObserver updates the camera and render dimensions.
 
 Browser checked enter/exit, portrait 390×844, landscape 844×390, and notebook open/return while immersive. Pages build and formatting pass. Physical iPhone native fullscreen availability and notch/browser chrome behavior remain device checks; fallback cannot hide browser chrome.
+
+## Olive patina and responsive notes
+
+Added area-tinted edge spill (studio amber, Den blue, street teal), localized corner/tab wear, short notebook opening and exhibit-settling animations, and a margin inscription derived from earned case progress. The objective recedes while walking and restores on stopping, hover, keyboard focus, dialogue, or a modal. Both system and in-game reduced-motion settings suppress new transforms/transitions. Reviewed the studio surround and earned two-record margin note in the browser. Build and formatting pass; no new story gates or combat changes.

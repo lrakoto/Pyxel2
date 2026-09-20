@@ -2,6 +2,7 @@ import './style.css';
 import './notebook.css';
 import './desk.css';
 import './fullscreen.css';
+import './patina.css';
 import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint, writeCheckpoint } from './checkpoint.ts';
@@ -512,6 +513,7 @@ class Game {
   }
   refreshArea() {
     const a = this.currentArea;
+    $('shell').dataset.area = a.id;
     $('location-title').textContent = a.title;
     $('location-subtitle').textContent = a.subtitle;
     $('hotspots').innerHTML = a.hotspots
@@ -759,6 +761,17 @@ class Game {
       $('save-status').textContent = 'SESSION ONLY · STORAGE UNAVAILABLE';
     }
   }
+  caseMarginNote() {
+    const save = this.model.save;
+    if (save.resolution === 'protect') return 'Keep her safe. Keep the record.';
+    if (save.resolution === 'testify') return 'Put the truth on record.';
+    if (save.followup) return 'A person behind every fragment.';
+    if (save.companion) return 'No longer working alone.';
+    if (this.model.deduced) return 'The pieces agree. Follow them out.';
+    if (save.deductions.length) return 'A connection. Now test the rest.';
+    if (save.clues.length) return 'Record first. Conclusions later.';
+    return 'Follow the evidence.';
+  }
   sync() {
     $('clue-count').textContent = String(this.model.save.clues.length).padStart(2, '0');
     $('objective-text').textContent = this.model.objective;
@@ -836,7 +849,7 @@ class Game {
     this.panel(
       second ? 'The first one' : 'The Graves case',
       second ? 'CASE FILE 07–032 · ARCHIVE 001' : 'CASE FILE 07–031 · MARLON GRAVES',
-      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${theories.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${theories.length} CONNECTIONS</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> Follow the evidence.</span><small>C. Cole / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
+      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${theories.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${theories.length} CONNECTIONS</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>C. Cole / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
       'board',
     );
     const notes = INSIGHTS.filter(
@@ -1405,6 +1418,9 @@ class Game {
     }
   }
   tickUI() {
+    const walking =
+      Math.abs(this.player.vx) > 20 && !this.modal && !this.lines.length && !this.combat;
+    $('stage').classList.toggle('walking', walking);
     const show =
       this.started &&
       !this.modal &&

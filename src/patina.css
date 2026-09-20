@@ -1,0 +1,98 @@
+/* Light stays on the mounting edge; the game and paper retain their own contrast. */
+.shell {
+  --spill: #679b9124;
+}
+.shell[data-area='studio'] {
+  --spill: #b58a512c;
+}
+.shell[data-area='den'] {
+  --spill: #6e9cba2b;
+}
+.stage {
+  box-shadow:
+    0 0 20px 3px var(--spill),
+    0 4px 9px #0008,
+    0 0 0 2px #444c3b;
+  transition: box-shadow 700ms ease;
+}
+.immersive .stage {
+  box-shadow: 0 0 12px var(--spill);
+}
+.shell {
+  background-image:
+    radial-gradient(ellipse at 0 0, #b5af7930, transparent 90px),
+    radial-gradient(ellipse at 100% 100%, #ada36a1a, transparent 120px), url('/paper/fibers.svg'),
+    radial-gradient(ellipse at 15% 0, #79765318, transparent 60%),
+    repeating-linear-gradient(0deg, #c9c7a804 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, #161b18, #343a30 7px, #272e27 12px, #30372e 28px, #272f29 96%, #1b231e);
+}
+.topbar .nav-button {
+  background-image:
+    radial-gradient(ellipse at 8% 95%, #c1bb842d, transparent 50%), url('/paper/fibers.svg');
+  border-top-color: #aaa77d66;
+}
+.monogram {
+  border-style: dashed;
+  text-shadow: 1px 0 #161b1833;
+}
+.panel[open] {
+  animation: notebook-unfold 220ms ease-out;
+  transform-origin: 12% 50%;
+}
+.record-reader figure {
+  animation: exhibit-settle 260ms ease-out;
+}
+@keyframes notebook-unfold {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-3deg) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes exhibit-settle {
+  from {
+    opacity: 0.4;
+    translate: 0 -6px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.objective {
+  transition:
+    opacity 240ms ease,
+    transform 240ms ease;
+}
+.walking .objective:not(:hover):not(:focus-visible) {
+  opacity: 0.28;
+  transform: translateY(-5px) scale(0.96);
+  transform-origin: top right;
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel[open],
+  .record-reader figure {
+    animation: none;
+  }
+  .stage,
+  .objective {
+    transition: none;
+  }
+  .walking .objective:not(:hover):not(:focus-visible) {
+    transform: none;
+  }
+}
+.reduced-motion .panel[open],
+.reduced-motion .record-reader figure {
+  animation: none;
+}
+.reduced-motion .stage,
+.reduced-motion .objective {
+  transition: none;
+}
+.reduced-motion .walking .objective:not(:hover):not(:focus-visible) {
+  transform: none;
+}
