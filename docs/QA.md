@@ -252,3 +252,7 @@ Verified the live desktop notebook and examination dialogue, then the notebook a
 Extended the analog treatment beyond overlays into the page: woven desk background, worn stock jacket with a stitched edge and fold, stamped monogram, handwritten case label and captions, physical notebook tab, pasted control slip, dark monitor bezel, and taped title action. Kept the scene's light foreground colors explicit so the surrounding paper ink cannot leak into game labels. Adjusted title spacing for shorter desktop displays and retained dark focus outlines on paper.
 
 Reviewed the local title at 1680×853, portrait gameplay at 390×844, and landscape gameplay at 844×390. No captured browser warnings/errors. Production Pages build and formatting pass; no game logic changed.
+
+## Night case jacket
+
+Darkened the page surround to charcoal/olive cloth and paper, with readable chalk-toned labels, muted tape, softer fold highlights, worn cover edging, and a brass notebook clip. The live scene and notebook pages retain their own palettes. Reviewed desktop title and 390×844 gameplay; production build and formatting pass. Styling only; no gameplay changes.

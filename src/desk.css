@@ -1,8 +1,8 @@
 /* The playable scene sits inside Cole's open case jacket. */
 body {
-  background-color: #151b19;
+  background-color: #0c1110;
   background-image:
-    radial-gradient(ellipse at 19% 0, #77765a30, transparent 65%),
+    radial-gradient(ellipse at 19% 0, #67634b1c, transparent 65%),
     repeating-linear-gradient(2deg, #00000016 0 1px, transparent 1px 5px),
     repeating-linear-gradient(92deg, #b5b89b08 0 1px, transparent 1px 4px);
 }
@@ -12,21 +12,22 @@ body {
   max-width: 2280px;
   padding-inline: clamp(14px, 3.6vw, 82px);
   background:
-    url('/paper/fibers.svg'),
+    url('/paper/fibers.svg'), radial-gradient(ellipse at 15% 0, #79765318, transparent 60%),
+    repeating-linear-gradient(0deg, #c9c7a804 0 1px, transparent 1px 4px),
     linear-gradient(
       90deg,
-      #514d3d 0,
-      #a39674 7px,
-      #c2b594 12px,
-      #d2c5a3 28px,
-      #c9bc99 96%,
-      #9e9272 100%
+      #161b18 0,
+      #343a30 7px,
+      #272e27 12px,
+      #30372e 28px,
+      #272f29 96%,
+      #1b231e 100%
     );
   box-shadow:
     0 0 70px #0009,
-    inset 0 0 80px #55472d35;
-  border-inline: 1px solid #665f48;
-  color: var(--note-ink);
+    inset 0 0 80px #080c0990;
+  border-inline: 1px solid #464b39;
+  color: #c2c0a7;
 }
 .shell::before {
   content: '';
@@ -34,25 +35,25 @@ body {
   inset: 0 12px;
   pointer-events: none;
   z-index: -1;
-  border-left: 1px dashed #62594366;
+  border-left: 1px dashed #8e89734a;
   background:
-    linear-gradient(112deg, transparent 42%, #6154360b 42.2%, #fff6 42.35%, transparent 42.6%),
-    radial-gradient(ellipse at 94% 97%, #66502a26, transparent 28%);
+    linear-gradient(112deg, transparent 42%, #0004 42.2%, #a49f7726 42.35%, transparent 42.6%),
+    radial-gradient(ellipse at 94% 97%, #05090760, transparent 28%);
 }
 .topbar {
   height: 91px;
-  border-bottom: 1px solid #655c4166;
+  border-bottom: 1px solid #85846a32;
   gap: 22px;
 }
 .monogram {
-  color: #4e5146;
-  border: 2px double #696a55;
+  color: #b8b39a;
+  border: 2px double #94917a88;
   padding: 5px 9px 8px;
   transform: rotate(-4deg);
   opacity: 0.85;
 }
 .monogram > span:first-child {
-  color: #8d4937;
+  color: #b67b60;
 }
 .edition {
   border: 0;
@@ -60,129 +61,129 @@ body {
   gap: 5px;
 }
 .edition > span {
-  color: #625e4d;
+  color: #aba994;
   font-size: 9px;
 }
 .edition strong {
   font: 25px var(--hand);
-  color: #303e3b;
+  color: #c2c0a7;
   letter-spacing: 0.2px;
 }
 .edition i {
-  color: #82624e;
+  color: #a08e72;
 }
 .topbar .nav-button {
   position: relative;
-  background: url('/paper/fibers.svg'), #b4b28e;
-  color: #293e3c;
-  border: 1px solid #7b8066;
-  border-bottom: 3px solid #7e8064;
+  background: url('/paper/fibers.svg'), #424b3a;
+  color: #ddd8b9;
+  border: 1px solid #777e615e;
+  border-bottom: 3px solid #1b241c;
   border-radius: 4px 9px 2px 1px;
   transform: rotate(-2deg);
-  box-shadow: 2px 3px 4px #51432e33;
+  box-shadow: 2px 3px 4px #0006;
   font: 23px var(--hand);
   padding: 9px 14px;
 }
 .topbar .nav-button b {
-  color: #813e31;
+  color: #d29d7c;
 }
 .topbar .icon-button {
-  color: #44514a;
+  color: #b3b7a1;
   border-radius: 50%;
 }
 .topbar .icon-button:hover {
   background: #6c715123;
-  border-color: #737255;
+  border-color: #8e917966;
 }
 .topbar kbd,
 .bottom-bar kbd {
-  color: #565748;
-  border-color: #77745b70;
+  color: #b6b8a0;
+  border-color: #a7a48b44;
 }
 .scene-meta {
   height: 43px;
-  color: #514e40;
+  color: #adb09b;
   letter-spacing: 1px;
 }
 .scene-meta > span:first-child {
-  background: #e1d6b5;
+  background: #3d4436;
   padding: 5px 12px;
-  border: 1px solid #a89776;
+  border: 1px solid #76785b70;
   transform: rotate(-1deg);
-  box-shadow: 1px 2px 2px #65533022;
+  box-shadow: 1px 2px 2px #0005;
 }
 .scene-meta .live-dot {
-  background: #974b38;
+  background: #bc7b5d;
   box-shadow: none;
 }
 .scene-meta b {
-  color: #857359;
+  color: #9c9479;
 }
 .stage {
-  border: 5px solid #333c35;
-  outline: 1px solid #756d54;
+  border: 5px solid #101916;
+  outline: 1px solid #595f4a;
   border-radius: 5px 6px 3px 4px;
   box-shadow:
-    0 4px 7px #3d332766,
-    0 0 0 2px #b5a986,
+    0 4px 7px #0009,
+    0 0 0 2px #444c3b,
     inset 0 0 20px #000;
   max-height: calc(100svh - 250px);
 }
 .scene-footer {
-  color: #5c5947;
+  color: #aaa991;
   height: 43px;
   border-bottom: 0;
 }
 .scene-footer > span:first-child {
-  color: #34463f;
+  color: #b7bca4;
   font: 21px var(--hand);
 }
 .scene-footer > span:first-child i {
-  color: #884638;
+  color: #c09170;
   font: 10px var(--mono);
 }
 .scene-footer > span:last-child {
   font: 18px var(--hand);
   transform: rotate(2deg);
-  border-bottom: 1px solid #73634855;
+  border-bottom: 1px solid #a1987244;
 }
 .save-dot {
-  background: #4b705c;
+  background: #89a585;
 }
 .bottom-bar {
-  border-top: 1px dashed #8d8060;
+  border-top: 1px dashed #82826655;
   height: 73px;
-  color: #4b5041;
+  color: #b6b79f;
 }
 .controls-hint {
-  color: #4b5148;
-  background: url('/paper/fibers.svg'), #e0d5b7;
-  box-shadow: 1px 3px 4px #6b583433;
+  color: #c0c2aa;
+  background: url('/paper/fibers.svg'), #3c4537;
+  box-shadow: 1px 3px 4px #0005;
   padding: 12px 16px;
   transform: rotate(-0.7deg);
-  border-left: 3px solid #9a746058;
+  border-left: 3px solid #a1886158;
 }
 .focus-button {
-  color: #3c5149;
+  color: #b3c0a5;
 }
 .focus-button:hover {
-  color: #182f29;
+  color: #e0e3c7;
 }
 .build-label {
-  color: #714b38;
+  color: #b49b78;
   font: 22px var(--hand);
   transform: rotate(-3deg);
 }
 .build-label b {
-  color: #866147;
+  color: #997d5c;
 }
 /* A taped index card replaces the website-like title call to action. */
 .title-content > .primary {
   position: relative;
-  background: url('/paper/fibers.svg'), #d3c49f;
-  color: #2d3d35;
-  border: 1px solid #968666;
-  border-bottom: 3px solid #988765;
+  background: url('/paper/fibers.svg'), #59604a;
+  color: #e0ddc3;
+  border: 1px solid #89906c;
+  border-bottom: 3px solid #303b2c;
   font-family: var(--hand);
   font-size: clamp(22px, 2.1cqw, 31px);
   transform: rotate(-1deg);
@@ -195,14 +196,14 @@ body {
   left: 39%;
   width: 58px;
   height: 19px;
-  background: #b8b38a99;
+  background: #8f947566;
   transform: rotate(5deg);
   clip-path: polygon(3% 0, 100% 5%, 96% 100%, 0 93%);
   pointer-events: none;
 }
 .title-content > .primary:hover {
-  background-color: #e3d5b5;
-  color: #172b22;
+  background-color: #6b7358;
+  color: #fff3d4;
 }
 .issue-label strong {
   font-family: var(--hand);
@@ -357,9 +358,48 @@ body {
 }
 .focus-button svg,
 .focus-button[aria-pressed='true'] {
-  color: #315d4c;
+  color: #b8cba1;
 }
 .topbar :focus-visible,
 .bottom-bar :focus-visible {
-  outline-color: #315d4c;
+  outline-color: #b8cba1;
+}
+
+/* Worn cover corners and a restrained brass clip, outside the live scene. */
+.shell::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset: 7px;
+  border: 1px solid #b1ab7830;
+  border-radius: 2px 14px 5px 2px;
+  clip-path: polygon(0 0, 42px 0, 42px 2px, 2px 2px, 2px 42px, 0 42px, 0 100%, 100% 100%, 100% 0);
+  opacity: 0.6;
+}
+.topbar .nav-button::after {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 26px;
+  right: 12px;
+  top: -12px;
+  border: 2px solid #aaa17b;
+  border-radius: 5px;
+  transform: rotate(7deg);
+  box-shadow:
+    1px 1px 2px #0008,
+    inset 1px 0 #232d22;
+  pointer-events: none;
+}
+.topbar .nav-button:hover {
+  background-color: #535e45;
+  color: #f0ead0;
+}
+@media (max-width: 650px) {
+  .topbar .nav-button::after {
+    width: 7px;
+    height: 19px;
+    right: 6px;
+    top: -8px;
+  }
 }
