@@ -36,3 +36,7 @@ The middle-distance buildings and rail deck, moving train, near-camera objects, 
 
 Barlow Condensed and DM Sans are served from local font files. Their SIL Open Font License texts are included in `public/fonts/barlowcondensed-OFL.txt` and `public/fonts/dmsans-OFL.txt`. No third-party font requests are required at runtime.
 
+
+## Notebook handwriting and paper
+
+Caveat is bundled locally from the Google Fonts repository (`ofl/caveat`) under the SIL Open Font License; the license is included at `public/fonts/caveat-OFL.txt`. It supplies Cole's short handwritten annotations and headings. Long observations retain the existing typewriter face. The tiled paper fibers in `public/paper/fibers.svg`, folds, tape, binding, and stamps are authored SVG/CSS treatments.

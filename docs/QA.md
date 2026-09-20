@@ -240,3 +240,9 @@ Inspected the actual renderer's Den capture with Cole and Lyra together and rege
 ## Lyra light emission
 
 Lyra now supplies a scene light only when her avatar is present outside combat. Its blue contribution reaches Cole's existing cloth/rim-light and shadow-direction calculations, nearby interior dust, and puddle highlights. Soft screen-blended wall/floor spill is captured by live reflections. The light stays steady with reduced motion and does not alter the baked sign-sheen exposure. Verified the Den renderer capture; all 38 tests, formatting, and the Pages build pass.
+
+## Analog notebook materials
+
+Added a stitched gutter, offset page edges, paper fibers, creases, tape, irregular handwritten annotations, circled theory numbers, crossed-out resolved questions, and filed stamps. Evidence mounts distinguish photos, tracing sheets, receipts, carbon copies, and notebook extracts. Gameplay CRT treatment is preserved.
+
+Verified the live desktop notebook and examination dialogue, then the notebook and full record reader at a 390×844 browser viewport. Collected the lock through normal play, selected its evidence, opened the reader, and returned with Escape: selection and focus were preserved. No browser warnings or errors were captured. All 38 tests, formatting, and the GitHub Pages production build pass. This is browser viewport testing, not a physical-phone or full-case playthrough.
