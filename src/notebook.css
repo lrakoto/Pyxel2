@@ -626,3 +626,16 @@ body {
     font-size: 13px;
   }
 }
+/* Lyra remains a signal in the margins of Cole's physical notebook. */
+.dialogue.lyra .portrait-mark {
+  color: #48729a;
+  background: repeating-linear-gradient(0deg, #476f9510 0 2px, transparent 2px 5px);
+  border: 1px solid #56799466;
+}
+.dialogue.lyra .portrait-mark span {
+  color: #607cab;
+}
+.companion .waveform {
+  color: #91cce3;
+  text-shadow: 0 0 9px #587cbc88;
+}

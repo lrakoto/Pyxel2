@@ -230,3 +230,9 @@ Browser access restored through the Chrome extension. Verified the current devel
 - Redesigned the surrounding interface, notebook, evidence reader, dialogue, map and settings around cloth, warm paper, ink, tabs and annotations. Existing keyboard controls and record-selection behavior are retained. Phone evidence cards use a single column.
 - Browser checks: entered the studio from the street, re-examined the saved journal, inspected the dialogue/evidence layout, notebook and full record at desktop and 390×844, and inspected the map. Inspected studio/Den scene captures from the actual renderer. No complete Den/story playthrough or physical-device touch/performance check in this pass.
 - All 38 tests, formatting, and the GitHub Pages production build pass. New tests cover bounded relief across viewport sizes and smooth shelter-light boundaries.
+
+## Lyra holographic avatar
+
+Replaced Lyra's hooded exploration silhouette with an original blue-violet holographic avatar inspired by the requested Cortana direction: cropped hair, uncovered face, a structured high-collar suit, memory traces, and an open-hand listening pose. Added a faint projection footprint and a blue signal accent in her notebook dialogue. Story, voice text, clue gates, and combat remain unchanged. No Halo assets were imported.
+
+Inspected the actual renderer's Den capture with Cole and Lyra together and regenerated the character study. All 38 tests, formatting, and the Pages production build pass. This verification used renderer captures, not a live playthrough to Lyra's gated encounter.

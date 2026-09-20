@@ -872,7 +872,20 @@ export class Renderer {
     c.drawImage(this.mist, x - 55 * figure, y - 100 * figure, 110 * figure, 120 * figure);
     c.restore();
     const rim = rimAt(lights, worldX, y - 40 * figure, facing, t);
+    c.save();
+    c.globalAlpha = 0.9;
     this.sprites.draw(c, 'lyra', speaking ? 'listen' : 'idle', t, x, y, facing, 70 * figure, rim);
+    c.restore();
+    // A restrained projector footprint replaces the weight of a physical shadow.
+    c.save();
+    c.globalCompositeOperation = 'screen';
+    c.strokeStyle = '#88cfe0';
+    c.globalAlpha = 0.22;
+    c.lineWidth = 0.6;
+    c.beginPath();
+    c.ellipse(x, y + 1, 12 * figure, 2 * figure, 0, 0, Math.PI * 2);
+    c.stroke();
+    c.restore();
   }
   private weather(c: CanvasRenderingContext2D, t: number, cam: number, reduced: boolean) {
     const W = this.canvas.width;
