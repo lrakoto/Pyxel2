@@ -886,6 +886,12 @@ button {
   gap: 10px;
   pointer-events: none;
 }
+.touch-controls,
+.touch-controls * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
 .touch-controls button {
   pointer-events: auto;
   touch-action: none;

@@ -295,6 +295,8 @@ class Game {
       s,
     );
     window.addEventListener('pointercancel', (e) => this.releaseTouch(e.pointerId), s);
+    // iOS long-press callouts must not interrupt held game controls.
+    $('touch-controls').addEventListener('contextmenu', (e) => e.preventDefault(), s);
     for (const button of document.querySelectorAll<HTMLElement>('[data-hold]')) {
       button.addEventListener(
         'pointerdown',

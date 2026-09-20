@@ -256,3 +256,9 @@ Reviewed the local title at 1680×853, portrait gameplay at 390×844, and landsc
 ## Night case jacket
 
 Darkened the page surround to charcoal/olive cloth and paper, with readable chalk-toned labels, muted tape, softer fold highlights, worn cover edging, and a brass notebook clip. The live scene and notebook pages retain their own palettes. Reviewed desktop title and 390×844 gameplay; production build and formatting pass. Styling only; no gameplay changes.
+
+## Leather cover study and touch callouts
+
+Preserved the olive design as annotated tag `checkpoint-olive-case-jacket` at `1f1dfac`. The leather study adds dark walnut stock, an authored tiled leather-grain SVG, saddle stitching, burnished edges, and a debossed monogram. Reviewed desktop and 390×844 browser layouts.
+
+Touch-control descendants now disable selection (including WebKit selection) and iOS touch callouts; the control strip also cancels contextmenu. Existing pointer capture/release behavior stays intact, and notebook text remains selectable. Verified the browser context menu is suppressed on the movement control and computed user-select/touch-action are none. A physical iPhone long-press retest is still needed. Pages build and formatting pass.
