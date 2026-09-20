@@ -1,5 +1,6 @@
 import './style.css';
 import './notebook.css';
+import './desk.css';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint, writeCheckpoint } from './checkpoint.ts';
 import { evidenceArt } from './evidence-art.ts';

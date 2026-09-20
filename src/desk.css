@@ -1,0 +1,365 @@
+/* The playable scene sits inside Cole's open case jacket. */
+body {
+  background-color: #151b19;
+  background-image:
+    radial-gradient(ellipse at 19% 0, #77765a30, transparent 65%),
+    repeating-linear-gradient(2deg, #00000016 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(92deg, #b5b89b08 0 1px, transparent 1px 4px);
+}
+.shell {
+  position: relative;
+  isolation: isolate;
+  max-width: 2280px;
+  padding-inline: clamp(14px, 3.6vw, 82px);
+  background:
+    url('/paper/fibers.svg'),
+    linear-gradient(
+      90deg,
+      #514d3d 0,
+      #a39674 7px,
+      #c2b594 12px,
+      #d2c5a3 28px,
+      #c9bc99 96%,
+      #9e9272 100%
+    );
+  box-shadow:
+    0 0 70px #0009,
+    inset 0 0 80px #55472d35;
+  border-inline: 1px solid #665f48;
+  color: var(--note-ink);
+}
+.shell::before {
+  content: '';
+  position: absolute;
+  inset: 0 12px;
+  pointer-events: none;
+  z-index: -1;
+  border-left: 1px dashed #62594366;
+  background:
+    linear-gradient(112deg, transparent 42%, #6154360b 42.2%, #fff6 42.35%, transparent 42.6%),
+    radial-gradient(ellipse at 94% 97%, #66502a26, transparent 28%);
+}
+.topbar {
+  height: 91px;
+  border-bottom: 1px solid #655c4166;
+  gap: 22px;
+}
+.monogram {
+  color: #4e5146;
+  border: 2px double #696a55;
+  padding: 5px 9px 8px;
+  transform: rotate(-4deg);
+  opacity: 0.85;
+}
+.monogram > span:first-child {
+  color: #8d4937;
+}
+.edition {
+  border: 0;
+  padding: 0;
+  gap: 5px;
+}
+.edition > span {
+  color: #625e4d;
+  font-size: 9px;
+}
+.edition strong {
+  font: 25px var(--hand);
+  color: #303e3b;
+  letter-spacing: 0.2px;
+}
+.edition i {
+  color: #82624e;
+}
+.topbar .nav-button {
+  position: relative;
+  background: url('/paper/fibers.svg'), #b4b28e;
+  color: #293e3c;
+  border: 1px solid #7b8066;
+  border-bottom: 3px solid #7e8064;
+  border-radius: 4px 9px 2px 1px;
+  transform: rotate(-2deg);
+  box-shadow: 2px 3px 4px #51432e33;
+  font: 23px var(--hand);
+  padding: 9px 14px;
+}
+.topbar .nav-button b {
+  color: #813e31;
+}
+.topbar .icon-button {
+  color: #44514a;
+  border-radius: 50%;
+}
+.topbar .icon-button:hover {
+  background: #6c715123;
+  border-color: #737255;
+}
+.topbar kbd,
+.bottom-bar kbd {
+  color: #565748;
+  border-color: #77745b70;
+}
+.scene-meta {
+  height: 43px;
+  color: #514e40;
+  letter-spacing: 1px;
+}
+.scene-meta > span:first-child {
+  background: #e1d6b5;
+  padding: 5px 12px;
+  border: 1px solid #a89776;
+  transform: rotate(-1deg);
+  box-shadow: 1px 2px 2px #65533022;
+}
+.scene-meta .live-dot {
+  background: #974b38;
+  box-shadow: none;
+}
+.scene-meta b {
+  color: #857359;
+}
+.stage {
+  border: 5px solid #333c35;
+  outline: 1px solid #756d54;
+  border-radius: 5px 6px 3px 4px;
+  box-shadow:
+    0 4px 7px #3d332766,
+    0 0 0 2px #b5a986,
+    inset 0 0 20px #000;
+  max-height: calc(100svh - 250px);
+}
+.scene-footer {
+  color: #5c5947;
+  height: 43px;
+  border-bottom: 0;
+}
+.scene-footer > span:first-child {
+  color: #34463f;
+  font: 21px var(--hand);
+}
+.scene-footer > span:first-child i {
+  color: #884638;
+  font: 10px var(--mono);
+}
+.scene-footer > span:last-child {
+  font: 18px var(--hand);
+  transform: rotate(2deg);
+  border-bottom: 1px solid #73634855;
+}
+.save-dot {
+  background: #4b705c;
+}
+.bottom-bar {
+  border-top: 1px dashed #8d8060;
+  height: 73px;
+  color: #4b5041;
+}
+.controls-hint {
+  color: #4b5148;
+  background: url('/paper/fibers.svg'), #e0d5b7;
+  box-shadow: 1px 3px 4px #6b583433;
+  padding: 12px 16px;
+  transform: rotate(-0.7deg);
+  border-left: 3px solid #9a746058;
+}
+.focus-button {
+  color: #3c5149;
+}
+.focus-button:hover {
+  color: #182f29;
+}
+.build-label {
+  color: #714b38;
+  font: 22px var(--hand);
+  transform: rotate(-3deg);
+}
+.build-label b {
+  color: #866147;
+}
+/* A taped index card replaces the website-like title call to action. */
+.title-content > .primary {
+  position: relative;
+  background: url('/paper/fibers.svg'), #d3c49f;
+  color: #2d3d35;
+  border: 1px solid #968666;
+  border-bottom: 3px solid #988765;
+  font-family: var(--hand);
+  font-size: clamp(22px, 2.1cqw, 31px);
+  transform: rotate(-1deg);
+  box-shadow: 3px 5px 8px #0006;
+}
+.title-content > .primary::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 39%;
+  width: 58px;
+  height: 19px;
+  background: #b8b38a99;
+  transform: rotate(5deg);
+  clip-path: polygon(3% 0, 100% 5%, 96% 100%, 0 93%);
+  pointer-events: none;
+}
+.title-content > .primary:hover {
+  background-color: #e3d5b5;
+  color: #172b22;
+}
+.issue-label strong {
+  font-family: var(--hand);
+}
+.title-coordinates {
+  transform: rotate(4deg);
+  border: 2px solid #c3b58b88;
+  padding: 10px 14px;
+  color: #c7bca0;
+}
+@media (min-width: 1500px) {
+  body {
+    padding: 16px 20px;
+  }
+  .shell {
+    min-height: calc(100svh - 32px);
+    border-radius: 3px 19px 7px 3px;
+  }
+  .stage {
+    max-height: calc(100svh - 282px);
+  }
+}
+@media (max-width: 900px) {
+  .edition strong {
+    font-size: 21px;
+  }
+  .controls-hint {
+    gap: 12px;
+    padding: 9px;
+  }
+  .build-label {
+    font-size: 18px;
+  }
+}
+@media (max-width: 650px) {
+  .shell {
+    padding-inline: 11px;
+  }
+  .shell::before {
+    inset-inline: 5px;
+  }
+  .topbar {
+    height: 73px;
+    gap: 9px;
+  }
+  .monogram {
+    font-size: 23px;
+    padding: 4px 5px;
+  }
+  .edition strong {
+    font: 10px var(--mono);
+    max-width: 86px;
+    line-height: 1.6;
+  }
+  .topbar .nav-button {
+    padding: 8px;
+    font-size: 15px;
+  }
+  .scene-meta {
+    height: 36px;
+    font-size: 7px;
+    letter-spacing: 0.2px;
+  }
+  .scene-meta > span:first-child {
+    padding: 4px 6px;
+    gap: 5px;
+  }
+  .scene-meta b {
+    padding-inline: 4px;
+  }
+  .stage {
+    border-width: 3px;
+    max-height: none;
+  }
+  .scene-footer {
+    height: 35px;
+    font-size: 7px;
+    letter-spacing: 0.2px;
+  }
+  .scene-footer > span:first-child {
+    font-size: 18px;
+  }
+  .scene-footer > span:first-child i {
+    font-size: 8px;
+    padding-right: 6px;
+  }
+  .bottom-bar {
+    height: 62px;
+    gap: 9px;
+  }
+  .controls-hint {
+    padding: 8px 6px;
+    gap: 8px;
+  }
+  .title-coordinates {
+    padding: 6px;
+  }
+}
+@media (max-height: 650px) and (min-width: 651px) {
+  body {
+    padding: 0;
+  }
+  .shell {
+    min-height: 100svh;
+  }
+  .topbar {
+    height: 55px;
+  }
+  .scene-meta {
+    height: 28px;
+  }
+  .scene-footer {
+    height: 28px;
+  }
+  .bottom-bar {
+    height: 45px;
+  }
+  .stage {
+    max-height: calc(100svh - 156px);
+  }
+  .controls-hint {
+    padding: 5px 9px;
+  }
+  .edition strong {
+    font-size: 19px;
+  }
+}
+.scene-footer > span:last-child i {
+  font-family: var(--mono);
+}
+@media (min-width: 1001px) and (max-height: 950px) {
+  .title-content {
+    padding-block: 18px;
+  }
+  .game-title {
+    font-size: min(8.4cqw, 15svh);
+    margin-block: 18px;
+  }
+  .opening {
+    margin-block: 18px;
+  }
+  .title-footnote {
+    margin-top: 14px;
+  }
+  .title-content > .primary {
+    min-height: 48px;
+    padding-block: 10px;
+  }
+}
+.stage {
+  color: #e9e5d9;
+}
+.focus-button svg,
+.focus-button[aria-pressed='true'] {
+  color: #315d4c;
+}
+.topbar :focus-visible,
+.bottom-bar :focus-visible {
+  outline-color: #315d4c;
+}

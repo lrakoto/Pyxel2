@@ -246,3 +246,9 @@ Lyra now supplies a scene light only when her avatar is present outside combat. 
 Added a stitched gutter, offset page edges, paper fibers, creases, tape, irregular handwritten annotations, circled theory numbers, crossed-out resolved questions, and filed stamps. Evidence mounts distinguish photos, tracing sheets, receipts, carbon copies, and notebook extracts. Gameplay CRT treatment is preserved.
 
 Verified the live desktop notebook and examination dialogue, then the notebook and full record reader at a 390×844 browser viewport. Collected the lock through normal play, selected its evidence, opened the reader, and returned with Escape: selection and focus were preserved. No browser warnings or errors were captured. All 38 tests, formatting, and the GitHub Pages production build pass. This is browser viewport testing, not a physical-phone or full-case playthrough.
+
+## Case jacket page surround
+
+Extended the analog treatment beyond overlays into the page: woven desk background, worn stock jacket with a stitched edge and fold, stamped monogram, handwritten case label and captions, physical notebook tab, pasted control slip, dark monitor bezel, and taped title action. Kept the scene's light foreground colors explicit so the surrounding paper ink cannot leak into game labels. Adjusted title spacing for shorter desktop displays and retained dark focus outlines on paper.
+
+Reviewed the local title at 1680×853, portrait gameplay at 390×844, and landscape gameplay at 844×390. No captured browser warnings/errors. Production Pages build and formatting pass; no game logic changed.
