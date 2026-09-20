@@ -358,7 +358,7 @@ export class Renderer {
         Math.abs(p.y - world.ground),
       );
       c.save();
-      c.globalAlpha = p.grounded ? 0.45 : 0.2;
+      c.globalAlpha = Math.max(0.08, 0.45 - Math.abs(p.y - world.ground) * 0.004);
       c.drawImage(
         this.contactShadow,
         p.x - cam - 20 * figure,
@@ -469,9 +469,14 @@ export class Renderer {
       c.fillStyle = '#060c0ed9';
       for (const pole of [40, 1360, 2210]) {
         const x = layerX(pole, cam, PARALLAX.foreground);
+        c.save();
+        // Retain near-plane movement without hiding Cole behind a solid pole.
+        if (!v.combat)
+          c.globalAlpha = 0.32 + 0.68 * Math.min(1, Math.abs(x + 6 - (p.x - cam)) / (42 * figure));
         c.fillRect(x, 0, 13, H);
         c.fillRect(x - 4, 122, 21, 9);
         c.fillRect(x + 11, 216, 18, 13);
+        c.restore();
       }
       c.strokeStyle = '#080e10';
       c.lineWidth = 3;
@@ -917,6 +922,8 @@ export class Renderer {
   ) {
     const x = worldX - cam,
       y = 438;
+    // Halo and sprite stay within this bound; skip off-camera projection work.
+    if (x < -80 * figure || x > c.canvas.width + 80 * figure) return;
     c.save();
     c.globalCompositeOperation = 'screen';
     c.globalAlpha = 0.13 + Math.sin(t * 2) * 0.025;

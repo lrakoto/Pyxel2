@@ -1,0 +1,92 @@
+/* Field annotations share the notebook's olive stock and pencil rules. */
+.hotspot-label {
+  background: #22271fee;
+  color: #ddd5b9;
+  border-color: #9b987452;
+  border-bottom-style: dashed;
+  box-shadow: 2px 3px 0 #03080745;
+  transition:
+    opacity 180ms,
+    transform 180ms;
+}
+.hotspot-dot {
+  border-radius: 3px 5px 4px 2px;
+  border-color: #b5b18a9c;
+  color: #e0d7b9;
+  background: #20271ee8;
+  transition:
+    background-color 180ms,
+    color 180ms,
+    box-shadow 180ms;
+}
+.hotspot.destination-selected {
+  opacity: 1;
+}
+.hotspot.destination-selected .hotspot-dot {
+  outline: 1px dashed #d5c797;
+  outline-offset: 5px;
+}
+.hotspot.destination-selected .hotspot-label {
+  opacity: 1;
+  transform: none;
+}
+.hotspot.edge-left .hotspot-label {
+  align-self: flex-start;
+  margin-left: 50%;
+}
+.hotspot.edge-right .hotspot-label {
+  align-self: flex-end;
+  margin-right: 50%;
+}
+.interaction button {
+  background: #20261ef2;
+  color: #e2dac1;
+  border: 1px solid #a59b6e88;
+  border-bottom: 2px solid #777957;
+  box-shadow: 3px 4px 0 #05090666;
+  max-width: min(88vw, 440px);
+  min-height: 44px;
+}
+#interaction-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stage:not(.in-combat) .touch-controls button {
+  border-radius: 7px 5px 8px 4px;
+  background: #20261ef2;
+  color: #e2dac1;
+  border-color: #9c98766b;
+}
+#touch-act:disabled {
+  opacity: 0.35;
+}
+@media (pointer: coarse), (max-width: 600px) {
+  .hotspot {
+    min-width: 48px;
+    min-height: 48px;
+  }
+  .hotspot-label {
+    max-width: 155px;
+  }
+  .interaction {
+    bottom: max(80px, calc(env(safe-area-inset-bottom) + 70px));
+  }
+  .touch-controls {
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .stage:not(.in-combat) .touch-controls button {
+    width: 52px;
+    height: 52px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-label,
+  .hotspot-dot {
+    transition: none;
+  }
+}
+.reduced-motion .hotspot-label,
+.reduced-motion .hotspot-dot {
+  transition: none;
+}

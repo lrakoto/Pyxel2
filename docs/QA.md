@@ -290,3 +290,13 @@ Reviewed the actual-renderer street capture; Pages build and formatting pass. No
 Added subtle frame-edge condensation and stationary beads to existing interior glass, faint tapered window slats behind studio furniture, and an 18-second localized scan inside the Den archive projection. Existing rain runners remain responsible for moving water. All additions are behind characters and excluded from combat; reduced motion retains static glass/light and suppresses the scan.
 
 Reviewed actual-renderer studio and Den captures and refreshed both images. Pages production build and formatting pass. No live browser or physical-device review in this pass.
+
+## Exploration cohesion pass
+
+Matched scene markers and action slips to olive field-note stock, with explicit examine/revisit/talk/enter prompts and a persistent selected-destination outline. Edge markers align their labels inward. Touch actions dim when unavailable, use contextual accessible names, and have larger exploration targets with safe-area spacing. Cached hotspot element/content pairs replace per-frame DOM queries and repeated content searches.
+
+Cole gains a restrained speed-dependent walking lean, suppressed during dialogue/examination and reduced motion. Contact shadows fade continuously with height; near-plane street poles become translucent when crossing Cole, preserving parallax and player readability. Offscreen Lyra projections are culled before drawing their halo/sprite.
+
+Browser review: street to studio, evidence discovery and re-examination markers, all three required notebook deductions, return route to the street, Lyra encounter, and Den unlock. Portrait 390×844 and landscape 844×390 layouts, notebook open/return, and immersive landscape enter/exit checked. Existing local progress was continued, not reset. All 40 tests, formatting, and Pages build pass. These are browser viewport checks, not physical iPhone or device performance measurements.
+
+Confirmed live Den arrival, lighting, Lyra presence, and return-door prompt; no captured browser warnings/errors. The walkthrough also caught stale locked-Den dialogue after the studio deductions: that state now points to the waiting woman rather than back to the completed studio.

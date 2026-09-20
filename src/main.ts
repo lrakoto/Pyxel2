@@ -3,6 +3,7 @@ import './notebook.css';
 import './desk.css';
 import './fullscreen.css';
 import './patina.css';
+import './field-feedback.css';
 import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint, writeCheckpoint } from './checkpoint.ts';
@@ -122,6 +123,7 @@ class Game {
   pending: Hotspot | null = null;
   queuedRoute: string | null = null;
   nearest: Hotspot | null = null;
+  private hotspotNodes: { element: HTMLElement; hotspot: Hotspot }[] = [];
   lines: { speaker: string; text: string }[] = [];
   lineIndex = 0;
   reveal = 0;
@@ -524,16 +526,25 @@ class Game {
         return `<button class="hotspot ${h.kind === 'door' ? 'door' : ''} ${h.clue && this.model.save.clues.includes(h.clue) ? 'collected' : ''} ${freshInsight ? 'new-insight' : ''}" data-hotspot="${h.id}" aria-label="${h.label}${freshInsight ? ' · New perspective' : ''}" style="top:${(h.y / H) * 100}%"><span class="hotspot-dot">${freshInsight ? '!' : h.kind === 'door' ? '↗' : h.kind === 'talk' ? '◌' : h.clue && this.model.save.clues.includes(h.clue) ? '✓' : '+'}</span><span class="hotspot-label">${h.label}${freshInsight ? ' · REVISIT' : ''}${!this.model.unlocked(h) ? ' · LOCKED' : ''}</span></button>`;
       })
       .join('');
+    this.hotspotNodes = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-hotspot]'),
+      (element) => ({
+        element,
+        hotspot: a.hotspots.find((h) => h.id === element.dataset.hotspot)!,
+      }),
+    );
     $('district-label').textContent = a.id === 'street' ? 'NEW ANGELES' : 'SECTOR 07 · INTERIOR';
     this.syncHotspots();
   }
   syncHotspots() {
-    for (const b of document.querySelectorAll<HTMLElement>('[data-hotspot]')) {
-      const h = this.currentArea.hotspots.find((h) => h.id === b.dataset.hotspot)!;
+    for (const { element: b, hotspot: h } of this.hotspotNodes) {
       const x = ((h.x - this.camera) / this.viewW) * 100;
       b.style.left = x + '%';
       b.hidden = x < 2 || x > 98;
       b.classList.toggle('near', h === this.nearest);
+      b.classList.toggle('destination-selected', h === this.pending);
+      b.classList.toggle('edge-left', x < 22);
+      b.classList.toggle('edge-right', x > 78);
     }
   }
   goTo(h: Hotspot, route: string | null = null) {
@@ -565,7 +576,9 @@ class Game {
       this.say([
         {
           speaker: 'COLE',
-          text: 'Locked from inside. Whoever runs this place isn’t taking walk-ins. Marlon’s studio is my way into this.',
+          text: this.model.deduced
+            ? 'Still locked. The woman outside has been watching me. Time to ask what she knows.'
+            : 'Locked from inside. Whoever runs this place isn’t taking walk-ins. Marlon’s studio is my way into this.',
         },
       ]);
       return;
@@ -1429,7 +1442,26 @@ class Game {
       !this.transitioning &&
       !!this.nearest;
     $('interaction').hidden = !show;
-    if (show) $('interaction-label').textContent = this.nearest!.label;
+    if (show) {
+      const h = this.nearest!;
+      const verb = !this.model.unlocked(h)
+        ? 'Inspect'
+        : h.kind === 'door'
+          ? 'Enter'
+          : h.kind === 'talk'
+            ? 'Talk'
+            : h.clue && this.model.save.clues.includes(h.clue)
+              ? 'Revisit'
+              : 'Examine';
+      $('interaction-label').textContent = h.label.startsWith('Return to ')
+        ? h.label
+        : `${verb} · ${h.label}`;
+      $('touch-act').setAttribute(
+        'aria-label',
+        h.label.startsWith('Return to ') ? h.label : `${verb} ${h.label}`,
+      );
+    }
+    $<HTMLButtonElement>('touch-act').disabled = !show;
     $('hotspots').hidden = !this.started || !!this.combat || this.transitioning;
     if (this.combat) {
       $('hp-text').textContent = String(this.combat.hp);

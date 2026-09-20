@@ -17,7 +17,10 @@ export class CharacterMotion {
     if (Math.abs(this.previousSpeed) > 8 && Math.abs(speed) <= 8) this.settle = 0.45;
     this.previousSpeed = speed;
     this.settle = Math.max(0, this.settle - Math.max(0, dt));
-    const lean = reduced ? 0 : Math.sin((this.settle / 0.45) * Math.PI) * 0.016 * facing;
+    const lean = reduced
+      ? 0
+      : Math.sin((this.settle / 0.45) * Math.PI) * 0.016 * facing -
+        (examining || speaking ? 0 : Math.max(-1, Math.min(1, speed / 145)) * 0.012);
     if (facing !== this.facing) {
       this.facing = facing;
       this.turn = 0.16;
