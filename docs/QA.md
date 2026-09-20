@@ -278,3 +278,9 @@ Added area-tinted edge spill (studio amber, Den blue, street teal), localized co
 Added bounded fading wet footprints alongside the existing distance-based splashes, stronger grounded contact shadows, a short exploration-only settling lean for Cole, and a restrained Lyra speaking lean. Street damp grit receives small broken color highlights separately from puddle mirrors; live reflections now vary slightly by depth. Passing headlights catch authored awning/door edges at separate world positions. Low street haze and warm/cool room particles distinguish locations, while broad lighting gently emphasizes available evidence and dims after collection.
 
 All new effects are excluded from combat; reduced motion freezes atmospheric time, suppresses character lean and clears wet prints. Reviewed live studio dialogue and actual-renderer street/Den captures; refreshed all three scene captures. All 40 tests, Pages build and formatting pass. New tests cover footprint storage/expiry/reduced-motion clearing and finite stop settling. No physical-device performance or complete case playthrough was performed in this pass.
+
+## Foreground weather depth
+
+Added two near-plane street vents with cached feathered vapor, world-anchored drift and independent parallax. Existing foreground railings now catch restrained wet highlights from nearby scene/headlights and shed sparse droplets. Culled offscreen vents; vapor uses a single 128×64 cached texture and bounded draws. Reduced motion retains static mist and disables falling drops. Excluded from combat.
+
+Reviewed the actual-renderer street capture; Pages build and formatting pass. No physical-device performance run in this pass.

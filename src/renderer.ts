@@ -1,3 +1,4 @@
+import { NearWeather } from './near-weather.ts';
 import { evidenceLight, edgeLight, roomVeil, dampAsphalt } from './world-polish.ts';
 import {
   drawRelief,
@@ -73,6 +74,7 @@ export class Renderer {
   private sprites = new Sprites();
   private characterMotion = new CharacterMotion();
   private footWater = new FootWater();
+  private nearWeather = new NearWeather();
   private discoveryLight = 0;
   private skyline: HTMLCanvasElement | null = null;
   private frontage: HTMLCanvasElement | null = null;
@@ -491,6 +493,8 @@ export class Renderer {
       c.globalCompositeOperation = 'source-over';
     }
     if (!v.combat) drawNearArchitecture(c, area, cam, t);
+    if (!v.combat && area === 'street')
+      this.nearWeather.draw(c, cam, t, actorLights, v.reducedMotion);
     if (!v.combat) drawInteriorForeground(c, area, cam, t, this.plates.get(area));
     this.discoveryLight +=
       ((v.discovery ? 1 : 0) - this.discoveryLight) *
