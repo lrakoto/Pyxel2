@@ -5,7 +5,11 @@ export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? '/Pyxel2/' : '/',
   build: {
     rollupOptions: {
-      input: { game: resolve('index.html'), characterLab: resolve('character-lab.html') },
+      input: {
+        game: resolve('index.html'),
+        characterLab: resolve('character-lab.html'),
+        lyraLab: resolve('lyra-lab.html'),
+      },
     },
   },
   plugins: [

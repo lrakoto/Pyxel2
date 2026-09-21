@@ -1,7 +1,7 @@
+import { LYRA_REFINED_FRAMES, lyraFrameIndex } from './lyra-art.ts';
 import {
   COLE_FRAMES,
   COLE_STORY_FRAMES,
-  LYRA_STORY_FRAMES,
   ENFORCER_FRAMES,
   DRONE_FRAMES,
   makePedFrames,
@@ -146,14 +146,16 @@ export class Sprites {
     if (id === 'cole')
       frames =
         COLE_STORY_FRAMES[tag] ?? COLE_FRAMES[tag as keyof typeof COLE_FRAMES] ?? COLE_FRAMES.idle;
-    else if (id === 'lyra') frames = LYRA_STORY_FRAMES[tag] ?? LYRA_STORY_FRAMES.idle;
+    else if (id === 'lyra') frames = LYRA_REFINED_FRAMES[tag === 'listen' ? 'listen' : 'idle'];
     else if (id === 'enforcer') frames = ENFORCER_FRAMES.walk;
     else if (id === 'drone') frames = DRONE_FRAMES.hover;
     else frames = this.peds[id === 'ped_a' ? 0 : 1];
     const index =
-      id === 'lyra' || (id === 'cole' && tag in COLE_STORY_FRAMES)
-        ? storyFrameIndex(tag, time, frames.length)
-        : Math.floor(time * 9) % frames.length;
+      id === 'lyra'
+        ? lyraFrameIndex(time, tag === 'listen')
+        : id === 'cole' && tag in COLE_STORY_FRAMES
+          ? storyFrameIndex(tag, time, frames.length)
+          : Math.floor(time * 9) % frames.length;
     const frame = frames[index];
     return {
       key: `${id}:${tag}#${index}`,
