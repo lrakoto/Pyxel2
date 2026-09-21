@@ -535,9 +535,9 @@ export const AREAS: Record<AreaId, Area> = {
 };
 export const LYRA_INTRO = [
   { speaker: 'LYRA', text: 'You noticed the oil on the lock. Most detectives stop at the body.' },
-  { speaker: 'COLE', text: 'You’ve been watching me.' },
+  { speaker: 'GRAVITY', text: 'You’ve been watching me.' },
   { speaker: 'LYRA', text: 'I’ve been watching everyone walk past. You went inside.' },
-  { speaker: 'COLE', text: 'Marlon painted a woman. Number zero-zero-one. You know her?' },
+  { speaker: 'GRAVITY', text: 'Marlon painted a woman. Number zero-zero-one. You know her?' },
   {
     speaker: 'LYRA',
     text: 'I know what they left of her. Come into the Den. There are things the rain shouldn’t hear.',
@@ -548,9 +548,9 @@ export const LYRA_ARCHIVE = [
     speaker: 'LYRA',
     text: 'The city erased her name. I kept the memory. I thought that if someone remembered, she wouldn’t be entirely gone.',
   },
-  { speaker: 'COLE', text: 'Marlon heard them. All those people.' },
+  { speaker: 'GRAVITY', text: 'Marlon heard them. All those people.' },
   { speaker: 'LYRA', text: 'He tried to give them back their faces. They killed him for it.' },
-  { speaker: 'COLE', text: 'Then we find who took them.' },
+  { speaker: 'GRAVITY', text: 'Then we find who took them.' },
   {
     speaker: 'LYRA',
     text: 'Your implant has an unused channel. If you let me, I can stay with you. Beyond this room. Beyond their cameras.',

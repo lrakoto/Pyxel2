@@ -206,7 +206,7 @@ export class CaseModel {
   }
 
   /**
-   * Why a pairing failed, in Cole's voice.
+   * Why a pairing failed, in Gravity's voice.
    *
    * A single flat rejection for all thirty-six pairs teaches the player
    * nothing and leaves brute force as the only strategy, which is a poor

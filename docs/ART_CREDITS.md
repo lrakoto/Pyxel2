@@ -40,3 +40,16 @@ Barlow Condensed and DM Sans are served from local font files. Their SIL Open Fo
 ## Notebook handwriting and paper
 
 Caveat is bundled locally from the Google Fonts repository (`ofl/caveat`) under the SIL Open Font License; the license is included at `public/fonts/caveat-OFL.txt`. It supplies Cole's short handwritten annotations and headings. Long observations retain the existing typewriter face. The tiled paper fibers in `public/paper/fibers.svg`, folds, tape, binding, and stamps are authored SVG/CSS treatments.
+
+
+## Gravity — current protagonist
+
+Gravity’s character animation is adapted from **Warped City**, by Luis Zuno
+(Ansimuz), released under CC0/public domain:
+https://opengameart.org/content/warped-city
+
+The original PNGs and creator license are retained in `public/character-lab/warped/`.
+`src/gravity-palette.ts` applies a deterministic black-outfit/blonde-hair palette
+when loading frames; source pixels, alpha and animation geometry are preserved.
+No music from the pack is used. Gravity’s name and narrative direction were
+chosen by the project owner. The former Cole design is a historical prototype.

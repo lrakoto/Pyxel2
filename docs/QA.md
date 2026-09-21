@@ -318,3 +318,19 @@ Confirmed installed Blender 5.2.1 LTS and authored an editable armature/model wi
 Added `/character-lab.html` as a second Vite/Pages entry: current procedural character and Blender study against the street image at comparable visible heights. Controls select motion, mirror facing, adjust speed, pause and scrub frames. Stop holds its last frame with Replay; system reduced motion starts paused. The gameplay character and combat remain unchanged.
 
 Reviewed material correction, frame rendering, street placement/scale, walk/sprint presentation, final stop hold and mirroring in the browser. No captured browser warnings/errors. All 42 existing tests, production Pages build and formatting pass. This is a rig/blockout study: baked lighting, rigid weights and approximate viewer contact shadow remain limitations; it is not approved replacement game art.
+
+## Gravity protagonist and palette — September 2026
+
+Promoted the selected Warped City female pixel animation to the default protagonist,
+Gravity. Renamed narrative speakers, Lyra's direct address, HUD and notebook signatures.
+Updated the original story bible and included its full revised text in this repository.
+
+Runtime palette adaptation preserves original PNGs and frame geometry, separates hair
+from the shared stocking purple, and keeps skin/alpha unchanged. Added the source jump
+frames so the protagonist remains visually consistent in combat; combat mechanics are
+unchanged. The study now compares original colors against Gravity's palette.
+
+44 tests pass, including all 32 source frames checked for alpha and skin preservation.
+Production build and formatting pass. Browser verified the side-by-side palettes,
+default Gravity on the street and Lyra's “I'm here, Gravity” dialogue. Existing local
+progress loaded successfully. Investigation-specific gestures still use idle art.

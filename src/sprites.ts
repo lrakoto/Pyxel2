@@ -48,11 +48,15 @@ export class Sprites {
   private shadows = new Map<string, HTMLCanvasElement>();
 
   async load() {
-    if (new URLSearchParams(location.search).get('character') === 'warped') {
+    if (new URLSearchParams(location.search).get('character') !== 'cole') {
       try {
-        this.candidate = await loadCandidate();
+        this.candidate = await loadCandidate(
+          new URLSearchParams(location.search).get('character') === 'original'
+            ? 'original'
+            : 'gravity',
+        );
       } catch {
-        console.warn('Character study unavailable; using Cole.');
+        console.warn('Gravity sprites unavailable; using legacy fallback.');
       }
     }
     try {
@@ -72,8 +76,15 @@ export class Sprites {
 
   /** Picks the frame of art for this id/tag at this time, from either source. */
   private resolve(id: string, tag: string, time: number): Frame {
-    if (this.candidate && id === 'cole' && tag in COLE_STORY_FRAMES && tag !== 'idle') {
-      const clip = tag === 'stride' ? 'walk' : tag === 'sprint' ? 'sprint' : 'idle';
+    if (this.candidate && id === 'cole') {
+      const clip =
+        tag === 'stride' || tag === 'walk'
+          ? 'walk'
+          : tag === 'sprint'
+            ? 'sprint'
+            : tag === 'jump'
+              ? 'jump'
+              : 'idle';
       const frames = this.candidate[clip];
       // CharacterMotion already scales its clock with movement speed.
       const index = candidateIndex(time, frames.length, 0.8);

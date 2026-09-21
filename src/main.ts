@@ -60,7 +60,7 @@ document.getElementById('app')!.innerHTML = `
  <main class="shell" id="shell">
   <header class="topbar">
    <a class="monogram" href="#" id="brand" aria-label="Pause Everybody Nobody">E<span>/</span>N</a>
-   <div class="edition"><span>DETECTIVE COLE · FIELD NOTES</span><strong>CASE 07–031 <i>/</i> FRAGMENTS</strong></div>
+   <div class="edition"><span>DETECTIVE GRAVITY · FIELD NOTES</span><strong>CASE 07–031 <i>/</i> FRAGMENTS</strong></div>
    <nav aria-label="Game controls">
     <button class="nav-button" id="board-btn" aria-label="Investigation notebook">${icon('case')}<span>Notebook</span><kbd>J</kbd><b id="clue-count">00</b></button>
     <button class="icon-button" id="map-btn" aria-label="District map" title="District map [M]">${icon('map')}</button>
@@ -80,16 +80,16 @@ document.getElementById('app')!.innerHTML = `
     <div id="destination" class="destination" hidden>⌄</div>
     <div id="interaction" class="interaction" hidden><button id="interact-btn"><kbd>E</kbd><span id="interaction-label">Examine</span>${icon('arrow')}</button></div>
     <div id="area-card" class="area-card" aria-live="polite"></div>
-    <div id="combat-hud" class="combat-hud" hidden><div><span class="eyebrow">COLE · VITALS</span><strong id="hp-text">100</strong><div class="hp-track"><i id="hp-fill"></i></div></div><div><span class="eyebrow">HOSTILE CONTACT</span><strong id="wave-text">WAVE 01 / 02</strong><button id="withdraw-btn">Disengage <kbd>Q</kbd></button></div></div>
+    <div id="combat-hud" class="combat-hud" hidden><div><span class="eyebrow">GRAVITY · VITALS</span><strong id="hp-text">100</strong><div class="hp-track"><i id="hp-fill"></i></div></div><div><span class="eyebrow">HOSTILE CONTACT</span><strong id="wave-text">WAVE 01 / 02</strong><button id="withdraw-btn">Disengage <kbd>Q</kbd></button></div></div>
     <div id="companion" class="companion" hidden><button id="companion-btn"><span class="waveform">▂▆▃▇▂</span><span>LYRA <small>CHANNEL OPEN</small></span></button></div>
-    <aside id="evidence-closeup" class="evidence-closeup" hidden aria-label="Evidence illustration"></aside><div id="dialogue" class="dialogue" hidden aria-label="Conversation"><div class="portrait-mark" id="portrait-mark">C<span>/</span></div><div class="dialogue-copy"><div class="dialogue-top"><span id="speaker" class="eyebrow">COLE</span><span id="line-count" class="eyebrow"></span></div><p id="dialogue-text" aria-hidden="true"></p><p id="dialogue-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p><div class="dialogue-bottom"><span id="dialogue-context">DETECTIVE’S OBSERVATION</span><button id="advance-btn">Continue <kbd>E</kbd>${icon('arrow')}</button></div></div></div>
+    <aside id="evidence-closeup" class="evidence-closeup" hidden aria-label="Evidence illustration"></aside><div id="dialogue" class="dialogue" hidden aria-label="Conversation"><div class="portrait-mark" id="portrait-mark">G<span>/</span></div><div class="dialogue-copy"><div class="dialogue-top"><span id="speaker" class="eyebrow">GRAVITY</span><span id="line-count" class="eyebrow"></span></div><p id="dialogue-text" aria-hidden="true"></p><p id="dialogue-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p><div class="dialogue-bottom"><span id="dialogue-context">DETECTIVE’S OBSERVATION</span><button id="advance-btn">Continue <kbd>E</kbd>${icon('arrow')}</button></div></div></div>
     <div id="transition" class="transition" aria-hidden="true"></div>
     <section id="title-screen" class="title-screen" aria-label="Start game"><div class="title-content"><div class="eyebrow title-kicker"><span>AN INTERACTIVE NOIR</span><i></i> NEW ANGELES, 2077</div><h1 class="game-title">EVERYBODY<span class="title-slash">/</span><br><span class="nobody">NOBODY</span><span class="title-period">.</span></h1><div class="issue-label"><span>ISSUE 01</span><i></i><strong>Fragments</strong></div><p class="opening">One dead artist. A thousand stolen minds.<br>Someone has to remember.</p><button class="primary" id="begin-btn" disabled><span id="begin-text">Entering New Angeles</span>${icon('arrow')}</button><div class="title-footnote">${icon('headphones')} HEADPHONES RECOMMENDED <span>·</span> SAVED ON THIS DEVICE</div></div><div class="title-coordinates"><span>SECTOR</span><strong>07</strong><span>34°03′ N<br>118°15′ W</span></div></section>
     <div class="touch-controls" id="touch-controls"><button data-hold="left" aria-label="Move left">←</button><button data-hold="right" aria-label="Move right">→</button><button data-hold="jump" aria-label="Jump">↑</button><button data-hold="sprint" aria-label="Hold to sprint">»</button><button id="touch-act" aria-label="Examine">E</button><button data-hold="fire" aria-label="Fire toward nearest enemy">◎</button></div>
    </div>
    <div class="scene-footer"><span id="chapter-label"><i>01</i> THE LAST WORK</span><span id="save-status"><i class="save-dot"></i> LOCAL CHECKPOINT</span><span>RAIN EXPECTED <i>↙</i> 17°C</span></div>
   </section>
-  <footer class="bottom-bar"><div class="controls-hint" id="controls-hint"><span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>⇧</kbd> Sprint</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span></div><button id="focus-btn" class="focus-button" aria-pressed="false">${icon('focus')}<span>Focus mode</span><kbd>I</kbd></button><span class="build-label">PRIVATE NOTES <b>/</b> C. COLE</span></footer>
+  <footer class="bottom-bar"><div class="controls-hint" id="controls-hint"><span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>⇧</kbd> Sprint</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span></div><button id="focus-btn" class="focus-button" aria-pressed="false">${icon('focus')}<span>Focus mode</span><kbd>I</kbd></button><span class="build-label">PRIVATE NOTES <b>/</b> GRAVITY</span></footer>
  </main>
  <dialog id="panel" class="panel" aria-labelledby="panel-title"><div id="panel-content"></div></dialog>
  <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -598,7 +598,7 @@ class Game {
     if (!this.model.unlocked(h)) {
       this.say([
         {
-          speaker: 'COLE',
+          speaker: 'GRAVITY',
           text: this.model.deduced
             ? 'Still locked. The woman outside has been watching me. Time to ask what she knows.'
             : 'Locked from inside. Whoever runs this place isn’t taking walk-ins. Marlon’s studio is my way into this.',
@@ -631,7 +631,7 @@ class Game {
         this.persist();
       }
       this.say(
-        [{ speaker: 'COLE', text: insight?.text ?? clue.observation }],
+        [{ speaker: 'GRAVITY', text: insight?.text ?? clue.observation }],
         () => {
           if (clue.id === 'fragment') {
             this.toast('ARCHIVE 001 RECOVERED', 'Lyra is waiting beside the terminal.');
@@ -686,7 +686,7 @@ class Game {
         ]);
       else if (!this.model.save.companion) this.say(LYRA_ARCHIVE, () => this.openCompanionChoice());
       else this.companionTalk();
-    } else this.say([{ speaker: 'COLE', text: h.text! }]);
+    } else this.say([{ speaker: 'GRAVITY', text: h.text! }]);
   }
   say(
     lines: { speaker: string; text: string }[],
@@ -712,7 +712,7 @@ class Game {
     const line = this.lines[this.lineIndex];
     $('speaker').textContent = line.speaker;
     $('dialogue-announcement').textContent = `${line.speaker}: ${line.text}`;
-    $('portrait-mark').innerHTML = line.speaker === 'LYRA' ? 'L<span>◌</span>' : 'C<span>/</span>';
+    $('portrait-mark').innerHTML = line.speaker === 'LYRA' ? 'L<span>◌</span>' : 'G<span>/</span>';
     if (line.speaker === 'MEI') $('portrait-mark').innerHTML = 'M<span>·</span>';
     $('dialogue').classList.toggle('lyra', line.speaker === 'LYRA');
     $('line-count').textContent =
@@ -885,7 +885,7 @@ class Game {
     this.panel(
       second ? 'The first one' : 'The Graves case',
       second ? 'CASE FILE 07–032 · ARCHIVE 001' : 'CASE FILE 07–031 · MARLON GRAVES',
-      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${theories.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${theories.length} CONNECTIONS</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>C. Cole / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
+      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${theories.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${theories.length} CONNECTIONS</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>Gravity / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
       'board',
     );
     const notes = INSIGHTS.filter(
@@ -921,7 +921,7 @@ class Game {
     this.panel(
       clue.title,
       `EVIDENCE RECORD · ${clue.category}`,
-      `<div class="record-reader" data-material="${RECORD_MOUNTS[id].material}"><figure>${evidenceArt(id)}<figcaption>RECORD ${String(Object.keys(CLUES).indexOf(id) + 1).padStart(2, '0')} · ${RECORD_MOUNTS[id].label}</figcaption></figure><section><span class="file-stamp">FILED / C. COLE</span><span class="eyebrow">RECORDED OBSERVATION</span><p class="record-body">${clue.body}</p><blockquote>${clue.observation}<cite>— Cole</cite></blockquote>${notes.map((i) => `<div class="record-note"><span class="eyebrow">RE-EXAMINATION</span><h3>${i.title}</h3><p>${i.text}</p></div>`).join('')}${links.map((d) => `<div class="record-note"><span class="eyebrow">ESTABLISHED CONNECTION</span><h3>${d.title}</h3><p>${d.conclusion}</p></div>`).join('')}<button class="primary" data-action="record-back">Return to notebook ${icon('arrow')}</button></section></div>`,
+      `<div class="record-reader" data-material="${RECORD_MOUNTS[id].material}"><figure>${evidenceArt(id)}<figcaption>RECORD ${String(Object.keys(CLUES).indexOf(id) + 1).padStart(2, '0')} · ${RECORD_MOUNTS[id].label}</figcaption></figure><section><span class="file-stamp">FILED / GRAVITY</span><span class="eyebrow">RECORDED OBSERVATION</span><p class="record-body">${clue.body}</p><blockquote>${clue.observation}<cite>— Gravity</cite></blockquote>${notes.map((i) => `<div class="record-note"><span class="eyebrow">RE-EXAMINATION</span><h3>${i.title}</h3><p>${i.text}</p></div>`).join('')}${links.map((d) => `<div class="record-note"><span class="eyebrow">ESTABLISHED CONNECTION</span><h3>${d.title}</h3><p>${d.conclusion}</p></div>`).join('')}<button class="primary" data-action="record-back">Return to notebook ${icon('arrow')}</button></section></div>`,
       'record',
     );
     $('panel').scrollTop = 0;
@@ -953,7 +953,7 @@ class Game {
     this.panel(
       'Sector 07',
       'DISTRICT MAP · NEW ANGELES',
-      `<div class="map-canvas"><div class="map-grid"></div><div class="map-rail"></div><div class="map-road"><span>FREMONT AVENUE</span></div>${sites.map((site, i) => `<button class="map-place ${site.area === this.model.save.area ? 'current' : ''}" style="left:${site.x}%;top:${site.y}%" data-route="${site.id}"><i>${String(i + 1).padStart(2, '0')}</i><strong>${site.label}</strong><span>${site.area === this.model.save.area ? 'CURRENT LOCATION' : i === 2 && !this.model.save.contact ? 'CONTACT REQUIRED' : 'SET WALKING DESTINATION'}</span></button>`).join('')}<span class="map-north">N<br>↑</span><span class="map-caption">LOW DISTRICT<br>34°03′ N · 118°15′ W</span></div><div class="map-note"><span class="live-dot"></span><p>${this.model.objective}</p><span>Destinations guide Cole through connected rooms.</span></div>`,
+      `<div class="map-canvas"><div class="map-grid"></div><div class="map-rail"></div><div class="map-road"><span>FREMONT AVENUE</span></div>${sites.map((site, i) => `<button class="map-place ${site.area === this.model.save.area ? 'current' : ''}" style="left:${site.x}%;top:${site.y}%" data-route="${site.id}"><i>${String(i + 1).padStart(2, '0')}</i><strong>${site.label}</strong><span>${site.area === this.model.save.area ? 'CURRENT LOCATION' : i === 2 && !this.model.save.contact ? 'CONTACT REQUIRED' : 'SET WALKING DESTINATION'}</span></button>`).join('')}<span class="map-north">N<br>↑</span><span class="map-caption">LOW DISTRICT<br>34°03′ N · 118°15′ W</span></div><div class="map-note"><span class="live-dot"></span><p>${this.model.objective}</p><span>Destinations guide Gravity through connected rooms.</span></div>`,
       'map',
     );
   }
@@ -969,7 +969,7 @@ class Game {
     this.panel(
       'An open channel.',
       'LYRA · PRIVATE CONNECTION',
-      `<div class="story-choice"><span class="signal-large">◌</span><p>“If you let me, I can stay with you.”</p><small>Let Lyra accompany Cole through the city. Her presence will travel between areas.</small><button class="primary" data-action="accept-lyra">Open the channel ${icon('arrow')}</button><button class="text-button" data-action="close">I need a moment.</button></div>`,
+      `<div class="story-choice"><span class="signal-large">◌</span><p>“If you let me, I can stay with you.”</p><small>Let Lyra accompany Gravity through the city. Her presence will travel between areas.</small><button class="primary" data-action="accept-lyra">Open the channel ${icon('arrow')}</button><button class="text-button" data-action="close">I need a moment.</button></div>`,
       'companion',
     );
   }
@@ -977,7 +977,7 @@ class Game {
     this.panel(
       'They found the signal.',
       'SECTOR 07 · HOSTILE CONTACT',
-      `<div class="story-choice"><span class="eyebrow danger">VEIL ENFORCERS INBOUND</span><p>“Cole. Two blocks out. They know you have the memory.”</p><small>Hold them off, or take Lyra’s route through the service alley. The evidence comes first.</small><button class="primary" data-action="fight">Stand your ground ${icon('arrow')}</button><button class="secondary" data-action="evade">Take the service alley →</button></div>`,
+      `<div class="story-choice"><span class="eyebrow danger">VEIL ENFORCERS INBOUND</span><p>“Gravity. Two blocks out. They know you have the memory.”</p><small>Hold them off, or take Lyra’s route through the service alley. The evidence comes first.</small><button class="primary" data-action="fight">Stand your ground ${icon('arrow')}</button><button class="secondary" data-action="evade">Take the service alley →</button></div>`,
       'ambush',
     );
   }
@@ -998,7 +998,7 @@ class Game {
     this.panel(
       'An open channel.',
       'LYRA · PRIVATE CONNECTION',
-      `<div class="topic-list"><p class="topic-intro">“I’m here, Cole.”</p>${topics.map((t) => `<button data-topic="${t.id}"><strong>${t.title}</strong><span>${t.detail}</span>${icon('arrow')}</button>`).join('')}${this.model.save.escaped && !this.model.save.followup ? '<button data-action="followup"><strong>Open the next case</strong><span>Find the woman in archive 001</span>↗</button>' : ''}${this.model.followupSolved && !this.model.save.resolution && this.model.save.area === 'den' ? '<button data-action="resolution"><strong>Decide what happens to the archive</strong><span>Three conclusions, one person to protect</span>↗</button>' : ''}</div>`,
+      `<div class="topic-list"><p class="topic-intro">“I’m here, Gravity.”</p>${topics.map((t) => `<button data-topic="${t.id}"><strong>${t.title}</strong><span>${t.detail}</span>${icon('arrow')}</button>`).join('')}${this.model.save.escaped && !this.model.save.followup ? '<button data-action="followup"><strong>Open the next case</strong><span>Find the woman in archive 001</span>↗</button>' : ''}${this.model.followupSolved && !this.model.save.resolution && this.model.save.area === 'den' ? '<button data-action="resolution"><strong>Decide what happens to the archive</strong><span>Three conclusions, one person to protect</span>↗</button>' : ''}</div>`,
       'topics',
     );
   }
@@ -1024,7 +1024,7 @@ class Game {
     const prepared = this.model.save.deductions.includes('entry');
     const lines: Line[] = [
       {
-        speaker: 'COLE',
+        speaker: 'GRAVITY',
         text: prepared
           ? 'I’m asking about a pickup. Eleven minutes off the camera, a lock prepared beforehand. A driver with somewhere else to be.'
           : 'Marlon kept a woman’s memory after the city erased her. Someone came to take it. We’re trying to give her a name again.',
@@ -1035,7 +1035,7 @@ class Game {
           ? 'You did your homework. V-17 signed for two meals. Asked me where Meridian’s intake B was. Called Marlon “the collection.” I kept the carbon.'
           : 'He paid for the children who couldn’t. Marlon, I mean. All right. A driver signed V-17. Asked for Meridian’s intake B. Here. I kept the carbon.',
       },
-      { speaker: 'COLE', text: 'I’ll keep this safe.' },
+      { speaker: 'GRAVITY', text: 'I’ll keep this safe.' },
     ];
     this.say(
       lines,
@@ -1067,7 +1067,7 @@ class Game {
     this.panel(
       'Ada Vale.',
       'CASE FILE 07–032 · THREE CONCLUSIONS',
-      `<div class="story-choice"><span class="signal-large">001</span><p>“She has a name now. What do we do with it?”</p><small>The archive is real. The shipment went to Meridian. Both choices preserve the evidence; this choice decides how Cole and Lyra keep Ada’s identity.</small><button class="primary" data-action="resolve-protect">Keep her name in Lyra’s private archive ${icon('arrow')}</button><button class="secondary" data-action="resolve-testify">Write a sealed witness statement ${icon('arrow')}</button><button class="text-button" data-action="close">Talk it through first</button></div>`,
+      `<div class="story-choice"><span class="signal-large">001</span><p>“She has a name now. What do we do with it?”</p><small>The archive is real. The shipment went to Meridian. Both choices preserve the evidence; this choice decides how Gravity and Lyra keep Ada’s identity.</small><button class="primary" data-action="resolve-protect">Keep her name in Lyra’s private archive ${icon('arrow')}</button><button class="secondary" data-action="resolve-testify">Write a sealed witness statement ${icon('arrow')}</button><button class="text-button" data-action="close">Talk it through first</button></div>`,
       'resolution',
     );
   }
@@ -1081,7 +1081,7 @@ class Game {
     this.say(
       [
         {
-          speaker: 'COLE',
+          speaker: 'GRAVITY',
           text:
             choice === 'protect'
               ? 'Keep her name here. Encrypted. We follow the route before giving the city another person to hunt.'
@@ -1448,8 +1448,8 @@ class Game {
       if (this.combat.down)
         this.panel(
           'Still breathing.',
-          'COLE · NEURAL RECOVERY',
-          `<div class="story-choice"><p>“Get up, Cole. You still have the memory.”</p><small>Your evidence is safe. Retry the encounter at full health, or disengage.</small><button class="primary" data-action="retry-combat">Try again ${icon('arrow')}</button><button class="text-button" data-action="leave-combat">Disengage</button></div>`,
+          'GRAVITY · NEURAL RECOVERY',
+          `<div class="story-choice"><p>“Get up, Gravity. You still have the memory.”</p><small>Your evidence is safe. Retry the encounter at full health, or disengage.</small><button class="primary" data-action="retry-combat">Try again ${icon('arrow')}</button><button class="text-button" data-action="leave-combat">Disengage</button></div>`,
           'down',
         );
       else if (this.combat.complete) this.finishCombat();

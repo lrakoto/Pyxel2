@@ -1,12 +1,16 @@
-/** Unmodified CC0 Warped City art by Luis Zuno (Ansimuz). See public/character-lab/warped. */
+/** CC0 source art by Luis Zuno (Ansimuz), palette-adapted as Gravity at load time. */
+import { applyGravityPalette } from './gravity-palette.ts';
 export const CANDIDATE_CLIPS = {
   idle: { source: 'idle', count: 4, duration: 0.8 },
   walk: { source: 'walk', count: 16, duration: 0.8 },
   sprint: { source: 'run', count: 8, duration: 0.4 },
+  jump: { source: 'jump', count: 4, duration: 0.6 },
 } as const;
 export type CandidateMotion = keyof typeof CANDIDATE_CLIPS;
-export type CandidateFrames = Record<CandidateMotion, HTMLImageElement[]>;
-export async function loadCandidate(): Promise<CandidateFrames> {
+export type CandidateFrames = Record<CandidateMotion, (HTMLImageElement | HTMLCanvasElement)[]>;
+export async function loadCandidate(
+  palette: 'gravity' | 'original' = 'gravity',
+): Promise<CandidateFrames> {
   const entries = await Promise.all(
     Object.entries(CANDIDATE_CLIPS).map(async ([name, clip]) => [
       name,
@@ -15,7 +19,16 @@ export async function loadCandidate(): Promise<CandidateFrames> {
           const image = new Image();
           image.src = `${import.meta.env.BASE_URL}character-lab/warped/${clip.source}-${i + 1}.png`;
           await image.decode();
-          return image;
+          if (palette === 'original') return image;
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const context = canvas.getContext('2d')!;
+          context.drawImage(image, 0, 0);
+          const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+          applyGravityPalette(pixels.data, canvas.width);
+          context.putImageData(pixels, 0, 0);
+          return canvas;
         }),
       ),
     ]),

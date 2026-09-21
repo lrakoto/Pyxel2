@@ -1,3 +1,8 @@
+> **Current protagonist: Detective Gravity (September 2026).** She replaces the earlier
+> Cole concept. Blonde hair, black outfit, authored pixel animation. See the
+> [story bible](docs/STORY_BIBLE.md) and [motion study](https://lrakoto.github.io/Pyxel2/character-lab.html).
+> Historical development notes below describe earlier Cole prototypes.
+
 # EVERYBODY / NOBODY — Fragments
 
 A new interpretation of Pyxel: a playable cyberpunk noir investigation, built in this directory without changing the original game.

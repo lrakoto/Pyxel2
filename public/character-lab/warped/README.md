@@ -6,7 +6,7 @@ Creator storefront: https://ansimuz.itch.io/warped-city
 Downloaded 2026-09-20 from the creator's OpenGameArt release:
 https://opengameart.org/sites/default/files/warped_city_files.zip
 
-These are the 28 unmodified PNG frames from SPRITES/player/{idle,walk,run}.
+These are the 32 unmodified PNG frames from SPRITES/player/{idle,walk,run,jump}.
 The accompanying LICENSE.txt is copied verbatim. No music is included.
 Original PSD sources for these animations are also in the upstream archive.
 
@@ -16,9 +16,16 @@ transparent shoe margin. It does not trim frames independently, preserving
 foot alignment and authored body movement. Walk is 16 frames / 0.8 seconds;
 run is 8 / 0.4 seconds at full sprint. These playback timings are game tuning.
 
-Preview: character-lab.html; optional game skin: ?character=warped.
-The default Cole and combat art remain unchanged. Investigation gestures use
-idle until custom examine/listen/turn frames are authored. No noir repaint yet.
+Gravity is the default protagonist. `src/gravity-palette.ts` recolors decoded
+frames once at load time, preserving their alpha and geometry. Hair detection
+separates the shared purple stockings from the hair shadow. Skin is unchanged.
+The original PNGs remain untouched. Combat mechanics and timing are unchanged;
+the character's appearance and jump art use the same female protagonist.
+
+Preview: character-lab.html compares the original palette with Gravity.
+`?character=original` previews the unmodified palette; `?character=cole` retains
+the legacy prototype for development. Investigation gestures use idle pending
+custom gesture art. The current narrative canon lives in docs/STORY_BIBLE.md.
 
 Shortlist considered:
 - Warped City: selected for separate authored walk/run cycles and CC0 source art.

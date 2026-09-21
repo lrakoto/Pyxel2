@@ -1,9 +1,8 @@
 import './character-lab.css';
-import { COLE_STORY_FRAMES } from './character-art.ts';
 import { loadCandidate, CANDIDATE_CLIPS, CANDIDATE_CROP } from './character-candidate.ts';
 const base = import.meta.env.BASE_URL;
 const root = document.querySelector<HTMLElement>('#lab')!;
-root.innerHTML = `<header><a href="${base}">← Return to the investigation</a><p>CHARACTER DEPARTMENT · STUDY 02</p><h1>Cole, in motion.</h1><p class="intro">Hand-authored pixel animation alongside Cole. Compare the footwork and weight, then try the candidate on the actual street. The yellow outfit is the original asset, ready for a later noir redesign.</p></header><section class="controls" aria-label="Animation controls"><label>Motion<select id="motion"><option value="idle">Idle / breathing</option><option value="walk" selected>Walk</option><option value="sprint">Sprint</option></select></label><button id="play" aria-pressed="true">Pause</button><button id="face">Face left</button><label>Speed<select id="speed"><option value="0.5">½ speed</option><option value="1" selected>Normal</option><option value="1.5">1½ speed</option></select></label><label class="scrub">Frame<input id="scrub" type="range" min="0" max="11" value="0" step="1"></label></section><section class="controls" aria-label="Movement controls"><button id="control" aria-pressed="false">Take control</button><button id="left" aria-label="Move left">←</button><button id="right" aria-label="Move right">→</button><button id="dash">Hold to sprint</button><span>Keyboard: A / D or arrows · Shift to sprint</span></section><section class="comparison"><article><h2><span>01</span> Current pixel character</h2><canvas id="current" width="640" height="360" aria-label="Current Cole animation on the street"></canvas><p>Procedural pixel poses and existing silhouette.</p></article><article><h2><span>02</span> Warped City · Ansimuz</h2><canvas id="prototype" width="640" height="360" aria-label="Warped City pixel animation on the street"></canvas><p>16-frame walk · 8-frame run · 4-frame idle. Original CC0 pixel art by Luis Zuno.</p></article></section><footer><p id="status" role="status">Loading character study…</p><p>This study uses the original outfit and palette. A Cole adaptation would retain his hat, coat and red scarf. Investigation gestures currently use the candidate’s idle pose.</p><p><a href="${base}?character=warped">Play the candidate in the game ↗</a> · <a href="${base}">Play original Cole ↗</a></p><a href="https://opengameart.org/content/warped-city">Source art &amp; CC0 license ↗</a></footer>`;
+root.innerHTML = `<header><a href="${base}">← Return to the investigation</a><p>CHARACTER DEPARTMENT · STUDY 03</p><h1>Meet Gravity.</h1><p class="intro">Our detective, reimagined. Blonde hair, black clothing and the same hand-authored animation you chose. Compare the original palette with Gravity, then take her onto the street.</p></header><section class="controls" aria-label="Animation controls"><label>Motion<select id="motion"><option value="idle">Idle / breathing</option><option value="walk" selected>Walk</option><option value="sprint">Sprint</option></select></label><button id="play" aria-pressed="true">Pause</button><button id="face">Face left</button><label>Speed<select id="speed"><option value="0.5">½ speed</option><option value="1" selected>Normal</option><option value="1.5">1½ speed</option></select></label><label class="scrub">Frame<input id="scrub" type="range" min="0" max="11" value="0" step="1"></label></section><section class="controls" aria-label="Movement controls"><button id="control" aria-pressed="false">Take control</button><button id="left" aria-label="Move left">←</button><button id="right" aria-label="Move right">→</button><button id="dash">Hold to sprint</button><span>Keyboard: A / D or arrows · Shift to sprint</span></section><section class="comparison"><article><h2><span>01</span> Original palette · Ansimuz</h2><canvas id="current" width="640" height="360" aria-label="Original Warped City animation on the street"></canvas><p>The original yellow outfit and purple hair, preserved for comparison.</p></article><article><h2><span>02</span> Gravity · final palette</h2><canvas id="prototype" width="640" height="360" aria-label="Gravity animation on the street"></canvas><p>16-frame walk · 8-frame run · 4-frame idle. Adapted from Luis Zuno’s CC0 pixel art.</p></article></section><footer><p id="status" role="status">Loading character study…</p><p>Gravity is now the protagonist. Her black outfit keeps cool charcoal highlights for the dark city. Investigation gestures currently use her idle animation.</p><p><a href="${base}">Play as Gravity ↗</a> · <a href="${base}?character=original">Try the original palette ↗</a></p><a href="https://opengameart.org/content/warped-city">Source art &amp; CC0 license ↗</a></footer>`;
 type Clip = { name: string; count: number; duration: number };
 const motion = document.querySelector<HTMLSelectElement>('#motion')!;
 const speed = document.querySelector<HTMLSelectElement>('#speed')!;
@@ -97,12 +96,18 @@ async function image(src: string) {
   return im;
 }
 async function load() {
-  const [street, candidate] = await Promise.all([image('env/street.webp'), loadCandidate()]);
-  clips = Object.entries(CANDIDATE_CLIPS).map(([name, clip]) => ({
-    name,
-    count: clip.count,
-    duration: clip.duration,
-  }));
+  const [street, candidate, original] = await Promise.all([
+    image('env/street.webp'),
+    loadCandidate(),
+    loadCandidate('original'),
+  ]);
+  clips = Object.entries(CANDIDATE_CLIPS)
+    .filter(([name]) => name !== 'jump')
+    .map(([name, clip]) => ({
+      name,
+      count: clip.count,
+      duration: clip.duration,
+    }));
   scrub.max = '15';
   document.querySelector('#status')!.textContent =
     'READY · 28 authored frames · matching foot baseline';
@@ -140,28 +145,20 @@ async function load() {
       c.save();
       c.translate(position, 312);
       c.scale(facing, 1);
-      if (index === 1) {
-        const frames = candidate[clip.name as keyof typeof candidate];
-        const crop = CANDIDATE_CROP;
-        const scale = 160 / crop.cellHeight;
-        c.drawImage(
-          frames[frame],
-          crop.x,
-          crop.y,
-          crop.width,
-          crop.height,
-          -crop.pivotX * scale,
-          -160,
-          crop.width * scale,
-          crop.height * scale,
-        );
-      } else {
-        const tag = clip.name === 'walk' ? 'stride' : clip.name === 'idle' ? 'breathe' : 'sprint';
-        const frames = COLE_STORY_FRAMES[tag];
-        const im = frames[Math.min(frames.length - 1, Math.floor(phase * frames.length))];
-        if (clip.name === 'sprint') c.transform(1, 0, -0.045, 1, 0, 0);
-        c.drawImage(im, -40, -160, 80, 160);
-      }
+      const frames = (index === 1 ? candidate : original)[clip.name as keyof typeof candidate];
+      const crop = CANDIDATE_CROP;
+      const scale = 160 / crop.cellHeight;
+      c.drawImage(
+        frames[frame],
+        crop.x,
+        crop.y,
+        crop.width,
+        crop.height,
+        -crop.pivotX * scale,
+        -160,
+        crop.width * scale,
+        crop.height * scale,
+      );
       c.restore();
     }
     requestAnimationFrame(draw);

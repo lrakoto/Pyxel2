@@ -100,9 +100,9 @@ export function lyraIntroduction(model: CaseModel): Line[] {
       : 'You stayed with the painting until it stopped looking like a painting. Most people only see the faces.';
   return [
     { speaker: 'LYRA', text: opening },
-    { speaker: 'COLE', text: 'You’ve been watching me.' },
+    { speaker: 'GRAVITY', text: 'You’ve been watching me.' },
     { speaker: 'LYRA', text: 'I’ve been watching everyone walk past. You went inside.' },
-    { speaker: 'COLE', text: 'Marlon painted a woman. Number zero-zero-one. You know her?' },
+    { speaker: 'GRAVITY', text: 'Marlon painted a woman. Number zero-zero-one. You know her?' },
     {
       speaker: 'LYRA',
       text: 'I know what they left of her. Come into the Den. There are things the rain shouldn’t hear.',
@@ -124,7 +124,7 @@ export function lyraTopics(model: CaseModel): Topic[] {
       title: 'Where do we look next?',
       detail: 'Talk through the current lead',
       lines: [
-        { speaker: 'COLE', text: 'What am I missing?' },
+        { speaker: 'GRAVITY', text: 'What am I missing?' },
         {
           speaker: 'LYRA',
           text: model.save.resolution
@@ -157,7 +157,7 @@ export function lyraTopics(model: CaseModel): Topic[] {
       detail: 'Camera outage + studio lock',
       lines: [
         {
-          speaker: 'COLE',
+          speaker: 'GRAVITY',
           text: 'A blind camera. An oiled hinge. Whoever came had done it before.',
         },
         {
@@ -178,7 +178,7 @@ export function lyraTopics(model: CaseModel): Topic[] {
             ? 'He used to apologize when he called someone by the wrong name. Then I realized he was answering a different voice. The painting was his way of letting them speak separately.'
             : 'He wanted people to look long enough to notice someone else. Even before the voices, that was what his work did.',
         },
-        { speaker: 'COLE', text: 'Then we keep looking.' },
+        { speaker: 'GRAVITY', text: 'Then we keep looking.' },
       ],
     });
   if (solved('identity'))
@@ -187,7 +187,7 @@ export function lyraTopics(model: CaseModel): Topic[] {
       title: 'Ada Vale',
       detail: 'A name recovered',
       lines: [
-        { speaker: 'COLE', text: 'Say her name.' },
+        { speaker: 'GRAVITY', text: 'Say her name.' },
         {
           speaker: 'LYRA',
           text: 'Ada Vale. I’ve held that memory for years. It shouldn’t feel different now. It does.',
@@ -204,7 +204,7 @@ export function lyraTopics(model: CaseModel): Topic[] {
           speaker: 'LYRA',
           text: 'I thought the important part was keeping an exact copy. But she let the child make a mistake. Maybe a memory matters because it leaves room for something new.',
         },
-        { speaker: 'COLE', text: 'We’re not just carrying evidence.' },
+        { speaker: 'GRAVITY', text: 'We’re not just carrying evidence.' },
       ],
     });
   if (model.save.resolution)
@@ -231,7 +231,7 @@ export const FOLLOWUP_OPENING: Line[] = [
     text: 'We saved one memory. I have spent years being afraid to ask what was around it.',
   },
   {
-    speaker: 'COLE',
+    speaker: 'GRAVITY',
     text: 'A room has a sound. A drawing has a back. Someone saw the van arrive. We start there.',
   },
   { speaker: 'LYRA', text: 'Then come back to the Den. Let’s listen again.' },
