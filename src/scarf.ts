@@ -20,12 +20,10 @@ import { rimColor } from './lighting.ts';
  */
 const TUNING = {
   /**
-   * Ribbon length, as a fraction of Cole's height. The original prototype
-   * used 1.15 / 1.92 = 0.6, which hangs to the ankles; the character sheet
-   * this sprite follows drapes only to the hip, so the tail is shortened to
-   * match. Everything else about the cloth is the original's tuning.
+   * Long ankle-length tail. Leave clearance beneath the lowest idle neck pose
+   * (0.60 figure heights above the soles), including the cloth's slight stretch.
    */
-  length: 0.38,
+  length: 0.58,
   /** Half-width, same fraction (0.045 / 1.92). */
   halfWidth: 0.045 / 1.92,
   /** Downward pull, in Cole-heights per second squared. */
