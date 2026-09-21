@@ -42,3 +42,21 @@ test('shared purple separates hair, shorts and bare legs', () => {
   }
   assert.deepEqual(colors, new Set([0x8f693c, 0x242a36, 0xffb164]));
 });
+
+test('idle bare legs stay continuous as the knees rise and fall', () => {
+  for (let frame = 1; frame <= 4; frame++) {
+    const source = PNG.sync.read(
+      readFileSync(new URL(`../public/character-lab/warped/idle-${frame}.png`, import.meta.url)),
+    );
+    const data = new Uint8ClampedArray(source.data);
+    applyGravityPalette(data, source.width, `idle-${frame}`);
+    // Sample through the thigh/knee/calf, above the preserved boot trim.
+    // A fixed recolor boundary left a dark band in frames 2, 3 and 4.
+    for (let y = 48; y <= 55; y++) {
+      const at = (y * source.width + 34) * 4;
+      const color = (data[at] << 16) | (data[at + 1] << 8) | data[at + 2];
+      assert.equal(data[at + 3], 255, `idle-${frame}: connected leg at row ${y}`);
+      assert.ok([0xffb164, 0xb15c51].includes(color), `idle-${frame}: skin at row ${y}`);
+    }
+  }
+});

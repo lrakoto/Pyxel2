@@ -25,7 +25,7 @@ export function applyGravityPalette(data: Uint8ClampedArray, width: number, pose
         ? ([44, 45, 46, 49, 44, 45, 46, 49][frame] ?? 49)
         : motion === 'walk'
           ? 50
-          : 52;
+          : ([52, 51, 50, 51][frame] ?? 52);
     return y >= start;
   };
   // Preserve the footwear's dark seams as well as its white sole and trim.
