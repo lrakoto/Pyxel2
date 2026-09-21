@@ -1,3 +1,4 @@
+import { BodyMotion, bodyStudyFrame } from './gravity-body.ts';
 import {
   COLE_FRAMES,
   COLE_STORY_FRAMES,
@@ -31,6 +32,12 @@ interface Frame {
 }
 
 export class Sprites {
+  private bodyMotion = new BodyMotion();
+  private bodyOffset = 0;
+  private bodyTrial = new URLSearchParams(location.search).get('figure') === 'fuller';
+  updateBody(dt: number, speed: number, time: number, reduced: boolean) {
+    this.bodyOffset = this.bodyMotion.update(dt, speed, time / 0.8, reduced);
+  }
   private candidate: CandidateFrames | null = null;
   get candidateActive() {
     return this.candidate !== null;
@@ -90,8 +97,8 @@ export class Sprites {
       const index = candidateIndex(time, frames.length, 0.8);
       const crop = CANDIDATE_CROP;
       return {
-        key: `warped:${clip}:${index}`,
-        src: frames[index],
+        key: `warped:${clip}:${index}:${this.bodyTrial ? this.bodyOffset : 'base'}`,
+        src: this.bodyTrial ? bodyStudyFrame(frames[index], clip, this.bodyOffset) : frames[index],
         sx: crop.x,
         sy: crop.y,
         sw: crop.width,

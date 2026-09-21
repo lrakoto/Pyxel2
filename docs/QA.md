@@ -334,3 +334,15 @@ unchanged. The study now compares original colors against Gravity's palette.
 Production build and formatting pass. Browser verified the side-by-side palettes,
 default Gravity on the street and Lyra's “I'm here, Gravity” dialogue. Existing local
 progress loaded successfully. Investigation-specific gestures still use idle art.
+
+## Optional Gravity torso study
+
+Character lab compares current Gravity with a fuller clothed torso composited at
+native sprite resolution. A bounded damped spring adds at most one pixel of
+secondary movement, responds to changes in speed, and settles at rest. Reduced
+motion resets it. The optional game link uses `?figure=fuller`; default art remains
+unchanged. Jump silhouettes retain the original art pending review. Frame variants
+are cached and share the existing lighting/reflection/shadow path.
+
+Browser inspected the comparison. 45 tests, formatting and production build pass;
+the added simulation test covers both gaits, bounds, settling and reduced motion.

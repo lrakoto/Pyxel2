@@ -330,6 +330,7 @@ export class Renderer {
       !!v.speaker,
       v.reducedMotion,
     );
+    this.sprites.updateBody(v.dt, p.vx, motion.time, v.reducedMotion);
     if (!v.combat) {
       const againstWall =
         area !== 'street' || (p.x > 70 && p.x < 500) || (p.x > 800 && p.x < 1140) || p.x > 1400;
