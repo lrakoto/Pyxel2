@@ -57,7 +57,7 @@ export class Sprites {
   private resolve(id: string, tag: string, time: number): Frame {
     const sheet = this.manifest?.sheets[id];
     if (sheet && this.atlas) {
-      const fallbackTag = tag === 'stride' ? 'walk' : 'idle';
+      const fallbackTag = tag === 'stride' || tag === 'sprint' ? 'walk' : 'idle';
       const window = sheet.tags[tag] ?? sheet.tags[fallbackTag] ?? { from: 0, to: 0, direction: 0 };
       let indices = Array.from({ length: window.to - window.from + 1 }, (_, i) => i + window.from);
       if (window.direction === 1 || window.direction === 3) indices.reverse();

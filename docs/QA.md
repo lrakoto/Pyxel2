@@ -300,3 +300,13 @@ Cole gains a restrained speed-dependent walking lean, suppressed during dialogue
 Browser review: street to studio, evidence discovery and re-examination markers, all three required notebook deductions, return route to the street, Lyra encounter, and Den unlock. Portrait 390×844 and landscape 844×390 layouts, notebook open/return, and immersive landscape enter/exit checked. Existing local progress was continued, not reset. All 40 tests, formatting, and Pages build pass. These are browser viewport checks, not physical iPhone or device performance measurements.
 
 Confirmed live Den arrival, lighting, Lyra presence, and return-door prompt; no captured browser warnings/errors. The walkthrough also caught stale locked-Den dialogue after the studio deductions: that state now points to the waiting woman rather than back to the completed studio.
+
+## Sprint, gait and folded objective
+
+Exploration now accepts either Shift key or the held touch » button for 290 px/s sprinting (walk: 145 px/s). Existing combat Shift behavior is retained. Pointer capture, release/cancel, blur and modal input clearing also cover the sprint input. Faster approach uses a velocity-aware arrival tolerance to avoid oscillation past click-to-walk destinations. Exploration footstep cadence increases when running.
+
+Added a distinct eight-frame procedural sprint cycle with longer stride, lifted recovery foot and larger arm swing; walk frames also lift the recovery foot. Walk/run transitions preserve gait phase, with speed-driven playback and stronger sprint lean. Reduced motion preserves essential leg animation while suppressing lean. Imported sprite sheets can provide a `sprint` tag; missing sprint art falls back to `walk`.
+
+The objective starts as a small field-note tab. Tap/click toggles the full note; outside pointer input or Escape folds it. ARIA expanded/controls state tracks the disclosure. The notebook remains available via its existing button/J key.
+
+Reviewed native frame contact sheet (`visual-gaits.png`), browser objective expansion/folding/Escape, and 390×844 touch layout including outside-tap folding. No captured browser warnings/errors. All 42 tests, formatting and Pages build pass. New tests cover speed/release/braking/bounds and phase-preserving gait transitions with reduced motion. Physical multi-touch sprint holding has not been tested on an iPhone.

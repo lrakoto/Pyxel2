@@ -97,6 +97,9 @@ export const COLE_PALETTE: Record<string, string> = {
 type ColePose = {
   stride?: number;
   crouch?: number;
+  frontLift?: number;
+  backLift?: number;
+  running?: boolean;
   airborne?: boolean;
   gesture?: number;
   turn?: boolean;
@@ -112,6 +115,9 @@ type ColePose = {
 function makeColeFrame({
   stride = 0,
   crouch = 0,
+  frontLift = 0,
+  backLift = 0,
+  running = false,
   airborne = false,
   gesture = 0,
   turn = false,
@@ -139,23 +145,23 @@ function makeColeFrame({
       [11, legTop],
       [15, legTop],
       [13 + back, 53],
-      [12 + back, 60],
-      [9 + back, 60],
+      [12 + back, 60 - backLift],
+      [9 + back, 60 - backLift],
       [10, 52],
     ]);
-    rect(K.B, 9 + back, 58, 6, 3);
-    rect(K.B, 8 + back, 60, 8, 3);
+    rect(K.B, 9 + back, 58 - backLift, 6, 3);
+    rect(K.B, 8 + back, 60 - backLift, 8, 3);
     poly(K.P2, [
       [15, legTop],
       [19, legTop],
       [20 + front, 53],
-      [19 + front, 60],
-      [16 + front, 60],
+      [19 + front, 60 - frontLift],
+      [16 + front, 60 - frontLift],
       [16, 52],
     ]);
-    rect(K.B, 16 + front, 58, 6, 3);
-    rect(K.B, 15 + front, 60, 8, 3);
-    rect('#2b323c', 17 + front, 58, 3, 1);
+    rect(K.B, 16 + front, 58 - frontLift, 6, 3);
+    rect(K.B, 15 + front, 60 - frontLift, 8, 3);
+    rect('#2b323c', 17 + front, 58 - frontLift, 3, 1);
 
     // --- Coat ---------------------------------------------------------
     // Straight-cut and knee-length. Narrow enough that the legs read
@@ -263,7 +269,7 @@ function makeColeFrame({
     // --- Arm ------------------------------------------------------------
     // Counter-swings with the stride; the glove stays a separate block so
     // it doesn't read as a hole in the coat.
-    const arm = Math.round(stride * 2);
+    const arm = Math.round(stride * (running ? 3 : 2));
     poly(K.D, [
       [21, 23],
       [24, 26],
@@ -280,7 +286,7 @@ function makeColeFrame({
       rect('#525e65', 11, 29, 3, 1);
       rect('#9f7957', 18, 33, 2, 1);
       rect('#69747b', 10, 39, 1, 3);
-      rect('#343d46', 16 + front, 62, 7, 1);
+      rect('#343d46', 16 + front, 62 - frontLift, 7, 1);
       rect('#ac8060', 22, 18, 1, 1);
       // Lapel, double-stitched cuff, brass fasteners and broken rain highlights.
       rect('#899096', 12, 24, 1, 3);
@@ -363,7 +369,21 @@ export const COLE_FRAMES: {
 export const COLE_STORY_FRAMES: Record<string, HTMLCanvasElement[]> = {
   breathe: [0, 0, 1, 1, 0, 0].map((crouch) => makeColeFrame({ crouch, detail: true })),
   stride: [0, 0.7, 1, 0.7, 0, -0.7, -1, -0.7].map((stride) =>
-    makeColeFrame({ stride, detail: true }),
+    makeColeFrame({
+      stride,
+      frontLift: Math.max(0, Math.round(stride * 3)),
+      backLift: Math.max(0, Math.round(-stride * 3)),
+      detail: true,
+    }),
+  ),
+  sprint: [0, 0.7, 1, 0.7, 0, -0.7, -1, -0.7].map((stride) =>
+    makeColeFrame({
+      stride: stride * 1.35,
+      frontLift: Math.max(0, Math.round(stride * 7)),
+      backLift: Math.max(0, Math.round(-stride * 7)),
+      running: true,
+      detail: true,
+    }),
   ),
   turn: [makeColeFrame({ turn: true, detail: true }), makeColeFrame({ detail: true })],
   examine: [0, 1, 2, 3].map((gesture) => makeColeFrame({ gesture, detail: true })),

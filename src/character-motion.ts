@@ -20,7 +20,7 @@ export class CharacterMotion {
     const lean = reduced
       ? 0
       : Math.sin((this.settle / 0.45) * Math.PI) * 0.016 * facing -
-        (examining || speaking ? 0 : Math.max(-1, Math.min(1, speed / 145)) * 0.012);
+        (examining || speaking ? 0 : Math.max(-1, Math.min(1, speed / 290)) * 0.045);
     if (facing !== this.facing) {
       this.facing = facing;
       this.turn = 0.16;
@@ -31,17 +31,21 @@ export class CharacterMotion {
         ? 'listen'
         : this.turn > 0 && !reduced
           ? 'turn'
-          : Math.abs(speed) > 8
-            ? 'stride'
-            : 'breathe';
+          : Math.abs(speed) > 200
+            ? 'sprint'
+            : Math.abs(speed) > 8
+              ? 'stride'
+              : 'breathe';
     if (tag !== this.previousTag) {
-      this.clock = 0;
+      if (!(['stride', 'sprint'].includes(tag) && ['stride', 'sprint'].includes(this.previousTag)))
+        this.clock = 0;
       this.previousTag = tag;
     }
-    if (!reduced || tag === 'stride')
-      this.clock += Math.max(0, dt) * (tag === 'stride' ? Math.min(1.4, Math.abs(speed) / 145) : 1);
+    const moving = tag === 'stride' || tag === 'sprint';
+    if (!reduced || moving)
+      this.clock += Math.max(0, dt) * (moving ? Math.min(2, Math.abs(speed) / 145) : 1);
     this.turn = Math.max(0, this.turn - Math.max(0, dt));
-    return { lean, tag, time: reduced && tag !== 'stride' ? 0 : this.clock };
+    return { lean, tag, time: reduced && !moving ? 0 : this.clock };
   }
 }
 

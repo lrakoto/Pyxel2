@@ -74,7 +74,7 @@ document.getElementById('app')!.innerHTML = `
    <div id="stage" class="stage">
     <canvas id="world" aria-label="Side-scrolling game world. Use A and D to walk, E to examine, I to highlight evidence, and J to open the notebook."></canvas>
     <div class="vignette" aria-hidden="true"></div><div class="scanlines" aria-hidden="true"></div>
-    <div class="scene-hud" id="scene-hud"><div class="location"><span class="eyebrow" id="location-subtitle"></span><h1 id="location-title"></h1><span class="location-rule"></span></div><button id="objective-btn" class="objective"><span class="eyebrow"><i class="red-square"></i> FOLLOW UP</span><span id="objective-text"></span><small id="objective-hint">OPEN NOTEBOOK ↗</small></button></div>
+    <div class="scene-hud" id="scene-hud"><div class="location"><span class="eyebrow" id="location-subtitle"></span><h1 id="location-title"></h1><span class="location-rule"></span></div><button id="objective-btn" class="objective" aria-expanded="false" aria-controls="objective-text objective-hint" aria-label="Current objective"><span class="eyebrow"><i class="red-square"></i> FOLLOW UP</span><span id="objective-text"></span><small id="objective-hint">TAP TO FOLD · NOTEBOOK [J]</small></button></div>
     <div id="hotspots" class="hotspots" aria-label="Nearby places and evidence"></div>
     <div id="focus-status" class="focus-status" hidden><i></i> FOCUS ACTIVE <span>Follow what the city leaves behind.</span></div>
     <div id="destination" class="destination" hidden>⌄</div>
@@ -85,11 +85,11 @@ document.getElementById('app')!.innerHTML = `
     <aside id="evidence-closeup" class="evidence-closeup" hidden aria-label="Evidence illustration"></aside><div id="dialogue" class="dialogue" hidden aria-label="Conversation"><div class="portrait-mark" id="portrait-mark">C<span>/</span></div><div class="dialogue-copy"><div class="dialogue-top"><span id="speaker" class="eyebrow">COLE</span><span id="line-count" class="eyebrow"></span></div><p id="dialogue-text" aria-hidden="true"></p><p id="dialogue-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p><div class="dialogue-bottom"><span id="dialogue-context">DETECTIVE’S OBSERVATION</span><button id="advance-btn">Continue <kbd>E</kbd>${icon('arrow')}</button></div></div></div>
     <div id="transition" class="transition" aria-hidden="true"></div>
     <section id="title-screen" class="title-screen" aria-label="Start game"><div class="title-content"><div class="eyebrow title-kicker"><span>AN INTERACTIVE NOIR</span><i></i> NEW ANGELES, 2077</div><h1 class="game-title">EVERYBODY<span class="title-slash">/</span><br><span class="nobody">NOBODY</span><span class="title-period">.</span></h1><div class="issue-label"><span>ISSUE 01</span><i></i><strong>Fragments</strong></div><p class="opening">One dead artist. A thousand stolen minds.<br>Someone has to remember.</p><button class="primary" id="begin-btn" disabled><span id="begin-text">Entering New Angeles</span>${icon('arrow')}</button><div class="title-footnote">${icon('headphones')} HEADPHONES RECOMMENDED <span>·</span> SAVED ON THIS DEVICE</div></div><div class="title-coordinates"><span>SECTOR</span><strong>07</strong><span>34°03′ N<br>118°15′ W</span></div></section>
-    <div class="touch-controls" id="touch-controls"><button data-hold="left" aria-label="Move left">←</button><button data-hold="right" aria-label="Move right">→</button><button data-hold="jump" aria-label="Jump">↑</button><button id="touch-act" aria-label="Examine">E</button><button data-hold="fire" aria-label="Fire toward nearest enemy">◎</button></div>
+    <div class="touch-controls" id="touch-controls"><button data-hold="left" aria-label="Move left">←</button><button data-hold="right" aria-label="Move right">→</button><button data-hold="jump" aria-label="Jump">↑</button><button data-hold="sprint" aria-label="Hold to sprint">»</button><button id="touch-act" aria-label="Examine">E</button><button data-hold="fire" aria-label="Fire toward nearest enemy">◎</button></div>
    </div>
    <div class="scene-footer"><span id="chapter-label"><i>01</i> THE LAST WORK</span><span id="save-status"><i class="save-dot"></i> LOCAL CHECKPOINT</span><span>RAIN EXPECTED <i>↙</i> 17°C</span></div>
   </section>
-  <footer class="bottom-bar"><div class="controls-hint" id="controls-hint"><span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span></div><button id="focus-btn" class="focus-button" aria-pressed="false">${icon('focus')}<span>Focus mode</span><kbd>I</kbd></button><span class="build-label">PRIVATE NOTES <b>/</b> C. COLE</span></footer>
+  <footer class="bottom-bar"><div class="controls-hint" id="controls-hint"><span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>⇧</kbd> Sprint</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span></div><button id="focus-btn" class="focus-button" aria-pressed="false">${icon('focus')}<span>Focus mode</span><kbd>I</kbd></button><span class="build-label">PRIVATE NOTES <b>/</b> C. COLE</span></footer>
  </main>
  <dialog id="panel" class="panel" aria-labelledby="panel-title"><div id="panel-content"></div></dialog>
  <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -232,7 +232,25 @@ class Game {
       s,
     );
     $('board-btn').addEventListener('click', () => this.openBoard(), s);
-    $('objective-btn').addEventListener('click', () => this.openBoard(), s);
+    $('objective-btn').addEventListener(
+      'click',
+      () => {
+        const button = $('objective-btn');
+        button.setAttribute(
+          'aria-expanded',
+          String(button.getAttribute('aria-expanded') !== 'true'),
+        );
+      },
+      s,
+    );
+    document.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (!$('objective-btn').contains(event.target as Node))
+          $('objective-btn').setAttribute('aria-expanded', 'false');
+      },
+      s,
+    );
     $('map-btn').addEventListener('click', () => this.openMap(), s);
     $('pause-btn').addEventListener('click', () => this.openPause(), s);
     $('brand').addEventListener(
@@ -424,6 +442,11 @@ class Game {
   }
   keydown(e: KeyboardEvent) {
     if (e.code === 'Escape') {
+      if ($('objective-btn').getAttribute('aria-expanded') === 'true') {
+        $('objective-btn').setAttribute('aria-expanded', 'false');
+        e.preventDefault();
+        return;
+      }
       if (this.modal) return;
       e.preventDefault();
       if (this.lines.length) this.closeDialogue();
@@ -795,7 +818,7 @@ class Game {
     $('combat-hud').hidden = !this.combat;
     $('controls-hint').innerHTML = this.combat
       ? '<span><kbd>A</kbd><kbd>D</kbd> Move</span><span><kbd>Space</kbd> Jump</span><span><kbd>Shift</kbd> Sprint</span><span>Hold click to fire</span>'
-      : '<span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span>';
+      : '<span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>⇧</kbd> Sprint</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span>';
     $('stage').classList.toggle('in-combat', !!this.combat);
     $<HTMLButtonElement>('focus-btn').disabled = !!this.combat;
   }
@@ -938,7 +961,7 @@ class Game {
     this.panel(
       this.started ? 'A moment in the rain.' : 'Before you step outside.',
       'EVERYBODY / NOBODY',
-      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Notebook / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Continue into The First One after the Graves case.</p></div>`,
+      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>Shift</kbd> / Hold » + direction</span><b>Sprint</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Notebook / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Continue into The First One after the Graves case.</p></div>`,
       'pause',
     );
   }
@@ -1362,7 +1385,7 @@ class Game {
       (this.keys.has('KeyA') || this.keys.has('ArrowLeft') || this.keys.has('touch-left') ? 1 : 0);
     if (this.target !== null) {
       const d = this.target - this.player.x;
-      if (Math.abs(d) < 4) {
+      if (Math.abs(d) < Math.max(4, Math.abs(this.player.vx) * dt + 1)) {
         const h = this.pending;
         this.target = null;
         this.pending = null;
@@ -1393,12 +1416,14 @@ class Game {
         jump,
         dt,
         this.currentArea.width,
-        !!this.combat && (this.keys.has('ShiftLeft') || this.keys.has('ShiftRight')),
+        this.keys.has('ShiftLeft') ||
+          this.keys.has('ShiftRight') ||
+          (!this.combat && this.keys.has('touch-sprint')),
         this.currentArea.ground,
       );
     if (Math.abs(this.player.vx) > 20 && this.player.grounded) {
       this.stepTime += dt;
-      if (this.stepTime > 0.38) {
+      if (this.stepTime > (!this.combat && Math.abs(this.player.vx) > 200 ? 0.28 : 0.38)) {
         this.stepTime = 0;
         this.audio.step();
       }

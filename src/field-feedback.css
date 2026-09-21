@@ -90,3 +90,44 @@
 .reduced-motion .hotspot-dot {
   transition: none;
 }
+
+/* Folded objective: one deliberate selection opens the full note. */
+.scene-hud .objective[aria-expanded='false'] {
+  width: auto;
+  max-width: none;
+  min-height: 44px;
+  padding: 10px 13px;
+  margin-top: 0;
+  align-self: flex-start;
+  opacity: 0.85;
+  transform: rotate(0.6deg);
+}
+.objective[aria-expanded='false'] > #objective-text,
+.objective[aria-expanded='false'] > #objective-hint {
+  display: none;
+}
+.objective[aria-expanded='true'] > #objective-text,
+.objective[aria-expanded='true'] > #objective-hint {
+  display: block;
+}
+.objective[aria-expanded='false']::before,
+.objective[aria-expanded='false']::after {
+  display: none;
+}
+.scene-hud .objective[aria-expanded='true'] {
+  opacity: 1;
+  transform: rotate(0.6deg);
+}
+.objective[aria-expanded='false'] .eyebrow::after {
+  content: '+';
+  margin-left: 8px;
+}
+.touch-controls [data-hold='sprint'] {
+  margin-left: auto;
+}
+.in-combat .touch-controls [data-hold='sprint'] {
+  display: none;
+}
+.stage:not(.in-combat) #touch-act {
+  margin-left: 0;
+}
