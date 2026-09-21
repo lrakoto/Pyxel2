@@ -26,7 +26,7 @@ export async function loadCandidate(
           const context = canvas.getContext('2d')!;
           context.drawImage(image, 0, 0);
           const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
-          applyGravityPalette(pixels.data, canvas.width);
+          applyGravityPalette(pixels.data, canvas.width, `${clip.source}-${i + 1}`);
           context.putImageData(pixels, 0, 0);
           return canvas;
         }),

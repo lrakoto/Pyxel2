@@ -11,7 +11,7 @@ test('Gravity palette preserves alpha, skin and geometry in every authored frame
   for (const file of files) {
     const source = PNG.sync.read(readFileSync(new URL(file, directory)));
     const data = new Uint8ClampedArray(source.data);
-    applyGravityPalette(data, source.width);
+    applyGravityPalette(data, source.width, file);
     let blonde = 0;
     for (let i = 0; i < data.length; i += 4) {
       assert.equal(data[i + 3], source.data[i + 3], `${file}: alpha`);
@@ -29,7 +29,7 @@ test('Gravity palette preserves alpha, skin and geometry in every authored frame
   }
 });
 
-test('shared purple becomes gold on the head and charcoal on the stockings', () => {
+test('shared purple separates hair, shorts and bare legs', () => {
   const source = PNG.sync.read(
     readFileSync(new URL('../public/character-lab/warped/idle-1.png', import.meta.url)),
   );
@@ -40,5 +40,5 @@ test('shared purple becomes gold on the head and charcoal on the stockings', () 
     if (source.data.readUIntBE(i, 3) === 0x442b61 && data[i + 3])
       colors.add((data[i] << 16) | (data[i + 1] << 8) | data[i + 2]);
   }
-  assert.deepEqual(colors, new Set([0x8f693c, 0x242a36]));
+  assert.deepEqual(colors, new Set([0x8f693c, 0x242a36, 0xffb164]));
 });
