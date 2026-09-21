@@ -3,3 +3,5 @@ dist/
 public/sprites/*.png
 public/sprites/manifest.json
 .DS_Store
+assets/characters/**/renders/
+assets/characters/**/*.blend1

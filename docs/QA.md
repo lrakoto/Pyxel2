@@ -310,3 +310,11 @@ Added a distinct eight-frame procedural sprint cycle with longer stride, lifted 
 The objective starts as a small field-note tab. Tap/click toggles the full note; outside pointer input or Escape folds it. ARIA expanded/controls state tracks the disclosure. The notebook remains available via its existing button/J key.
 
 Reviewed native frame contact sheet (`visual-gaits.png`), browser objective expansion/folding/Escape, and 390×844 touch layout including outside-tap folding. No captured browser warnings/errors. All 42 tests, formatting and Pages build pass. New tests cover speed/release/braking/bounds and phase-preserving gait transitions with reduced motion. Physical multi-touch sprint holding has not been tested on an iPhone.
+
+## Blender Cole motion study
+
+Confirmed installed Blender 5.2.1 LTS and authored an editable armature/model with two-bone leg IK, articulated arms, head/spine, split coat tails and scarf. Rendered 40 frames across idle, walk, sprint and stop; packed transparent 64×96 cells. Source rig and reproducible generation/packing scripts are included. Normal game builds use committed renders and do not require Blender.
+
+Added `/character-lab.html` as a second Vite/Pages entry: current procedural character and Blender study against the street image at comparable visible heights. Controls select motion, mirror facing, adjust speed, pause and scrub frames. Stop holds its last frame with Replay; system reduced motion starts paused. The gameplay character and combat remain unchanged.
+
+Reviewed material correction, frame rendering, street placement/scale, walk/sprint presentation, final stop hold and mirroring in the browser. No captured browser warnings/errors. All 42 existing tests, production Pages build and formatting pass. This is a rig/blockout study: baked lighting, rigid weights and approximate viewer contact shadow remain limitations; it is not approved replacement game art.

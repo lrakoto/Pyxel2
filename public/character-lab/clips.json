@@ -1,0 +1,26 @@
+{
+  "width": 64,
+  "height": 96,
+  "clips": [
+    {
+      "name": "idle",
+      "count": 8,
+      "duration": 1.6
+    },
+    {
+      "name": "walk",
+      "count": 12,
+      "duration": 0.8
+    },
+    {
+      "name": "sprint",
+      "count": 12,
+      "duration": 0.6
+    },
+    {
+      "name": "stop",
+      "count": 8,
+      "duration": 0.45
+    }
+  ]
+}

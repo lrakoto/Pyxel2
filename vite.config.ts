@@ -3,6 +3,11 @@ import { execFile } from 'node:child_process';
 import { resolve } from 'node:path';
 export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? '/Pyxel2/' : '/',
+  build: {
+    rollupOptions: {
+      input: { game: resolve('index.html'), characterLab: resolve('character-lab.html') },
+    },
+  },
   plugins: [
     {
       name: 'aseprite-art',
