@@ -18,7 +18,8 @@ export function applyGravityPalette(data: Uint8ClampedArray, width: number) {
     else if (color === 0x442b61) replacement = y <= hairBottom + 1 ? 0x8f693c : 0x242a36;
     else if (color === 0xffd800) replacement = 0x343d4a;
     else if (color === 0xec7809) replacement = 0x161d29;
-    else if (color === 0xa096d1) replacement = 0x929da9;
+    else if (color === 0xa096d1) replacement = 0x151b25;
+    else if (color === 0xfcfcfc) replacement = 0x292f39;
     if (replacement === undefined) continue;
     data[i] = replacement >> 16;
     data[i + 1] = (replacement >> 8) & 255;
