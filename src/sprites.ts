@@ -11,6 +11,12 @@ import type { SpriteManifest } from './sprite-types.ts';
 import type { RimLight } from './lighting.ts';
 import { buildRimMasks, paintRim, type RimMasks } from './rim-mask.ts';
 import { storyFrameIndex } from './character-motion.ts';
+import {
+  loadCandidate,
+  candidateIndex,
+  CANDIDATE_CROP,
+  type CandidateFrames,
+} from './character-candidate.ts';
 
 /** One resolved frame of art, from either the atlas or the procedural set. */
 interface Frame {
@@ -25,6 +31,10 @@ interface Frame {
 }
 
 export class Sprites {
+  private candidate: CandidateFrames | null = null;
+  get candidateActive() {
+    return this.candidate !== null;
+  }
   private atlas: HTMLImageElement | null = null;
   private manifest: SpriteManifest | null = null;
   // Walkers read as a block away because their palette is pre-mixed toward the
@@ -38,6 +48,13 @@ export class Sprites {
   private shadows = new Map<string, HTMLCanvasElement>();
 
   async load() {
+    if (new URLSearchParams(location.search).get('character') === 'warped') {
+      try {
+        this.candidate = await loadCandidate();
+      } catch {
+        console.warn('Character study unavailable; using Cole.');
+      }
+    }
     try {
       const r = await fetch(`${import.meta.env.BASE_URL}sprites/manifest.json`);
       if (!r.ok) return;
@@ -55,6 +72,23 @@ export class Sprites {
 
   /** Picks the frame of art for this id/tag at this time, from either source. */
   private resolve(id: string, tag: string, time: number): Frame {
+    if (this.candidate && id === 'cole' && tag in COLE_STORY_FRAMES && tag !== 'idle') {
+      const clip = tag === 'stride' ? 'walk' : tag === 'sprint' ? 'sprint' : 'idle';
+      const frames = this.candidate[clip];
+      // CharacterMotion already scales its clock with movement speed.
+      const index = candidateIndex(time, frames.length, 0.8);
+      const crop = CANDIDATE_CROP;
+      return {
+        key: `warped:${clip}:${index}`,
+        src: frames[index],
+        sx: crop.x,
+        sy: crop.y,
+        sw: crop.width,
+        sh: crop.height,
+        pivotX: crop.pivotX,
+        cellH: crop.cellHeight,
+      };
+    }
     const sheet = this.manifest?.sheets[id];
     if (sheet && this.atlas) {
       const fallbackTag = tag === 'stride' || tag === 'sprint' ? 'walk' : 'idle';

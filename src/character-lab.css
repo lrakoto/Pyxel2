@@ -113,3 +113,25 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+.controls span {
+  font: 12px/1.5 monospace;
+  color: #a5ae9c;
+  align-self: center;
+}
+#left,
+#right,
+#dash {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+button:disabled,
+select:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+button[aria-pressed='true'] {
+  border-color: #d5c18a;
+  background: #414a32;
+}

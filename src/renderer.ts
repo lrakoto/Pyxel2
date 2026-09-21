@@ -407,7 +407,7 @@ export class Renderer {
         !v.combat && area === 'street' ? shelterShade(p.x) : 0,
       );
       c.restore();
-      this.scarf.draw(c, cam, rim);
+      if (v.combat || !this.sprites.candidateActive) this.scarf.draw(c, cam, rim);
     }
     if (!v.combat) {
       const wet =
