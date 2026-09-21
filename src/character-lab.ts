@@ -1,8 +1,14 @@
+import { Scarf } from './scarf.ts';
 import './character-lab.css';
-import { loadCandidate, CANDIDATE_CLIPS, CANDIDATE_CROP } from './character-candidate.ts';
+import {
+  loadCandidate,
+  CANDIDATE_CLIPS,
+  CANDIDATE_CROP,
+  scarfSocket,
+} from './character-candidate.ts';
 const base = import.meta.env.BASE_URL;
 const root = document.querySelector<HTMLElement>('#lab')!;
-root.innerHTML = `<header><a href="${base}">← Return to the investigation</a><p>CHARACTER DEPARTMENT · STUDY 03</p><h1>Meet Gravity.</h1><p class="intro">Our detective, reimagined. Blonde hair, black clothing and the same hand-authored animation you chose. Compare the original palette with Gravity, then take her onto the street.</p></header><section class="controls" aria-label="Animation controls"><label>Motion<select id="motion"><option value="idle">Idle / breathing</option><option value="walk" selected>Walk</option><option value="sprint">Sprint</option></select></label><button id="play" aria-pressed="true">Pause</button><button id="face">Face left</button><label>Speed<select id="speed"><option value="0.5">½ speed</option><option value="1" selected>Normal</option><option value="1.5">1½ speed</option></select></label><label class="scrub">Frame<input id="scrub" type="range" min="0" max="11" value="0" step="1"></label></section><section class="controls" aria-label="Movement controls"><button id="control" aria-pressed="false">Take control</button><button id="left" aria-label="Move left">←</button><button id="right" aria-label="Move right">→</button><button id="dash">Hold to sprint</button><span>Keyboard: A / D or arrows · Shift to sprint</span></section><section class="comparison"><article><h2><span>01</span> Original palette · Ansimuz</h2><canvas id="current" width="640" height="360" aria-label="Original Warped City animation on the street"></canvas><p>The original yellow outfit and purple hair, preserved for comparison.</p></article><article><h2><span>02</span> Gravity · final palette</h2><canvas id="prototype" width="640" height="360" aria-label="Gravity animation on the street"></canvas><p>16-frame walk · 8-frame run · 4-frame idle. Adapted from Luis Zuno’s CC0 pixel art.</p></article></section><footer><p id="status" role="status">Loading character study…</p><p>Gravity is now the protagonist. Her black outfit keeps cool charcoal highlights for the dark city. Investigation gestures currently use her idle animation.</p><p><a href="${base}">Play as Gravity ↗</a> · <a href="${base}?character=original">Try the original palette ↗</a></p><a href="https://opengameart.org/content/warped-city">Source art &amp; CC0 license ↗</a></footer>`;
+root.innerHTML = `<header><a href="${base}">← Return to the investigation</a><p>CHARACTER DEPARTMENT · STUDY 03</p><h1>Meet Gravity.</h1><p class="intro">Our detective, reimagined. Blonde hair, black clothing and the same hand-authored animation you chose. Compare the original palette with Gravity, then take her onto the street.</p></header><section class="controls" aria-label="Animation controls"><label>Motion<select id="motion"><option value="idle">Idle / breathing</option><option value="walk" selected>Walk</option><option value="sprint">Sprint</option></select></label><button id="play" aria-pressed="true">Pause</button><button id="face">Face left</button><label>Speed<select id="speed"><option value="0.5">½ speed</option><option value="1" selected>Normal</option><option value="1.5">1½ speed</option></select></label><label class="scrub">Frame<input id="scrub" type="range" min="0" max="11" value="0" step="1"></label></section><section class="controls" aria-label="Movement controls"><button id="control" aria-pressed="false">Take control</button><button id="left" aria-label="Move left">←</button><button id="right" aria-label="Move right">→</button><button id="dash">Hold to sprint</button><span>Keyboard: A / D or arrows · Shift to sprint</span></section><section class="comparison"><article><h2><span>01</span> Original palette · Ansimuz</h2><canvas id="current" width="640" height="360" aria-label="Original Warped City animation on the street"></canvas><p>The original yellow outfit and purple hair, preserved for comparison.</p></article><article><h2><span>02</span> Gravity · final palette</h2><canvas id="prototype" width="640" height="360" aria-label="Gravity animation on the street"></canvas><p>16-frame walk · 8-frame run · 4-frame idle. Adapted from Luis Zuno’s CC0 pixel art.</p></article></section><footer><p id="status" role="status">Loading character study…</p><p>Gravity is now the protagonist. Her red scarf now follows her movement, with a fitted neck wrap and simulated cloth tail. Investigation gestures currently use her idle animation.</p><p><a href="${base}">Play as Gravity ↗</a> · <a href="${base}?character=original">Try the original palette ↗</a></p><a href="https://opengameart.org/content/warped-city">Source art &amp; CC0 license ↗</a></footer>`;
 type Clip = { name: string; count: number; duration: number };
 const motion = document.querySelector<HTMLSelectElement>('#motion')!;
 const speed = document.querySelector<HTMLSelectElement>('#speed')!;
@@ -112,6 +118,7 @@ async function load() {
   document.querySelector('#status')!.textContent =
     'READY · 28 authored frames · matching foot baseline';
   button();
+  const scarf = new Scarf();
   function draw(now: number) {
     const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
     if (controlled) {
@@ -148,6 +155,22 @@ async function load() {
       const frames = (index === 1 ? candidate : original)[clip.name as keyof typeof candidate];
       const crop = CANDIDATE_CROP;
       const scale = 160 / crop.cellHeight;
+      if (index === 1) {
+        const neck = scarfSocket(frames[frame]);
+        scarf.step(
+          !playing || matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 0
+            : dt * Number(speed.value),
+          position + (neck.x - crop.pivotX) * scale * facing,
+          312 - 160 + (neck.y - crop.y) * scale,
+          clip.name === 'idle' ? 0 : (clip.name === 'sprint' ? 290 : 145) * facing,
+          160,
+        );
+        c.save();
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        scarf.draw(c, 0, null);
+        c.restore();
+      }
       c.drawImage(
         frames[frame],
         crop.x,

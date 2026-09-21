@@ -10,7 +10,8 @@ signatures. A surname or explanation for her name has not been established.
 
 Her visual identity is now the animated female pixel character: blonde hair,
 a black outfit with cool charcoal highlights, and the existing agile walk and run.
-The former fedora, trench coat and red scarf are retired from her current design.
+The former fedora and trench coat are retired. Cole’s red scarf carries forward as
+a fitted neck wrap and flowing cloth tail, now part of Gravity’s visual identity.
 Keep her human, observant and physically capable; this change does not introduce
 gravity powers or rewrite the case. Her backstory possibilities below remain open.
 

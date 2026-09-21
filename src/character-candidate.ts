@@ -8,6 +8,10 @@ export const CANDIDATE_CLIPS = {
 } as const;
 export type CandidateMotion = keyof typeof CANDIDATE_CLIPS;
 export type CandidateFrames = Record<CandidateMotion, (HTMLImageElement | HTMLCanvasElement)[]>;
+const neckSockets = new WeakMap<CanvasImageSource, { x: number; y: number }>();
+export function scarfSocket(frame: CanvasImageSource) {
+  return neckSockets.get(frame) ?? { x: 35, y: 29 };
+}
 export async function loadCandidate(
   palette: 'gravity' | 'original' = 'gravity',
 ): Promise<CandidateFrames> {
@@ -28,6 +32,34 @@ export async function loadCandidate(
           const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
           applyGravityPalette(pixels.data, canvas.width, `${clip.source}-${i + 1}`);
           context.putImageData(pixels, 0, 0);
+          let right = 0,
+            bottom = 0;
+          for (let y = 0; y < canvas.height; y++)
+            for (let x = 0; x < canvas.width; x++) {
+              const at = (y * canvas.width + x) * 4;
+              if (
+                pixels.data[at] === 216 &&
+                pixels.data[at + 1] === 181 &&
+                pixels.data[at + 2] === 104
+              ) {
+                right = Math.max(right, x);
+                bottom = Math.max(bottom, y);
+              }
+            }
+          const jumpSockets = [
+            { x: 40, y: 30 },
+            { x: 43, y: 37 },
+            { x: 31, y: 29 },
+            { x: 35, y: 25 },
+          ];
+          const socket = name === 'jump' ? jumpSockets[i] : { x: right - 6, y: bottom + 3 };
+          neckSockets.set(canvas, socket);
+          context.fillStyle = '#812421';
+          context.fillRect(socket.x - 1, socket.y, 7, 3);
+          context.fillStyle = '#c8382f';
+          context.fillRect(socket.x - 1, socket.y, 7, 2);
+          context.fillStyle = '#e46245';
+          context.fillRect(socket.x, socket.y, 4, 1);
           return canvas;
         }),
       ),

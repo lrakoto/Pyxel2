@@ -15,6 +15,7 @@ import {
   loadCandidate,
   candidateIndex,
   CANDIDATE_CROP,
+  scarfSocket,
   type CandidateFrames,
 } from './character-candidate.ts';
 
@@ -72,6 +73,16 @@ export class Sprites {
     } catch {
       /* Procedural character frames remain available offline. */
     }
+  }
+
+  neck(tag: string, time: number, height: number) {
+    if (!this.candidate) return { x: (3 * height) / 73, y: (-46 * height) / 73 };
+    const frame = this.resolve('cole', tag, time);
+    const socket = scarfSocket(frame.src);
+    return {
+      x: ((socket.x - frame.pivotX) * height) / frame.cellH,
+      y: -height + ((socket.y - frame.sy) * height) / frame.cellH,
+    };
   }
 
   /** Picks the frame of art for this id/tag at this time, from either source. */

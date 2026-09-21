@@ -375,18 +375,20 @@ export class Renderer {
       c.fill();
       c.globalAlpha = 1;
     }
-    // The scarf hangs from his neck and is simulated in world space, so it
-    // keeps its momentum through a turn instead of snapping with the mirror.
-    // Anchored over the coat's front edge rather than his centre line, so
-    // the tail reads as hanging off the wrap instead of splitting him in two.
+    const neck = this.sprites.neck(
+      v.combat ? tag : motion.tag,
+      v.combat ? t : motion.time,
+      73 * figure,
+    );
     this.scarf.step(
       v.reducedMotion ? 0 : v.dt,
-      p.x + 3 * figure * p.facing,
-      p.y - 46 * figure,
+      p.x + neck.x * p.facing + (!v.combat ? neck.y * motion.lean : 0),
+      p.y + neck.y,
       p.vx,
       73 * figure,
     );
     if (!v.combat || v.combat.invulnerable <= 0 || Math.floor(t * 18) % 2 === 0) {
+      if (this.sprites.candidateActive) this.scarf.draw(c, cam, rim);
       c.save();
       if (!v.combat && motion.lean) {
         c.translate(p.x - cam, p.y);

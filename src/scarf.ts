@@ -33,7 +33,7 @@ const TUNING = {
   /** Verlet velocity retained per step. */
   damping: 0.8,
   /** Backward drag proportional to his speed. */
-  wind: 0,
+  wind: 0.8,
   /** How far his speed lifts the tail toward horizontal. */
   loft: 1.6,
   /** Gust strength, in Cole-heights per second squared. */
@@ -86,6 +86,10 @@ export class Scarf {
    * velocity in pixels per second, `height` his current on-screen height.
    */
   step(dt: number, anchorX: number, anchorY: number, vx: number, height: number) {
+    if (dt <= 0) {
+      this.build(anchorX, anchorY, height);
+      return;
+    }
     if (!this.rows || this.height !== height) this.build(anchorX, anchorY, height);
     this.t += dt;
     const h = Math.min(dt, 1 / 30); // a stall must not explode the sim
