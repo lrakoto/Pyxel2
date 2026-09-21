@@ -1,3 +1,4 @@
+import { loadLyraCandidate, LYRA_CROP, type LyraCandidate } from './lyra-candidate.ts';
 import { LYRA_REFINED_FRAMES, lyraFrameIndex } from './lyra-art.ts';
 import {
   COLE_FRAMES,
@@ -33,6 +34,7 @@ interface Frame {
 
 export class Sprites {
   private candidate: CandidateFrames | null = null;
+  private lyraCandidate: LyraCandidate | null = null;
   get candidateActive() {
     return this.candidate !== null;
   }
@@ -49,6 +51,11 @@ export class Sprites {
   private shadows = new Map<string, HTMLCanvasElement>();
 
   async load() {
+    try {
+      this.lyraCandidate = await loadLyraCandidate();
+    } catch {
+      console.warn('Lyra asset unavailable; using procedural fallback.');
+    }
     if (new URLSearchParams(location.search).get('character') !== 'cole') {
       try {
         this.candidate = await loadCandidate(
@@ -102,6 +109,21 @@ export class Sprites {
       const crop = CANDIDATE_CROP;
       return {
         key: `warped:${clip}:${index}`,
+        src: frames[index],
+        sx: crop.x,
+        sy: crop.y,
+        sw: crop.width,
+        sh: crop.height,
+        pivotX: crop.pivotX,
+        cellH: crop.cellHeight,
+      };
+    }
+    if (id === 'lyra' && this.lyraCandidate) {
+      const frames = this.lyraCandidate.idle;
+      const index = candidateIndex(time, frames.length, 1.2);
+      const crop = LYRA_CROP;
+      return {
+        key: `lyra-warped:${index}`,
         src: frames[index],
         sx: crop.x,
         sy: crop.y,
