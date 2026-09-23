@@ -642,8 +642,8 @@ export class Renderer {
       // A slow, shallow breath only: the city reads as inhabited without any
       // window drawing attention to itself.
       const level = 0.72 + 0.1 * Math.sin(t * 0.5 + w.seed * 0.37);
-      const r = 11 + level * 7;
-      c.globalAlpha = Math.min(0.6, level * 0.4);
+      const r = 6 + level * 5;
+      c.globalAlpha = level * 0.24;
       c.drawImage(this.windowGlow, x - r, w.y - r, r * 2, r * 2);
     }
     c.restore();
@@ -659,10 +659,10 @@ export class Renderer {
     const width = c.canvas.width;
     c.save();
     const wash = c.createLinearGradient(0, 60, 0, 445);
-    wash.addColorStop(0, '#5c8a9c0a');
-    wash.addColorStop(0.4, '#5c8a9c33');
-    wash.addColorStop(0.78, '#6f9aa85e');
-    wash.addColorStop(1, '#7ba3b078');
+    wash.addColorStop(0, '#38576800');
+    wash.addColorStop(0.4, '#3857680a');
+    wash.addColorStop(0.72, '#46657420');
+    wash.addColorStop(1, '#5678843d');
     c.fillStyle = wash;
     c.fillRect(0, 60, width, 385);
 
@@ -670,8 +670,8 @@ export class Renderer {
     for (let i = 0; i < 8; i++) {
       const drift = ((t * (4 + i * 2.1) + i * 470) % 2900) - 800;
       const x = drift - cam * PARALLAX.midground * 0.5;
-      const y = 190 + i * 32 + Math.sin(t * 0.24 + i) * 14;
-      c.globalAlpha = 0.075 + 0.03 * Math.sin(t * 0.3 + i * 1.7);
+      const y = 258 + i * 24 + Math.sin(t * 0.24 + i) * 14;
+      c.globalAlpha = 0.03 + 0.012 * Math.sin(t * 0.3 + i * 1.7);
       c.drawImage(this.mist, x, y, 680 + i * 80, 190 + i * 20);
     }
     c.restore();
@@ -707,18 +707,27 @@ export class Renderer {
       c.save();
       c.globalCompositeOperation = 'screen';
       const spill = c.createLinearGradient(0, 210, 0, 285);
-      spill.addColorStop(0, '#b49c5720');
+      spill.addColorStop(0, '#b49c5715');
       spill.addColorStop(1, '#b49c5700');
       c.fillStyle = spill;
       for (let window = 0; window < 6; window++) c.fillRect(x + 6 + window * 10, 210, 5, 75);
       c.restore();
-      c.fillStyle = '#22363d';
+      c.fillStyle = '#10232b';
       c.fillRect(x, 177, 71, 17);
-      c.fillStyle = '#0c2029';
+      c.fillStyle = '#07151c';
       c.fillRect(x + 2, 189, 66, 4);
-      c.fillStyle = '#a8904f';
-      for (let j = 0; j < 6; j++) c.fillRect(x + 6 + j * 10, 181, 6, 5);
-      c.fillStyle = '#6f8a92';
+      // Door seams and recessed window surrounds give the dark body weight.
+      c.fillRect(x + 2, 180, 1, 9);
+      c.fillRect(x + 68, 180, 1, 9);
+      c.fillRect(x + 32, 180, 1, 12);
+      for (let j = 0; j < 6; j++) {
+        const wx = x + 6 + j * 10;
+        c.fillStyle = '#07151c';
+        c.fillRect(wx - 1, 180, 8, 7);
+        c.fillStyle = j === (i * 3 + 1) % 6 ? '#4e5040' : '#a78a50';
+        c.fillRect(wx, 181, 6, 5);
+      }
+      c.fillStyle = '#354f5b';
       c.fillRect(x + 2, 177, 66, 1);
 
       for (const mirror of mirrors) {
@@ -736,9 +745,9 @@ export class Renderer {
         c.save();
         c.globalCompositeOperation = 'lighter';
         c.fillStyle = band;
-        c.globalAlpha = 0.42 * power;
-        c.fillRect(x, 177, 71, 11);
-        c.globalAlpha = 0.9 * power;
+        c.globalAlpha = 0.18 * power;
+        c.fillRect(x, 177, 71, 4);
+        c.globalAlpha = 0.58 * power;
         c.fillRect(x + 2, 177, 66, 1);
 
         c.restore();

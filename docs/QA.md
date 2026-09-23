@@ -352,3 +352,9 @@ Three named local slots, migration of the legacy checkpoint into file 01, and fo
 Validation: 86 tests pass, including archive migration, quota failures, damaged-file fallback, isolation, history bounds, reversible recovery, stale-write rejection, escaped file names, and earned-progress recap text. TypeScript/Vite build and formatting pass.
 
 Browser checks on an isolated origin: legacy file appears in folder 01; create/name file 02 without changing folder 01; skip opening then reload; return recap; collect street-camera evidence; recovery list/restore; switch back to original zero-clue file; rename file; 390×844 portrait folder and recap layouts; second-tab change pauses saving in the older tab. Tests did not replace live player progress. Scene photos use existing location artwork rather than captured player screenshots.
+
+## September 22 — middle-distance contrast
+
+Reduced the broad cyan fog wash and lowered drifting mist toward building bases. Darkened middle-distance facade/rail masses, added shadowed side faces, and tightened warm window halos. The train now has a dark body and recessed windows, door seams, a dim pane per carriage, and a narrower, weaker metal reflection. The far skyline veil and four parallax speeds are preserved.
+
+Validation: compared live street play with the previous release and inspected a temporary deterministic frame with all seven train carriages visible, including an enlarged pixel detail. The temporary preview was removed. All 86 tests, formatting, TypeScript/Vite production build, and diff checks pass.
