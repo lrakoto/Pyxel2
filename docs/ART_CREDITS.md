@@ -52,9 +52,15 @@ https://opengameart.org/content/warped-city
 
 The original PNGs and creator license are retained in `public/character-lab/warped/`.
 `src/gravity-palette.ts` applies a deterministic black-outfit/blonde-hair palette
-when loading frames; source pixels, alpha and animation geometry are preserved.
-No music from the pack is used. Gravity’s name and narrative direction were
-chosen by the project owner. The former Cole design is a historical prototype.
+when loading frames, preserving their alpha and geometry. Exploration idle uses
+three complete source frames at a slower pace, omitting the deep bouncing crouch.
+`src/gravity-acting.ts` creates additional pixel-authored derivatives for standing
+inspection, floor-evidence crouching, terminal use, listening, and speaking.
+These drawings alter the arms and crouching silhouette, with pose-specific scarf
+anchors; they are game additions, not extra animations supplied by Ansimuz.
+The source PNGs and the downloaded walk, run, and jump artwork remain unchanged.
+No music from the pack is used. Gravity’s name and narrative direction were chosen
+by the project owner. The former Cole design is a historical prototype.
 
 ## Lyra — current humanoid character
 
@@ -66,9 +72,17 @@ Three unchanged source layers (pale base, black bob hair, blue ninja outfit)
 are retained in `public/character-lab/lyra-human/` with provenance and license
 notes. `src/lyra-candidate.ts` composites the layers and applies a deterministic
 navy/gunmetal palette with authored cyan visor and circuit pixels mapped to each
-pose, without changing source silhouettes or transparency. Lyra uses one
-authored idle pose with subtle code-driven breathing around a fixed foot pivot,
-plus six authored walking frames available in the comparison lab. It is a
-different model from Gravity and the previous Warped Caves Lyra. The lab now
+pose. Lyra retains one authored idle pose with subtle code-driven breathing around
+a fixed foot pivot, plus six authored walking frames available in the comparison
+lab. `src/lyra-acting.ts` derives listening, speaking, and hand-projecting reactions
+from that stance and arm pixels in the source sheet’s other action cells. A
+one-pixel head inclination and composited arm placements change the reaction
+silhouettes while preserving the idle legs and foot baseline. These derivatives
+and their measured timing are game additions; the three downloaded source layers
+remain unchanged. Listening and projection settle into held poses, while speaking
+rests between gestures.
+
+This is a different model from Gravity and the previous Warped Caves Lyra. The lab
 compares the approved humanoid model's previous pale projection with its current
-cyber finish. `src/lyra-projection.ts` supplies the shared emitter and scan effects.
+cyber finish and previews the same reactions and timing as the game.
+`src/lyra-projection.ts` supplies the shared emitter and scan effects.

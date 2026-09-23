@@ -1,4 +1,9 @@
 # Lyra asset source
+
+Historical candidate retained for comparison. The current game and Lyra lab use
+MoikMellah's MV Platformer Female; see `../lyra-human/LICENSE.txt`. The notes below
+describe the earlier Warped Caves model.
+
 Artwork: Luis Zuno / Ansimuz, Warped Caves. CC0/public domain.
 Source: https://opengameart.org/content/warped-caves-pixel-art-pack
 Downloaded 2026-09-20: https://opengameart.org/sites/default/files/warped-files_1.zip

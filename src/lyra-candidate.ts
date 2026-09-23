@@ -1,3 +1,11 @@
+import { makeLyraReactionPixels } from './lyra-acting.ts';
+export {
+  LYRA_REACTION_TIMING,
+  lyraReactionFrame,
+  lyraProjectionSocket,
+  type LyraReaction,
+} from './lyra-acting.ts';
+
 /** CC0 Warped Caves character by Luis Zuno (Ansimuz), adapted as Lyra. */
 export const LYRA_CROP = { x: 0, y: 20, width: 80, height: 44, pivotX: 40, cellHeight: 44 };
 const COLORS: Record<number, number> = {
@@ -83,7 +91,7 @@ const CYBER_DETAILS = [
 export function applyLyraHumanoidPalette(
   data: Uint8ClampedArray,
   style: LyraHumanoidStyle = 'cyber',
-  frame = 0,
+  frame: number | 'listen' | 'speak-low' | 'speak-high' | 'project' = 0,
 ) {
   const colors = style === 'projection' ? HUMAN_PROJECTION_COLORS : HUMAN_CYBER_COLORS;
   for (let i = 0; i < data.length; i += 4) {
@@ -95,7 +103,21 @@ export function applyLyraHumanoidPalette(
     data[i + 2] = color & 255;
   }
   if (style !== 'cyber' || data.length !== 32 * 64 * 4) return;
-  const detail = CYBER_DETAILS[Math.max(0, Math.min(6, Math.floor(frame)))];
+  const detail =
+    typeof frame === 'number'
+      ? CYBER_DETAILS[Math.max(0, Math.min(6, Math.floor(frame)))]
+      : {
+          ...CYBER_DETAILS[0],
+          eye: frame === 'listen' ? 17 : 16,
+          wrist:
+            frame === 'project'
+              ? [25, 29]
+              : frame === 'speak-high'
+                ? [20, 34]
+                : frame === 'speak-low'
+                  ? [20, 35]
+                  : [11, 39],
+        };
   const suit = [0x101f35, 0x263c51, 0x3f5867];
   const accent = (x: number, y: number, color: number, material: readonly number[]) => {
     const at = (y * 32 + x) * 4;
@@ -126,18 +148,58 @@ export async function loadLyraHumanoid(original = false, style: LyraHumanoidStyl
       return image;
     }),
   );
-  const frames = Array.from({ length: 7 }, (_, index) => {
+  const cell = (column: number, row = 0) => {
     const canvas = document.createElement('canvas');
     canvas.width = 32;
     canvas.height = 64;
     const context = canvas.getContext('2d')!;
-    for (const layer of layers) context.drawImage(layer, index * 32, 0, 32, 64, 0, 0, 32, 64);
+    for (const layer of layers)
+      context.drawImage(layer, column * 32, row * 64, 32, 64, 0, 0, 32, 64);
+    return canvas;
+  };
+  const pixelsOf = (canvas: HTMLCanvasElement) =>
+    canvas.getContext('2d')!.getImageData(0, 0, 32, 64).data;
+  const raw = Array.from({ length: 7 }, (_, index) => cell(index));
+  const acting = makeLyraReactionPixels(
+    pixelsOf(raw[0]),
+    pixelsOf(cell(0, 1)),
+    pixelsOf(cell(2, 2)),
+  );
+  const finish = (
+    canvas: HTMLCanvasElement,
+    index: Parameters<typeof applyLyraHumanoidPalette>[2],
+  ) => {
+    const context = canvas.getContext('2d')!;
     if (!original) {
       const pixels = context.getImageData(0, 0, 32, 64);
       applyLyraHumanoidPalette(pixels.data, style, index);
       context.putImageData(pixels, 0, 0);
     }
     return canvas;
-  });
-  return { idle: frames.slice(0, 1), walk: frames.slice(1) };
+  };
+  const actingFrame = (
+    pixels: Uint8ClampedArray,
+    detail: Parameters<typeof applyLyraHumanoidPalette>[2],
+  ) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 64;
+    const context = canvas.getContext('2d')!;
+    const image = context.createImageData(32, 64);
+    image.data.set(pixels);
+    context.putImageData(image, 0, 0);
+    return finish(canvas, detail);
+  };
+  const frames = raw.map((canvas, index) => finish(canvas, index));
+  return {
+    idle: frames.slice(0, 1),
+    walk: frames.slice(1),
+    listen: acting.listen.map((pixels, index) => actingFrame(pixels, index ? 'listen' : 0)),
+    speak: acting.speak.map((pixels, index) =>
+      actingFrame(pixels, index === 2 ? 'speak-high' : index ? 'speak-low' : 0),
+    ),
+    project: acting.project.map((pixels, index) =>
+      actingFrame(pixels, index === 2 ? 'project' : index ? 'speak-high' : 0),
+    ),
+  };
 }

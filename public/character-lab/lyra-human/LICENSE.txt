@@ -14,8 +14,17 @@ hair.png = hair/hair_bob_black.png
 suit.png = outfits/outfit_ninja_blue.png
 
 The game and Lyra comparison study composite the layers and apply a navy/gunmetal
-palette with cyan visor and circuit details in src/lyra-candidate.ts. Source
-silhouettes and transparency are preserved. The lab also retains the previous
-pale palette for comparison. Both use the first idle pose and six walking frames.
-Subtle breathing is applied in code around a stationary foot pivot; it is not a
-new hand-authored idle animation.
+palette with cyan visor and circuit details in src/lyra-candidate.ts. The lab also
+retains the previous pale palette for comparison. Both use the first idle pose
+and six walking frames. Subtle breathing is applied in code around a stationary
+foot pivot; it is not a new hand-authored idle animation.
+
+src/lyra-acting.ts creates additional listening, speaking, and hand-projecting
+reactions from the composited idle pose and authored arm pixels in other source
+action cells (zero-based row 1 / column 0 and row 2 / column 2). A one-pixel head
+inclination and composited arm placements change the reaction silhouettes while
+retaining the idle legs and foot baseline. Visor and circuit accents follow the
+new placements. These pose derivatives and their timing are game additions, not
+extra animations supplied by the creator. Listening and projection settle into
+held poses; speaking rests between gestures. The game and lab share the same
+reaction frames and timing. All three original PNG layers remain unchanged.

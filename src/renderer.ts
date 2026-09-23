@@ -29,6 +29,7 @@ import { drawFlare } from './flare.ts';
 import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
 import { leakImpacts } from './water-events.ts';
 import { drawLyraEmitter } from './lyra-projection.ts';
+import type { ActorPerformance } from './interaction-staging.ts';
 import { FootWater, drawInteriorForeground, drawMei } from './visual-details.ts';
 import { CharacterMotion, footfallBetween } from './character-motion.ts';
 import { streetWind, streetWindDisplacement } from './wind.ts';
@@ -68,6 +69,7 @@ interface View {
   examining: boolean;
   discovery: { id: ClueId; x: number; y: number } | null;
   speaker: string | null;
+  performance?: ActorPerformance;
   /** Wall-clock seconds since the last frame, for the scarf's cloth sim. */
   dt: number;
 }
@@ -323,6 +325,7 @@ export class Renderer {
         world.lights,
         v.speaker === 'LYRA',
         v.player.x < 1280 ? -1 : 1,
+        v.performance,
       );
     if (area === 'den')
       this.drawLyra(
@@ -335,6 +338,7 @@ export class Renderer {
         world.lights,
         v.speaker === 'LYRA',
         v.player.x < 1150 ? -1 : 1,
+        v.performance,
       );
     const p = v.player,
       tag = !p.grounded ? 'jump' : Math.abs(p.vx) > 8 ? 'walk' : 'idle';
@@ -346,6 +350,11 @@ export class Renderer {
       !!v.speaker,
       v.reducedMotion,
     );
+    if (!v.combat && v.performance?.gravity) {
+      motion.tag = v.performance.gravity;
+      motion.time = v.performance.gravityTime;
+      motion.lean = 0;
+    }
     // Footsteps follow the feet: a tap each time the drawn stride lands.
     if (
       !v.combat &&
@@ -1001,6 +1010,7 @@ export class Renderer {
     lights: SignLight[],
     speaking = false,
     facing = 1,
+    performance?: ActorPerformance,
   ) {
     const x = worldX - cam,
       y = ground;
@@ -1010,10 +1020,18 @@ export class Renderer {
     const rim = rimAt(lights, worldX, y - 40 * figure, facing, t);
     c.save();
     c.globalAlpha = 1;
-    c.translate(x, y);
-    c.transform(1, 0, speaking ? Math.sin(t * 1.2) * 0.008 * facing : 0, 1, 0, 0);
-    c.translate(-x, -y);
-    this.sprites.draw(c, 'lyra', speaking ? 'listen' : 'idle', t, x, y, facing, 70 * figure, rim);
+    const reaction = performance?.lyra ?? (speaking ? 'speak' : 'idle');
+    this.sprites.draw(
+      c,
+      'lyra',
+      reaction,
+      reaction === 'idle' ? t : (performance?.lyraTime ?? t),
+      x,
+      y,
+      facing,
+      70 * figure,
+      rim,
+    );
     c.restore();
   }
   private weather(

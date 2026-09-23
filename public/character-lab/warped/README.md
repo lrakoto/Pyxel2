@@ -1,4 +1,4 @@
-# Warped City character motion candidate
+# Warped City — Gravity source and derivatives
 
 Artwork by Luis Zuno / Ansimuz, CC0/public domain.
 Source: https://opengameart.org/content/warped-city
@@ -22,10 +22,20 @@ separates the shared purple stockings from the hair shadow. Skin is unchanged.
 The original PNGs remain untouched. Combat mechanics and timing are unchanged;
 the character's appearance and jump art use the same female protagonist.
 
+Exploration idle plays complete source frames 2–4 over 2.4 seconds, leaving out
+the first frame's deep bouncing crouch. The walking, sprinting, jumping, and combat
+idle artwork is retained. `src/gravity-acting.ts` adds three-pose pixel derivatives
+for standing inspection, a floor-evidence crouch, terminal reach, listening at an
+earpiece, and an open-hand speaking gesture. Each gesture settles into its final
+pose. The arms and crouching silhouette are new game drawings, with matching
+scarf anchors; they are not additional animations from the source pack. All
+changes happen in cached runtime frames, leaving these original PNGs unchanged.
+
 Preview: character-lab.html compares the original palette with Gravity.
 `?character=original` previews the unmodified palette; `?character=cole` retains
-the legacy prototype for development. Investigation gestures use idle pending
-custom gesture art. The current narrative canon lives in docs/STORY_BIBLE.md.
+the legacy prototype for development. The motion selector and replay control
+preview the investigation gestures with the same timing as the game. The current
+narrative canon lives in docs/STORY_BIBLE.md.
 
 Shortlist considered:
 - Warped City: selected for separate authored walk/run cycles and CC0 source art.

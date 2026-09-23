@@ -321,6 +321,27 @@
   color: #746c53;
   font: 9px/1.5 var(--mono);
 }
+.archive-export-link {
+  max-width: 240px;
+}
+.archive-transfer-note {
+  padding-top: 14px;
+  border-top: 1px dashed #74694966;
+}
+.panel .archive-import-link {
+  background: #75805a1a;
+  min-height: 44px;
+}
+.archive-import-preview .archive-recap .archive-import-notice {
+  font-size: 11px;
+  padding: 12px 14px;
+  border: 1px dashed #65715188;
+  color: #40513a;
+}
+.archive-import-preview .archive-recap > .archive-note {
+  margin-top: 16px;
+  font: 10px/1.8 var(--mono);
+}
 .archive-checkpoints {
   list-style: none;
   margin: 26px 0 0;

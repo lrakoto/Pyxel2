@@ -54,7 +54,7 @@ function checkId(id: number) {
 function defaultName(id: number) {
   return `Case file ${String(id).padStart(2, '0')}`;
 }
-function cleanName(name: string, id: number) {
+export function cleanCaseName(name: string, id: number) {
   return (
     name
       .replace(/[\u0000-\u001f\u007f]/g, '')
@@ -103,7 +103,7 @@ function parseEnvelope(raw: string | null, id: number): SlotEnvelope | null {
     return {
       version: 1,
       id,
-      name: cleanName(value.name, id),
+      name: cleanCaseName(value.name, id),
       updatedAt: value.updatedAt,
       save: normalizedSave(value.save),
       history,
@@ -202,17 +202,23 @@ export class SaveArchive {
   }
 
   create(id: number, name: string): void {
+    this.importCase(id, name, freshSave());
+  }
+
+  /** File a validated copy in an empty folder without switching the live investigation. */
+  importCase(id: number, name: string, save: SaveData): void {
     checkId(id);
     const stored = this.load(id);
     if (stored.occupied) throw new Error('That case file is already occupied.');
     this.requireCurrent(id, stored);
+    const next = normalizedSave(save);
     this.commit(
       {
         version: 1,
         id,
-        name: cleanName(name, id),
+        name: cleanCaseName(name, id),
         updatedAt: this.timestamp(),
-        save: freshSave(),
+        save: next,
         history: [],
       },
       stored,
@@ -225,7 +231,7 @@ export class SaveArchive {
     this.requireReadable(stored);
     this.requireCurrent(id, stored);
     if (!stored.envelope) throw new Error('Start an investigation before naming this case file.');
-    const nextName = cleanName(name, id);
+    const nextName = cleanCaseName(name, id);
     if (stored.envelope.name === nextName && !stored.recovered) return;
     // A label edit is not playtime and should not move the last-played timestamp.
     this.commit({ ...stored.envelope, name: nextName, recoveryNotice: false }, stored);

@@ -18,7 +18,7 @@ npm ci
 npm run dev
 ```
 
-Open **http://127.0.0.1:5174/**. Click **Begin investigation** to enable the procedural soundscape. Headphones help. The game saves automatically in this browser, using its own versioned storage key. It does not share saves with the original.
+Open **http://127.0.0.1:5174/**. Click **Begin investigation** to enable the soundscape. Headphones help. The game saves automatically in this browser, with three independent folders in **Case archive**. It does not share saves with the original.
 
 ```sh
 npm test               # Case progression, save validation, physics, combat, depth, routing
@@ -44,14 +44,14 @@ npm run optimize-art  # Rebuild lossless WebP from PNG masters; verify decoded p
 | B on the street | Optional combat practice |
 | Mouse aim + hold left button | Fire in combat |
 | Space / W / ↑ | Jump in combat |
-| Shift | Sprint in combat |
+| Shift | Sprint |
 | Q | Disengage from combat |
 
 On small screens and touch devices, movement and action buttons appear over the game. The touch fire button aims at the nearest enemy. Portrait and landscape layouts both work. Desktop keyboard and mouse remain the primary play experience. Pause settings include volume and reduced motion; system reduced-motion preferences are respected by default.
 
 ## The chapter
 
-Explore Sector 07, examine Graves’ studio, and connect evidence in the case board. Three deductions reveal a new contact and open the Memory Den. Recover archive 001, invite Lyra to accompany Cole, then protect the memory or take her escape route. The chapter has a definite ending and allows continued exploration afterward.
+Explore Sector 07, examine Graves’ studio, and connect evidence in the case board. Three deductions reveal a new contact and open the Memory Den. Recover archive 001, invite Lyra to accompany Gravity, then protect the memory or take her escape route. The chapter has a definite ending and allows continued exploration afterward.
 
 This is a contained vertical slice: three areas, nine evidence records, three deductions, a persistent companion, and a two-wave combat encounter. It is not a full RPG campaign. There is no backend, account system, telemetry, multiplayer, or cloud save.
 
@@ -65,9 +65,10 @@ This is a contained vertical slice: three areas, nine evidence records, three de
 | `src/renderer.ts` | Canvas compositor, lighting, live reflections, weather, actors |
 | `src/layers.ts` | Four parallax rates, cached middle-distance city, reflection math |
 | `src/combat.ts` | Finite encounters, enemies, projectiles, damage, recovery |
-| `src/audio.ts` | Procedural Web Audio ambience and effects |
+| `src/audio.ts` | Web Audio ambience, procedural effects, and recorded water impacts |
 | `src/sprites.ts` | Imported atlas playback with procedural fallback |
 | `src/character-art.ts` | Adapted original character pixels, rendered to cached canvases |
+| `src/gravity-acting.ts`, `src/lyra-acting.ts` | Pixel pose derivatives and reaction timing shared by the game and character labs |
 | `assets/environments/` | Original-resolution PNG artwork masters |
 | `public/env/` | Lossless WebP delivery assets |
 | `assets/sprites/` | Drop `.aseprite` source files here |
@@ -79,7 +80,7 @@ The production app has **no runtime npm dependencies**. Vite, TypeScript, the sp
 
 ## Adding art and areas
 
-The original Aseprite importer is preserved. Place `cole.aseprite`, `enforcer.aseprite`, `drone.aseprite`, `ped_a.aseprite`, `ped_b.aseprite`, or `lyra.aseprite` in `assets/sprites/`. Development watches that directory; builds compile it automatically. Use `idle`, `walk`, and `jump` for Cole; `walk` for enemies and pedestrians; `idle` for Lyra. Playback supports the imported frame durations and forward / reverse / ping-pong directions. Missing sheets fall back to the existing procedural frames. The current renderer loops animation tags; finite repeats and one-shot completion callbacks are not implemented.
+The original Aseprite importer is preserved. Place `cole.aseprite`, `enforcer.aseprite`, `drone.aseprite`, `ped_a.aseprite`, `ped_b.aseprite`, or `lyra.aseprite` in `assets/sprites/`. Development watches that directory; builds compile it automatically. Use `idle`, `walk`, and `jump` for the legacy Cole sheet; `walk` for enemies and pedestrians; `idle` for Lyra. Imported atlas playback supports frame durations and forward / reverse / ping-pong directions, with procedural fallback when sheets are missing. That playback path loops animation tags; finite repeats and one-shot completion callbacks are not implemented. The current Gravity and humanoid Lyra models use separate PNG source loaders and explicit reaction timing, including held end poses for investigation gestures.
 
 New rooms belong in `AREAS` in `src/content.ts`, with a matching environment file and explicit doors. Current map routing assumes a street hub. A bigger district should replace that helper with graph routing. Keep clue and story identifiers stable; changing the save schema requires a version migration.
 
@@ -105,7 +106,7 @@ The illustrated-evidence treatment now covers all fourteen clues across both cas
 
 ## Recovery and accessibility
 
-The previous distinct checkpoint is retained locally as a fallback if the main save becomes unreadable. Interrupted object conversations restart from the relevant interaction on Continue; already collected clues and deductions remain saved. Starting a new investigation deliberately replaces both checkpoint slots. Storage failures remain visible in the checkpoint indicator.
+Each case folder retains a previous checkpoint envelope as a fallback if its latest save becomes unreadable. Interrupted object conversations restart from the relevant interaction on Continue; already collected clues and deductions remain saved. Starting a new investigation uses an empty folder and preserves existing cases. Storage failures remain visible in the checkpoint indicator.
 
 The case board’s **Need a lead?** disclosure suggests a location or a question supported by records you already hold. Dialogue provides complete lines to assistive technology independently of the visual typewriter. Coarse-pointer controls have larger minimum targets. World rendering stops behind modal panels and resumes when they close; resizing or changing reduced motion refreshes the paused image.
 
@@ -119,7 +120,7 @@ Play at **https://lrakoto.github.io/Pyxel2/**.
 
 The `Publish playable preview` workflow deploys pushes to `feat/case-board`, the approved Pages release branch. It installs locked dependencies, checks formatting, runs tests, builds, and publishes `dist` through GitHub Pages. Repository Settings → Pages must use **GitHub Actions** as its source. To move releases to another branch later, update the workflow's push filter.
 
-The workflow sets `GITHUB_PAGES=true` to build with `/Pyxel2/` as the base path. Ordinary local builds keep `/`, so a future host can use the same project without the Pages setting. Saves remain local to each browser and origin; localhost progress does not transfer to the online preview.
+The workflow sets `GITHUB_PAGES=true` to build with `/Pyxel2/` as the base path. Ordinary local builds keep `/`, so a future host can use the same project without the Pages setting. Saves remain local to each browser and origin. To move localhost progress to the online preview, use **Download case**, then **Import case** into an empty folder there; progress does not transfer automatically.
 
 ### Spatial depth and notebook
 
@@ -132,7 +133,9 @@ The interface now follows Cole's field notebook: cloth cover, paper case tabs, p
 
 The active development branch is `feat/intro-cinematic`. Publish by advancing `feat/case-board` after validation; GitHub Pages environment protection allows that release branch. GRAVITY is the game title; Everybody / Nobody remains Marlon’s painting. The opening is a skippable 35.5-second scripted scene. Completing or skipping it is saved, and existing investigation saves continue without replaying it. Starting a new investigation resets the opening along with case progress.
 
-Gravity and Lyra use the downloaded Ansimuz character assets; compare them in `character-lab.html` and `lyra-lab.html`. Lyra’s asset has idle and run cycles, but no dedicated speaking poses. Interface text uses bundled DejaVu Sans Mono. Exploration footsteps follow Gravity’s animation footfalls.
+Gravity uses Ansimuz’s **Warped City** character; Lyra uses MoikMellah’s **MV Platformer Female (32x64)**. Both source packs are CC0, and the original PNGs remain unchanged. Compare the runtime derivatives in `character-lab.html` and `lyra-lab.html`; full provenance is in [the art notes](docs/ART_CREDITS.md). Interface text uses bundled DejaVu Sans Mono. Exploration footsteps follow Gravity’s animation footfalls.
+
+Gravity’s exploration idle now uses three complete source poses at a quiet pace, omitting the deep bouncing crouch. Pixel-authored derivatives add standing inspection, a floor-evidence crouch, terminal reach, listening at her earpiece, and an open-hand speaking gesture, with scarf anchors matched to each pose. Lyra keeps her approved cyber palette, glow, and subtle idle breath. Her new reactions add a small listening inclination, measured speaking gestures with rests, and a raised hand held for archive projection. The game and labs share these pose timings; the downloaded walking, sprinting, and jumping artwork is preserved.
 
 ## Player saves — case archive
 
@@ -140,6 +143,8 @@ Open **Case archive** on the title screen or from Pause. Three named folders kee
 
 Existing browser progress migrates to file 01, retaining the original checkpoint keys. Each folder keeps its latest save, a previous-envelope fallback, and up to four earlier meaningful checkpoints. Walking updates the current position without displacing discovery/area checkpoints. **Earlier checkpoints** restores a point while keeping the current progress available to recover. Saves resume on the ground; active encounters keep their pre-encounter checkpoint, and cinematics do not save intermediate staging positions.
 
-Files remain in this browser on this device. Cloud sync and save-file export/import are future work. If storage is unavailable/full, the game reports session-only progress. A changed file in another tab pauses writes here to protect newer notes; reload that tab to use the current archive.
+To move a case between browsers or devices, open an occupied folder’s recap and choose **Download case**. In an empty folder, choose **Import case**, select the downloaded JSON, review the case preview, then confirm with **File imported case**. Import validates the file and checks that the destination is still empty before writing. It keeps the current investigation open and never overwrites an occupied folder. When all three folders are occupied, downloads remain available; importing requires an empty folder in another browser or profile.
 
-Implementation: `src/save-archive.ts` owns migration/storage/recovery; `src/archive-ui.ts` owns recaps and folder rendering; `src/archive.css` styles the archive. Tests cover corruption, quota errors, stale tabs, slot isolation, reversible restoration, and spoiler-safe recaps.
+Only the latest saved checkpoint travels with a download; earlier checkpoints and browser preferences stay local. Nothing is uploaded, and there is no cloud sync or account system. If storage is unavailable/full, the game reports session-only progress. A changed file in another tab pauses writes here to protect newer notes; reload that tab to use the current archive.
+
+Implementation: `src/save-archive.ts` owns migration/storage/recovery; `src/archive-transfer.ts` validates versioned JSON transfers; `src/archive-ui.ts` owns recaps, folder rendering, and import previews; `src/archive.css` styles the archive. Tests cover corruption, quota errors, stale tabs, slot isolation, reversible restoration, spoiler-safe recaps, transfer round trips, rejected files, and occupied-folder protection.

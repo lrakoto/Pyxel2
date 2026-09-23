@@ -1,9 +1,14 @@
 import './character-lab.css';
-import { loadLyraHumanoid, LYRA_HUMAN_CROP } from './lyra-candidate.ts';
+import {
+  loadLyraHumanoid,
+  LYRA_HUMAN_CROP,
+  lyraReactionFrame,
+  type LyraReaction,
+} from './lyra-candidate.ts';
 import { drawLyraEmitter, drawLyraSignal } from './lyra-projection.ts';
 const base = import.meta.env.BASE_URL;
 document.querySelector('#lab')!.innerHTML =
-  `<header><a href="${base}">← Return to the investigation</a><p>CHARACTER DEPARTMENT · STUDY 06</p><h1>A clearer signal.</h1><p class="intro">The same Lyra, with a darker technical suit, cyan circuitry and a luminous visor. Her projection now comes from a defined emitter instead of a soft mist. Compare the previous pale treatment with the version in the game.</p></header><section class="controls"><label>Motion<select id="motion"><option value="idle">Idle / breathing</option><option value="walk">Walk / movement study</option></select></label><button id="pause">Pause</button><button id="face">Face left</button><label>Location<select id="scene"><option value="den">Memory Den</option><option value="street">Sector 07</option></select></label><label><input id="original" type="checkbox"> Original asset colors</label></section><section class="comparison"><article><h2>01 · Previous projection</h2><canvas id="before" width="640" height="360" aria-label="Previous pale humanoid Lyra animation"></canvas><p>The approved humanoid model with its earlier pale-blue palette and soft halo.</p></article><article><h2>02 · Cyber Lyra — in game</h2><canvas id="after" width="640" height="360" aria-label="Cyber Lyra animation"></canvas><p>The same silhouette with a dark suit, visor, circuit accents and a sharper projection.</p></article></section><footer><p id="status" role="status">Loading character comparison…</p><p>Both sides use the same source animation: 1 authored idle pose with subtle breathing, and 6 authored walk frames. The new palette, pixel details and projection effects are shared with the game.</p><p><a href="${base}">Return to the investigation ↗</a> · <a href="${base}character-lab.html">Gravity’s motion study ↗</a> · <a href="https://opengameart.org/content/mv-platformer-female-32x64">New asset &amp; CC0 license ↗</a></p></footer>`;
+  `<header><a href="${base}">← Return to the investigation</a><p>CHARACTER DEPARTMENT · STUDY 07</p><h1>Someone is listening.</h1><p class="intro">Lyra keeps her dark technical suit, cyan circuitry and luminous visor. Her new conversation poses add a small turn of attention, measured hand gestures, and a deliberate hand-raised pose for the archive. Compare her earlier projection with the reactions used in the game.</p></header><section class="controls"><label>Motion<select id="motion"><option value="idle">Idle / breathing</option><option value="listen">Listening / attention</option><option value="speak">Speaking / hand gesture</option><option value="project">Projecting / archive memory</option><option value="walk">Walk / movement study</option></select></label><button id="pause">Pause</button><button id="replay">Replay reaction</button><button id="face">Face left</button><label>Location<select id="scene"><option value="den">Memory Den</option><option value="street">Sector 07</option></select></label><label><input id="original" type="checkbox"> Original asset colors</label></section><section class="comparison"><article><h2>01 · Previous projection</h2><canvas id="before" width="640" height="360" aria-label="Previous pale humanoid Lyra animation"></canvas><p>The approved humanoid model with its earlier pale-blue palette and neutral conversation pose.</p></article><article><h2>02 · Cyber Lyra — in game</h2><canvas id="after" width="640" height="360" aria-label="Cyber Lyra conversation reactions"></canvas><p>New pixel poses use the source artist’s arms on Lyra’s planted stance. Her projection and small idle breath remain.</p></article></section><footer><p id="status" role="status">Loading character comparison…</p><p>Listening settles into a single attention pose. Speaking rests between gestures. Projecting raises one hand and holds it for the memory; use Replay reaction to watch the transition again. Frames and timing are shared with the game.</p><p><a href="${base}">Return to the investigation ↗</a> · <a href="${base}character-lab.html">Gravity’s motion study ↗</a> · <a href="https://opengameart.org/content/mv-platformer-female-32x64">Source asset &amp; CC0 license ↗</a></p></footer>`;
 const motion = document.querySelector<HTMLSelectElement>('#motion')!;
 const pause = document.querySelector<HTMLButtonElement>('#pause')!;
 const scene = document.querySelector<HTMLSelectElement>('#scene')!;
@@ -42,10 +47,22 @@ Promise.all([
       'READY · previous projection and cyber game version';
     let time = 0,
       previous = 0;
+    motion.onchange = () => {
+      time = playing ? 0 : 0.5;
+      document.querySelector('#status')!.textContent =
+        `READY · ${motion.selectedOptions[0].textContent}`;
+    };
+    document.querySelector<HTMLButtonElement>('#replay')!.onclick = () => {
+      time = 0;
+      previous = 0;
+      playing = true;
+      updateButton();
+    };
     function draw(now: number) {
       if (playing && previous && !document.hidden) time += Math.min(0.05, (now - previous) / 1000);
       previous = now;
-      const walking = motion.value === 'walk';
+      const reaction = motion.value as LyraReaction;
+      const walking = reaction === 'walk';
       const background = scene.value === 'den' ? den : street;
       for (const [i, id] of ['before', 'after'].entries()) {
         const c = document.querySelector<HTMLCanvasElement>(`#${id}`)!.getContext('2d')!;
@@ -77,9 +94,9 @@ Promise.all([
         c.globalAlpha = i ? 1 : 0.93;
         const crop = LYRA_HUMAN_CROP;
         const frames = i
-          ? (originalColors.checked ? original : candidate)[walking ? 'walk' : 'idle']
+          ? (originalColors.checked ? original : candidate)[reaction]
           : current[walking ? 'walk' : 'idle'];
-        const index = Math.floor(time * 8) % frames.length;
+        const index = lyraReactionFrame(i ? reaction : walking ? 'walk' : 'idle', time);
         // A restrained breath changes chest/head height around a fixed sole pivot.
         // The single authored idle pose is preserved; no leg cropping or bobbing.
         if (!walking) {

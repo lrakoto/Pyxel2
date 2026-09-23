@@ -12,9 +12,23 @@ import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint } from './checkpoint.ts';
 import { SaveArchive, ACTIVE_SLOT_KEY, slotKey, slotBackupKey } from './save-archive.ts';
-import { renderArchive, renderResume, renderRecovery } from './archive-ui.ts';
+import { renderArchive, renderResume, renderRecovery, renderImportPreview } from './archive-ui.ts';
+import {
+  CaseFileError,
+  assertCaseFileSize,
+  exportCaseFile,
+  parseCaseFile,
+  findImportSlot,
+  type CaseFileProposal,
+} from './archive-transfer.ts';
 import { evidenceArt } from './evidence-art.ts';
 import { evidenceBoardState, renderEvidenceCard } from './case-board.ts';
+import {
+  actorPerformance,
+  interactionPosition,
+  interactionReach,
+  interactionLead,
+} from './interaction-staging.ts';
 import {
   AREAS,
   CLUES,
@@ -139,6 +153,8 @@ class Game {
   time = 0;
   started = false;
   archiveChanged = false;
+  private importProposal: { slot: number; file: CaseFileProposal } | null = null;
+  private importRequest = 0;
   ready = false;
   scan = false;
   reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -167,6 +183,10 @@ class Game {
   selected: ClueId[] = [];
   boardFile: 'graves' | 'first-one' = 'graves';
   examining = false;
+  interactionSubject: Hotspot | null = null;
+  staging: { hotspot: Hotspot; remaining: number } | null = null;
+  interactionTime = 0;
+  lineTime = 0;
   discovery: { id: ClueId; x: number; y: number } | null = null;
   previous = 0;
   accumulator = 0;
@@ -331,6 +351,7 @@ class Game {
           this.cinematic ||
           this.modal ||
           this.lines.length ||
+          this.staging ||
           this.transitioning
         )
           return;
@@ -370,7 +391,7 @@ class Game {
         'pointerdown',
         (e) => {
           e.preventDefault();
-          if (this.modal || !this.started) return;
+          if (this.modal || !this.started || this.staging || this.lines.length) return;
           button.setPointerCapture(e.pointerId);
           const action = button.dataset.hold!;
           this.touchPointers.set(e.pointerId, action);
@@ -429,9 +450,20 @@ class Game {
       'close',
       () => {
         if (this.modal) return;
+        this.importProposal = null;
+        this.importRequest++;
         this.panelMode = '';
         this.keys.clear();
         this.firing = false;
+        // A topic choice can start dialogue before this queued close event runs.
+        // Only finish panel-only conversations; paused acting and dialogue resume.
+        if (this.interactionSubject && !this.staging && !this.lines.length) {
+          this.interactionSubject = null;
+          const hadResume = this.model.save.resumeHotspot !== null;
+          this.model.save.resumeHotspot = null;
+          $('hotspots').classList.remove('inactive');
+          if (hadResume) this.persist();
+        }
         this.sync();
       },
       s,
@@ -518,7 +550,8 @@ class Game {
       }
       if (this.modal) return;
       e.preventDefault();
-      if (this.lines.length) this.closeDialogue();
+      if (this.staging) this.cancelInteraction();
+      else if (this.lines.length) this.closeDialogue();
       else if (this.started) this.openPause();
       return;
     }
@@ -532,6 +565,10 @@ class Game {
       return;
     }
     if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault();
+    if (this.staging) {
+      if (!e.repeat && ['KeyE', 'Space', 'Enter'].includes(e.code)) this.finishInteractionLead();
+      return;
+    }
     if (this.lines.length) {
       if (!e.repeat && ['KeyE', 'Space', 'Enter'].includes(e.code)) {
         e.preventDefault();
@@ -594,7 +631,9 @@ class Game {
     if (slot?.save) this.openResume(slot.id);
     else this.openArchive();
   }
-  archiveError() {
+  archiveError(
+    detail = 'The case could not be filed. Storage may be full or unavailable. Your current session is still open; no other case was replaced.',
+  ) {
     let message = document.getElementById('archive-error');
     if (!message) {
       message = document.createElement('p');
@@ -602,10 +641,11 @@ class Game {
       message.setAttribute('role', 'alert');
       $('panel-content').append(message);
     }
-    message.textContent =
-      'The case could not be filed. Storage may be full or unavailable. Your current session is still open; no other case was replaced.';
+    message.textContent = detail;
   }
   openArchive() {
+    this.importProposal = null;
+    this.importRequest++;
     if (this.transitioning || !this.ready) return;
     if (this.started && !this.persist()) {
       this.panel(
@@ -633,6 +673,8 @@ class Game {
     );
   }
   openResume(id: number) {
+    this.importProposal = null;
+    this.importRequest++;
     const slot = archive?.list().find((slot) => slot.id === id);
     if (!slot?.save) return;
     this.panel(
@@ -670,6 +712,9 @@ class Game {
     this.nearest = null;
     this.discovery = null;
     this.examining = false;
+    this.interactionSubject = null;
+    this.staging = null;
+    this.interactionTime = this.lineTime = 0;
     this.scan = false;
     this.selected = [];
     this.inspectedClue = null;
@@ -704,6 +749,34 @@ class Game {
     if (![1, 2, 3].includes(id)) return;
     try {
       switch (el.dataset.action) {
+        case 'archive-export': {
+          if (!this.persist()) return this.archiveError();
+          const slot = archive.list().find((slot) => slot.id === id);
+          if (!slot) return;
+          const file = exportCaseFile(slot);
+          const url = URL.createObjectURL(new Blob([file.contents], { type: 'application/json' }));
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = file.filename;
+          document.body.append(link);
+          link.click();
+          link.remove();
+          window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+          break;
+        }
+        case 'archive-import':
+          this.chooseCaseFile(findImportSlot(archive.list(), id));
+          break;
+        case 'archive-import-confirm': {
+          const proposal = this.importProposal;
+          if (!proposal || proposal.slot !== id) return;
+          if (!this.persist()) return this.archiveError();
+          findImportSlot(archive.list(), id);
+          archive.importCase(id, proposal.file.name, proposal.file.save);
+          this.importProposal = null;
+          this.openResume(id);
+          break;
+        }
         case 'archive-open':
           this.openResume(id);
           break;
@@ -760,9 +833,63 @@ class Game {
           );
           break;
       }
-    } catch {
-      this.archiveError();
+    } catch (error) {
+      this.archiveError(error instanceof CaseFileError ? error.message : undefined);
     }
+  }
+  chooseCaseFile(slot: number) {
+    const request = ++this.importRequest;
+    this.importProposal = null;
+    const picker = document.createElement('input');
+    picker.type = 'file';
+    picker.accept = '.json,application/json';
+    picker.hidden = true;
+    picker.setAttribute('aria-label', 'Import a Gravity case file');
+    $('panel-content').append(picker);
+    picker.addEventListener('cancel', () => picker.remove(), { once: true });
+    picker.addEventListener(
+      'change',
+      async () => {
+        const file = picker.files?.[0];
+        picker.remove();
+        if (!file) return;
+        try {
+          assertCaseFileSize(file.size);
+          const proposal = parseCaseFile(await file.text());
+          if (
+            this.events.signal.aborted ||
+            request !== this.importRequest ||
+            !this.modal ||
+            this.panelMode !== 'archive' ||
+            this.archiveChanged ||
+            !archive
+          )
+            return;
+          findImportSlot(archive.list(), slot);
+          this.importProposal = { slot, file: proposal };
+          this.panel(
+            'Bring your notes along.',
+            'CASE ARCHIVE · IMPORT',
+            renderImportPreview(proposal, slot),
+            'archive',
+          );
+        } catch (error) {
+          if (
+            !this.events.signal.aborted &&
+            request === this.importRequest &&
+            this.modal &&
+            this.panelMode === 'archive'
+          )
+            this.archiveError(
+              error instanceof CaseFileError
+                ? error.message
+                : 'The file could not be read. Choose a downloaded Gravity case file and try again.',
+            );
+        }
+      },
+      { once: true },
+    );
+    picker.click();
   }
   begin() {
     this.started = true;
@@ -902,20 +1029,25 @@ class Game {
       this.modal ||
       this.combat ||
       this.lines.length ||
+      this.staging ||
       this.transitioning
     )
       return;
     this.keys.clear();
     this.queuedRoute = route;
-    this.target = h.x;
+    this.target = interactionPosition(h, this.currentArea, this.player.x, this.player.facing);
     this.pending = h;
-    if (Math.abs(this.player.x - h.x) < 48) {
+    if (Math.abs(this.player.x - this.target) < 5) {
       this.target = null;
       this.pending = null;
       this.interact(h);
     }
   }
   examineNearest() {
+    if (this.staging) {
+      this.finishInteractionLead();
+      return;
+    }
     if (this.lines.length) {
       this.advance();
       return;
@@ -923,7 +1055,52 @@ class Game {
     if (this.nearest && !this.combat && !this.modal) this.interact(this.nearest);
   }
   interact(h: Hotspot) {
-    if (!this.started || this.transitioning || this.modal || !this.model.available(h)) return;
+    if (
+      !this.started ||
+      this.transitioning ||
+      this.modal ||
+      this.staging ||
+      !this.model.available(h)
+    )
+      return;
+    if (this.model.unlocked(h) && (h.kind === 'clue' || h.kind === 'talk')) {
+      const position = interactionPosition(h, this.currentArea, this.player.x, this.player.facing);
+      if (Math.abs(position - this.player.x) > 5) {
+        this.goTo(h);
+        return;
+      }
+      this.clearInput();
+      this.player.facing = Math.sign(h.x - this.player.x) || this.player.facing;
+      this.interactionSubject = h;
+      this.interactionTime = this.lineTime = 0;
+      this.model.save.resumeHotspot = h.id;
+      this.persist();
+      const lead = interactionLead(h, this.reducedMotion);
+      if (lead > 0) {
+        this.staging = { hotspot: h, remaining: lead };
+        $('hotspots').classList.add('inactive');
+        this.tickUI();
+        return;
+      }
+    }
+    this.resolveInteraction(h);
+  }
+  cancelInteraction() {
+    this.staging = null;
+    this.interactionSubject = null;
+    this.model.save.resumeHotspot = null;
+    this.clearInput();
+    $('hotspots').classList.remove('inactive');
+    this.persist();
+  }
+  finishInteractionLead() {
+    const h = this.staging?.hotspot;
+    if (!h) return;
+    this.staging = null;
+    $('hotspots').classList.remove('inactive');
+    this.resolveInteraction(h);
+  }
+  resolveInteraction(h: Hotspot) {
     const route = this.queuedRoute;
     if (Math.abs(h.x - this.player.x) > 1) this.player.facing = Math.sign(h.x - this.player.x);
     this.clearInput();
@@ -1043,6 +1220,7 @@ class Game {
     this.showLine();
   }
   showLine() {
+    this.lineTime = 0;
     const line = this.lines[this.lineIndex];
     $('speaker').textContent = line.speaker;
     $('dialogue-announcement').textContent = `${line.speaker}: ${line.text}`;
@@ -1075,6 +1253,8 @@ class Game {
     this.persist();
     this.lines = [];
     this.examining = false;
+    this.interactionSubject = null;
+    this.staging = null;
     this.discovery = null;
     $('evidence-closeup').hidden = true;
     this.dialogueDone = null;
@@ -1089,6 +1269,8 @@ class Game {
   async travel(id: AreaId, route: string | null = null) {
     if (this.transitioning) return;
     this.transitioning = true;
+    this.interactionSubject = null;
+    this.staging = null;
     this.clearInput();
     $('transition').classList.add('active');
     await new Promise((r) => setTimeout(r, this.reducedMotion ? 40 : 350));
@@ -1183,6 +1365,8 @@ class Game {
     if (!d.open) d.showModal();
   }
   closePanel() {
+    this.importProposal = null;
+    this.importRequest++;
     $<HTMLDialogElement>('panel').close();
     this.clearInput();
   }
@@ -1334,7 +1518,7 @@ class Game {
     );
   }
   companionTalk() {
-    if (this.cinematic || this.combat || this.lines.length || this.modal) return;
+    if (this.cinematic || this.combat || this.lines.length || this.staging || this.modal) return;
     const topics = lyraTopics(this.model);
     this.panel(
       'An open channel.',
@@ -1459,6 +1643,9 @@ class Game {
         'archive-rename',
         'archive-history',
         'archive-restore',
+        'archive-export',
+        'archive-import',
+        'archive-import-confirm',
         'resume-slot',
       ].includes(el.dataset.action ?? '')
     ) {
@@ -1491,6 +1678,7 @@ class Game {
     if (el.dataset.route) {
       const id = el.dataset.route;
       this.closePanel();
+      if (this.staging) this.cancelInteraction();
       const h = nextRouteHotspot(this.model.save.area, id);
       if (h) {
         this.goTo(h, id);
@@ -1647,13 +1835,22 @@ class Game {
     if (!document.hidden) {
       const active = this.started && !this.modal && !this.transitioning;
       if (!this.modal) this.time += elapsed;
+      if (active && (this.staging || this.lines.length)) {
+        this.interactionTime += elapsed;
+        this.lineTime += elapsed;
+        if (this.staging) {
+          this.staging.remaining -= elapsed;
+          if (this.staging.remaining <= 0 || this.reducedMotion) this.finishInteractionLead();
+        }
+      }
       if (active && this.lines.length) {
         this.reveal += elapsed * 48;
         const text = this.lines[this.lineIndex].text;
         const next = text.slice(0, Math.floor(this.reveal));
         if ($('dialogue-text').textContent !== next) $('dialogue-text').textContent = next;
       }
-      this.accumulator = active && !this.lines.length ? this.accumulator + elapsed : 0;
+      this.accumulator =
+        active && !this.lines.length && !this.staging ? this.accumulator + elapsed : 0;
       let steps = 0;
       while (this.accumulator >= 1 / 60 && steps < 6) {
         this.update(1 / 60);
@@ -1662,12 +1859,14 @@ class Game {
       }
       if (steps === 6) this.accumulator = 0;
       if (active && this.cinematic) this.stepIntro(elapsed);
-      else if (active && (!this.lines.length || (this.discovery && !this.reducedMotion))) {
+      else if (active && (!this.lines.length || (this.interactionSubject && !this.reducedMotion))) {
+        const focus =
+          !this.reducedMotion && (this.staging || this.lines.length)
+            ? this.interactionSubject
+            : null;
         const desired = clamp(
-          (this.discovery && !this.reducedMotion
-            ? this.player.x * 0.65 + this.discovery.x * 0.35
-            : this.player.x) -
-            this.viewW * (this.discovery && !this.reducedMotion ? 0.42 : 0.48),
+          (focus ? this.player.x * 0.55 + focus.x * 0.45 : this.player.x) -
+            this.viewW * (focus ? 0.5 : 0.48),
           0,
           this.currentArea.width - this.viewW,
         );
@@ -1687,6 +1886,19 @@ class Game {
           examining: this.examining,
           discovery: this.discovery,
           speaker: this.lines[this.lineIndex]?.speaker ?? null,
+          performance:
+            !this.combat && !this.cinematic
+              ? actorPerformance(
+                  this.interactionSubject,
+                  !!this.staging || this.examining,
+                  this.lines[this.lineIndex]?.speaker ?? null,
+                  this.interactionSubject?.id.startsWith('lyra') === true ||
+                    this.lines.some((line) => line.speaker === 'LYRA'),
+                  this.interactionTime,
+                  this.lineTime,
+                  this.reducedMotion,
+                )
+              : undefined,
           dt: this.modal ? 0 : elapsed,
         });
         this.renderDirty = false;
@@ -1771,7 +1983,11 @@ class Game {
     }
     this.nearest =
       this.currentArea.hotspots
-        .filter((h) => this.model.available(h) && Math.abs(h.x - this.player.x) < 65)
+        .filter(
+          (h) =>
+            this.model.available(h) &&
+            Math.abs(h.x - this.player.x) < interactionReach(h, this.currentArea),
+        )
         .sort((a, b) => Math.abs(a.x - this.player.x) - Math.abs(b.x - this.player.x))[0] ?? null;
     if (this.combat) {
       if (this.firing) {
@@ -1805,6 +2021,7 @@ class Game {
       !this.cinematic &&
       !this.modal &&
       !this.lines.length &&
+      !this.staging &&
       !this.combat &&
       !this.transitioning &&
       !!this.nearest;
@@ -1843,6 +2060,8 @@ class Game {
     }
   }
   dispose() {
+    this.importProposal = null;
+    this.importRequest++;
     this.resizeObserver.disconnect();
     this.events.abort();
     cancelAnimationFrame(this.raf);

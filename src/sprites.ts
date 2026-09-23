@@ -1,4 +1,9 @@
-import { loadLyraHumanoid, LYRA_HUMAN_CROP } from './lyra-candidate.ts';
+import {
+  loadLyraHumanoid,
+  LYRA_HUMAN_CROP,
+  lyraReactionFrame,
+  type LyraReaction,
+} from './lyra-candidate.ts';
 import { drawLyraSignal } from './lyra-projection.ts';
 import { LYRA_REFINED_FRAMES, lyraFrameIndex } from './lyra-art.ts';
 import {
@@ -15,7 +20,7 @@ import { buildRimMasks, paintRim, type RimMasks } from './rim-mask.ts';
 import { storyFrameIndex } from './character-motion.ts';
 import {
   loadCandidate,
-  candidateIndex,
+  resolveGravityPose,
   candidateFloorOffset,
   CANDIDATE_CROP,
   scarfSocket,
@@ -101,17 +106,8 @@ export class Sprites {
   /** Picks the frame of art for this id/tag at this time, from either source. */
   private resolve(id: string, tag: string, time: number): Frame {
     if (this.candidate && id === 'cole') {
-      const clip =
-        tag === 'stride' || tag === 'walk'
-          ? 'walk'
-          : tag === 'sprint'
-            ? 'sprint'
-            : tag === 'jump'
-              ? 'jump'
-              : 'idle';
+      const { clip, index } = resolveGravityPose(tag, time);
       const frames = this.candidate[clip];
-      // CharacterMotion already scales its clock with movement speed.
-      const index = candidateIndex(time, frames.length, 0.8);
       const crop = CANDIDATE_CROP;
       return {
         key: `warped:${clip}:${index}`,
@@ -125,9 +121,14 @@ export class Sprites {
       };
     }
     if (id === 'lyra' && this.lyraCandidate) {
-      const clip = tag === 'walk' || tag === 'stride' ? 'walk' : 'idle';
+      const clip: LyraReaction =
+        tag === 'walk' || tag === 'stride'
+          ? 'walk'
+          : tag === 'listen' || tag === 'speak' || tag === 'project'
+            ? tag
+            : 'idle';
       const frames = this.lyraCandidate[clip];
-      const index = candidateIndex(time, frames.length, 0.75);
+      const index = lyraReactionFrame(clip, time);
       const crop = LYRA_HUMAN_CROP;
       return {
         key: `lyra-human:${clip}:${index}`,
@@ -271,7 +272,7 @@ export class Sprites {
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.scale(facing, 1);
-    if (id === 'lyra' && this.lyraCandidate && tag !== 'walk' && tag !== 'stride') {
+    if (id === 'lyra' && this.lyraCandidate && tag === 'idle') {
       // A quiet breath around the soles, matching the single-pose lab preview.
       const breath = Math.sin(time * 1.7);
       ctx.transform(1, 0, breath * 0.002, 1 + breath * 0.004, 0, 0);
