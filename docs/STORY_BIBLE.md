@@ -29,6 +29,13 @@ The victim may be everybody. And the killer may be nobody.
 
 ## Title ideas
 
+**Game title — decided September 2026: GRAVITY.** The game is named for its
+detective, and the word carries the story: the pull that draws scattered
+fragments into one mass (Everybody), the weight of what was taken, and the
+person who holds the case together. Gravity has no gravity powers; the name is
+meaning, not mechanic. "Everybody / Nobody" remains the name of Marlon's last
+painting and the series' central idea, not the title.
+
 The current strongest issue title remains: **Issue #1: Fragments**
 
 Other possible titles that blend both concepts:

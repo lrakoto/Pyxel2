@@ -575,13 +575,11 @@ button {
   color: #ece8dc;
   position: relative;
 }
-.title-slash {
-  color: var(--red);
-  padding-left: 7px;
-}
-.nobody {
-  font-weight: 600;
-  color: #c3c9bd;
+/* One word carries what two lines used to; scaling it relative to the
+   title keeps every responsive size rule in charge of its proportions. */
+.wordmark {
+  display: block;
+  font-size: 1.32em;
 }
 .title-period {
   color: var(--red);
