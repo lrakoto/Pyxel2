@@ -344,3 +344,11 @@ Validation: 60 tests pass, TypeScript/Vite build and formatting pass. On an isol
 The Pages environment only permits `feat/case-board`. Keep that release filter and advance the approved release branch from validated development commits; the intro branch itself was rejected by the environment protection rule. The previous release did not include the other agent’s new work.
 
 Also verified uninterrupted intro completion and the return to gameplay with a saved checkpoint.
+
+## September 22 — player case archive
+
+Three named local slots, migration of the legacy checkpoint into file 01, and four prior meaningful checkpoints per file. The latest position continues to autosave; position-only updates do not consume recovery history. A restored checkpoint retains the former current state so restoration can be undone. Old save keys remain intact after migration. Storage failures are surfaced and stale tabs cannot silently overwrite newer notes.
+
+Validation: 86 tests pass, including archive migration, quota failures, damaged-file fallback, isolation, history bounds, reversible recovery, stale-write rejection, escaped file names, and earned-progress recap text. TypeScript/Vite build and formatting pass.
+
+Browser checks on an isolated origin: legacy file appears in folder 01; create/name file 02 without changing folder 01; skip opening then reload; return recap; collect street-camera evidence; recovery list/restore; switch back to original zero-clue file; rename file; 390×844 portrait folder and recap layouts; second-tab change pauses saving in the older tab. Tests did not replace live player progress. Scene photos use existing location artwork rather than captured player screenshots.

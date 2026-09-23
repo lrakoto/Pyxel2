@@ -1,0 +1,505 @@
+/* Filed notes: olive folders, contact prints, and a pencilled lead to return to. */
+.case-archive {
+  padding: 24px 34px 34px 42px;
+  color: #313b30;
+}
+.archive-intro {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 34px;
+}
+.archive-intro p,
+.archive-recovery-intro {
+  margin: 0;
+  font: 28px/1.2 var(--hand);
+}
+.archive-intro > span,
+.archive-kicker,
+.archive-filed,
+.archive-stats,
+.archive-tab,
+.archive-note,
+.archive-date,
+.archive-rename label {
+  font: 10px/1.6 var(--mono);
+}
+.archive-intro > span {
+  color: #62614d;
+}
+.archive-folders {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 0;
+  margin: 0 0 24px;
+  list-style: none;
+}
+.archive-folder {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+  padding: 20px 14px 0;
+  color: #dacfad;
+  background: #394335 url('/paper/fibers.svg');
+  border: 1px solid #6e77564d;
+  border-radius: 1px 6px 4px 2px;
+  box-shadow:
+    inset 2px 0 #4f5a4070,
+    2px 4px 0 #61573e54;
+}
+.archive-folder:nth-child(2) {
+  transform: rotate(0.6deg);
+}
+.archive-folder:nth-child(3) {
+  transform: rotate(-0.4deg);
+}
+.archive-tab {
+  position: absolute;
+  left: -1px;
+  top: -21px;
+  min-width: 85px;
+  height: 21px;
+  padding: 3px 14px;
+  color: #d6c59d;
+  background: #394335;
+  border: 1px solid #6e77564d;
+  border-bottom: 0;
+  border-radius: 5px 12px 0 0;
+  letter-spacing: 1px;
+}
+.archive-stamp {
+  position: absolute;
+  top: -13px;
+  right: 9px;
+  z-index: 1;
+  padding: 1px 5px;
+  color: #e8bd8b;
+  background: #394335;
+  border: 1px solid #b9976d99;
+  transform: rotate(5deg);
+  font: 9px/1.5 var(--mono);
+  letter-spacing: 1px;
+}
+.archive-photo {
+  position: relative;
+  margin: 0 0 17px;
+  padding: 5px 5px 0;
+  background: #b8ae8f;
+  box-shadow: 2px 4px 4px #121a1a55;
+  transform: rotate(-2deg);
+}
+.archive-photo::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 11px;
+  width: 9px;
+  height: 23px;
+  border: 2px solid #8b9283;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px #151b1677;
+}
+.archive-photo img {
+  display: block;
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  filter: saturate(0.65) sepia(0.13);
+  background: #1d2928;
+}
+.archive-photo figcaption {
+  padding: 5px 3px 7px;
+  color: #2e3b34;
+  font: 19px/1 var(--hand);
+  text-align: center;
+}
+.archive-folder-copy {
+  flex: 1;
+}
+.archive-kicker {
+  display: block;
+  letter-spacing: 1px;
+}
+.archive-folder .archive-kicker {
+  color: #b8b499;
+  font-size: 8px;
+}
+.archive-folder h3 {
+  margin: 8px 0 10px;
+  color: #e3d9b8;
+  font: 600 28px/1.05 var(--hand);
+  overflow-wrap: anywhere;
+}
+.archive-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 12px;
+  color: #bfbda5;
+}
+.archive-filed {
+  display: block;
+  margin: 15px 0 19px;
+  color: #aeb39a;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+}
+.archive-filed .archive-date {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0;
+}
+.panel .archive-open {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: calc(100% + 28px);
+  margin: 0 -14px;
+  padding: 13px 14px;
+  color: #e3d7b3;
+  border: 0;
+  border-top: 1px dashed #a0a88855;
+  background: #10191230;
+  text-align: left;
+  font: 11px/1.5 var(--mono);
+}
+.panel .archive-open:hover {
+  color: #fff1c9;
+  background: #10191277;
+}
+.panel .archive-open:focus-visible {
+  outline-color: #f3d69d;
+  outline-offset: -4px;
+}
+.archive-empty {
+  background-color: #414a38;
+  background-image: repeating-linear-gradient(transparent 0 29px, #c3c8a40b 29px 30px);
+}
+.archive-empty .archive-tab {
+  background-color: #414a38;
+}
+.archive-empty-mark {
+  display: block;
+  margin: 24px 0 10px;
+  color: #a6ad8b;
+  font: 40px/1 var(--hand);
+}
+.archive-empty p,
+.archive-damaged p {
+  flex: 1;
+  margin: 4px 0 24px;
+  color: #bcbda1;
+  font: 12px/1.7 var(--mono);
+}
+.archive-folder-foot {
+  margin-bottom: 16px;
+  font: 10px/1.6 var(--mono);
+  color: #c9baa0;
+}
+.archive-note {
+  max-width: 62ch;
+  margin: 16px 0 0;
+  color: #666049;
+  line-height: 1.8;
+}
+.archive-back {
+  margin: 0 0 24px;
+  padding: 0;
+  text-align: left;
+}
+.archive-return {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(0, 1.6fr);
+  gap: 30px;
+}
+.archive-return aside {
+  padding: 9px 5px 0;
+}
+.archive-return .archive-photo img {
+  height: 145px;
+}
+.archive-return .archive-filed,
+.archive-return .archive-stats {
+  color: #62624d;
+}
+.archive-return aside > .archive-kicker {
+  margin-top: 20px;
+  font-size: 9px;
+}
+.archive-recap h3 {
+  margin: 9px 0 15px;
+  color: #314135;
+  font: 600 36px/1.1 var(--hand);
+  overflow-wrap: anywhere;
+}
+.archive-recap > p {
+  font: 12px/1.9 var(--mono);
+  margin: 0 0 20px;
+}
+.archive-lead {
+  padding: 13px 16px;
+  margin: 0 0 23px;
+  border-left: 2px solid #8d4f39aa;
+  background: #a19e7644;
+  background-image: repeating-linear-gradient(transparent 0 26px, #4d604112 26px 27px);
+}
+.archive-lead .archive-kicker {
+  color: #6e4936;
+  font-size: 9px;
+}
+.archive-lead p {
+  margin: 7px 0 0;
+  font: 25px/1.13 var(--hand);
+}
+.archive-recap .primary {
+  width: 100%;
+  justify-content: space-between;
+}
+.archive-recap .archive-recovered {
+  padding: 10px 12px;
+  border: 1px dashed #57735288;
+  font: 11px/1.7 var(--mono);
+  color: #3a5038;
+}
+.archive-tools {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px dashed #74694966;
+}
+.archive-rename {
+  flex: 1;
+  max-width: 370px;
+}
+.archive-rename label {
+  display: block;
+  margin: 0 0 7px;
+  color: #63583e;
+}
+.archive-rename > div {
+  display: flex;
+  gap: 8px;
+}
+.archive-rename input {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  color: #303c31;
+  background: #f7eac61a;
+  border: 1px solid #766b4e77;
+  border-radius: 2px;
+  font: 16px/1.5 var(--mono);
+  user-select: text;
+  -webkit-user-select: text;
+}
+.archive-rename input:focus-visible {
+  outline: 2px solid #405b47;
+  outline-offset: 2px;
+}
+.archive-tools .secondary,
+.archive-checkpoints .secondary {
+  min-height: 44px;
+  padding: 10px 13px;
+  font-size: 11px;
+}
+.archive-history-link {
+  padding: 9px 0;
+  text-align: left;
+}
+.archive-history-link small {
+  display: block;
+  margin-top: 4px;
+  color: #746c53;
+  font: 9px/1.5 var(--mono);
+}
+.archive-checkpoints {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+}
+.archive-checkpoints li {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: start;
+  gap: 16px;
+  padding: 20px 0;
+  border-top: 1px dashed #75684b70;
+}
+.archive-checkpoint-number {
+  padding-top: 5px;
+  color: #886344;
+  font: 20px/1 var(--hand);
+}
+.archive-checkpoints h3 {
+  margin: 4px 0 7px;
+  font: 27px/1.1 var(--hand);
+}
+.archive-checkpoints .archive-date,
+.archive-checkpoints .archive-stats {
+  color: #625e49;
+}
+.archive-checkpoints p {
+  margin: 10px 0 0;
+  font: 11px/1.7 var(--mono);
+}
+.archive-no-checkpoints {
+  padding: 25px;
+  border: 1px dashed #80755480;
+  text-align: center;
+  font: 12px/1.8 var(--mono);
+}
+.archive-new {
+  display: grid;
+  gap: 14px;
+  max-width: 510px;
+  padding: 26px 34px 34px 42px;
+}
+.archive-new label {
+  color: #514e39;
+  font: 11px/1.5 var(--mono);
+}
+.archive-new input {
+  min-height: 48px;
+  width: 100%;
+  padding: 10px 12px;
+  color: #303c31;
+  border: 1px solid #766b4e77;
+  border-radius: 2px;
+  background: #f7eac622;
+  font: 16px/1.5 var(--mono);
+  user-select: text;
+  -webkit-user-select: text;
+}
+.archive-new input:focus-visible {
+  outline: 2px solid #405b47;
+  outline-offset: 2px;
+}
+.archive-new p {
+  margin: 0 0 8px;
+  color: #5b5742;
+  font: 12px/1.8 var(--mono);
+}
+.archive-new > .text-button {
+  justify-self: start;
+}
+#archive-error {
+  margin: 0 34px 28px 42px;
+  padding: 12px 16px;
+  color: #683e2e;
+  background: #9e694418;
+  border: 1px dashed #894a3680;
+  font: 12px/1.7 var(--mono);
+}
+#archive-btn {
+  display: block;
+  width: fit-content;
+  min-height: 44px;
+  margin-top: 6px;
+  color: #c8c2a6;
+  font: 11px/1.5 var(--mono);
+  text-decoration-color: #aaa58380;
+}
+#archive-btn:hover {
+  color: #f2e9c9;
+}
+@media (max-width: 760px) {
+  .case-archive,
+  .archive-new {
+    padding: 20px 22px 28px 28px;
+  }
+  .archive-folders {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+  .archive-folder {
+    padding: 18px 18px 0;
+  }
+  .archive-folder .archive-photo {
+    float: right;
+    width: 130px;
+    margin: 0 0 14px 12px;
+  }
+  .archive-folder {
+    display: block;
+  }
+  .archive-folder-copy {
+    min-height: 156px;
+  }
+  .archive-folder .archive-photo img {
+    height: 88px;
+  }
+  .panel .archive-open {
+    clear: both;
+    width: calc(100% + 36px);
+    margin-inline: -18px;
+    padding-inline: 18px;
+  }
+  .archive-empty-mark {
+    float: right;
+    margin: 10px 20px 0;
+  }
+  .archive-empty h3 {
+    font-size: 27px;
+  }
+  .archive-return {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+  .archive-return aside {
+    padding: 0;
+  }
+  .archive-return .archive-photo {
+    width: 150px;
+    float: left;
+    margin: 0 23px 5px 0;
+  }
+  .archive-return .archive-photo img {
+    height: 85px;
+  }
+  .archive-return .archive-filed {
+    margin-top: 4px;
+    margin-bottom: 12px;
+  }
+  .archive-return aside > .archive-kicker {
+    margin-top: 12px;
+  }
+  .archive-recap {
+    clear: both;
+  }
+  .archive-tools {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .archive-rename {
+    max-width: none;
+  }
+  .archive-checkpoints li {
+    grid-template-columns: 20px 1fr;
+    gap: 10px;
+  }
+  .archive-checkpoints li > button {
+    grid-column: 2;
+    justify-self: start;
+  }
+  #archive-error {
+    margin-inline: 28px 22px;
+  }
+}
+@media (max-width: 390px) {
+  .archive-folder .archive-photo {
+    width: 104px;
+  }
+  .archive-return .archive-photo {
+    width: 118px;
+    margin-right: 16px;
+  }
+}

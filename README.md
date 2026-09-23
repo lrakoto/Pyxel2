@@ -133,3 +133,13 @@ The interface now follows Cole's field notebook: cloth cover, paper case tabs, p
 The active development branch is `feat/intro-cinematic`. Publish by advancing `feat/case-board` after validation; GitHub Pages environment protection allows that release branch. GRAVITY is the game title; Everybody / Nobody remains Marlon’s painting. The opening is a skippable 35.5-second scripted scene. Completing or skipping it is saved, and existing investigation saves continue without replaying it. Starting a new investigation resets the opening along with case progress.
 
 Gravity and Lyra use the downloaded Ansimuz character assets; compare them in `character-lab.html` and `lyra-lab.html`. Lyra’s asset has idle and run cycles, but no dedicated speaking poses. Interface text uses bundled DejaVu Sans Mono. Exploration footsteps follow Gravity’s animation footfalls.
+
+## Player saves — case archive
+
+Open **Case archive** on the title screen or from Pause. Three named folders keep independent investigations, with a location photograph, last-filed date, evidence counts, and a recap of the current lead. **New investigation** opens a free folder instead of replacing the active game. Occupied folders are preserved; there is no delete/overwrite action in this pass.
+
+Existing browser progress migrates to file 01, retaining the original checkpoint keys. Each folder keeps its latest save, a previous-envelope fallback, and up to four earlier meaningful checkpoints. Walking updates the current position without displacing discovery/area checkpoints. **Earlier checkpoints** restores a point while keeping the current progress available to recover. Saves resume on the ground; active encounters keep their pre-encounter checkpoint, and cinematics do not save intermediate staging positions.
+
+Files remain in this browser on this device. Cloud sync and save-file export/import are future work. If storage is unavailable/full, the game reports session-only progress. A changed file in another tab pauses writes here to protect newer notes; reload that tab to use the current archive.
+
+Implementation: `src/save-archive.ts` owns migration/storage/recovery; `src/archive-ui.ts` owns recaps and folder rendering; `src/archive.css` styles the archive. Tests cover corruption, quota errors, stale tabs, slot isolation, reversible restoration, and spoiler-safe recaps.

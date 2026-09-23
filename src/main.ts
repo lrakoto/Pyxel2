@@ -5,9 +5,12 @@ import './fullscreen.css';
 import './patina.css';
 import './field-feedback.css';
 import './cinematic.css';
+import './archive.css';
 import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
-import { readCheckpoint, writeCheckpoint } from './checkpoint.ts';
+import { readCheckpoint } from './checkpoint.ts';
+import { SaveArchive, ACTIVE_SLOT_KEY, slotKey, slotBackupKey } from './save-archive.ts';
+import { renderArchive, renderResume, renderRecovery } from './archive-ui.ts';
 import { evidenceArt } from './evidence-art.ts';
 import {
   AREAS,
@@ -20,7 +23,15 @@ import {
   type ClueId,
   type Hotspot,
 } from './content.ts';
-import { CaseModel, freshSave, clamp, stepBody, nextRouteHotspot, type Body } from './model.ts';
+import {
+  CaseModel,
+  freshSave,
+  clamp,
+  stepBody,
+  nextRouteHotspot,
+  type Body,
+  type SaveData,
+} from './model.ts';
 import { Renderer, H } from './renderer.ts';
 import { AudioEngine } from './audio.ts';
 import { Combat } from './combat.ts';
@@ -50,11 +61,18 @@ const icon = (name: string) => {
   };
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true">${paths[name] || paths.arrow}</svg>`;
 };
+let archive: SaveArchive | null = null;
 let checkpoint = { save: freshSave(), recovered: false };
 try {
-  checkpoint = readCheckpoint(localStorage);
+  archive = new SaveArchive(localStorage);
+  checkpoint = archive.read();
 } catch {
-  /* Device storage can be unavailable. */
+  // A failed migration must not hide the player's original checkpoint.
+  try {
+    checkpoint = readCheckpoint(localStorage);
+  } catch {
+    /* Session-only play. */
+  }
 }
 const model = new CaseModel(checkpoint.save);
 const hasSave =
@@ -91,7 +109,7 @@ document.getElementById('app')!.innerHTML = `
     <aside id="evidence-closeup" class="evidence-closeup" hidden aria-label="Evidence illustration"></aside><div id="dialogue" class="dialogue" hidden aria-label="Conversation"><div class="portrait-mark" id="portrait-mark">G<span>/</span></div><div class="dialogue-copy"><div class="dialogue-top"><span id="speaker" class="eyebrow">GRAVITY</span><span id="line-count" class="eyebrow"></span></div><p id="dialogue-text" aria-hidden="true"></p><p id="dialogue-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p><div class="dialogue-bottom"><span id="dialogue-context">DETECTIVE’S OBSERVATION</span><button id="advance-btn">Continue <kbd>E</kbd>${icon('arrow')}</button></div></div></div>
     <div id="transition" class="transition" aria-hidden="true"></div>
     <section id="cinematic" class="cinematic" hidden aria-label="Opening scene"><div class="cine-bar top"></div><div class="cine-bar bottom"></div><div class="cine-fade" id="cine-fade"></div><div class="cine-caption" id="cine-caption" aria-live="polite"><span class="eyebrow" id="cine-kicker"></span><p id="cine-text"></p></div><button class="cine-skip" id="cine-skip">Skip <kbd>Esc</kbd></button></section>
-    <section id="title-screen" class="title-screen" aria-label="Start game"><div class="title-content"><div class="eyebrow title-kicker"><span>AN INTERACTIVE NOIR</span><i></i> NEW ANGELES, 2077</div><h1 class="game-title"><span class="wordmark">GRAVITY<span class="title-period">.</span></span></h1><div class="issue-label"><span>ISSUE 01</span><i></i><strong>Fragments</strong></div><p class="opening">One dead artist. A thousand stolen minds.<br>Someone has to remember.</p><button class="primary" id="begin-btn" disabled><span id="begin-text">Entering New Angeles</span>${icon('arrow')}</button><div class="title-footnote">${icon('headphones')} HEADPHONES RECOMMENDED <span>·</span> SAVED ON THIS DEVICE</div></div><div class="title-coordinates"><span>SECTOR</span><strong>07</strong><span>34°03′ N<br>118°15′ W</span></div></section>
+    <section id="title-screen" class="title-screen" aria-label="Start game"><div class="title-content"><div class="eyebrow title-kicker"><span>AN INTERACTIVE NOIR</span><i></i> NEW ANGELES, 2077</div><h1 class="game-title"><span class="wordmark">GRAVITY<span class="title-period">.</span></span></h1><div class="issue-label"><span>ISSUE 01</span><i></i><strong>Fragments</strong></div><p class="opening">One dead artist. A thousand stolen minds.<br>Someone has to remember.</p><button class="primary" id="begin-btn" disabled><span id="begin-text">Entering New Angeles</span>${icon('arrow')}</button><button class="text-button" id="archive-btn">Open case archive</button><div class="title-footnote">${icon('headphones')} HEADPHONES RECOMMENDED <span>·</span> SAVED ON THIS DEVICE</div></div><div class="title-coordinates"><span>SECTOR</span><strong>07</strong><span>34°03′ N<br>118°15′ W</span></div></section>
     <div class="touch-controls" id="touch-controls"><button data-hold="left" aria-label="Move left">←</button><button data-hold="right" aria-label="Move right">→</button><button data-hold="jump" aria-label="Jump">↑</button><button data-hold="sprint" aria-label="Hold to sprint">»</button><button id="touch-act" aria-label="Examine">E</button><button data-hold="fire" aria-label="Fire toward nearest enemy">◎</button></div>
    </div>
    <div class="scene-footer"><span id="chapter-label"><i>01</i> THE LAST WORK</span><span id="save-status"><i class="save-dot"></i> LOCAL CHECKPOINT</span><span>RAIN EXPECTED <i>↙</i> 17°C</span></div>
@@ -117,6 +135,7 @@ class Game {
   camera = clamp(model.save.x - this.viewW * 0.48, 0, AREAS[model.save.area].width - this.viewW);
   time = 0;
   started = false;
+  archiveChanged = false;
   ready = false;
   scan = false;
   reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -238,10 +257,11 @@ class Game {
           location.reload();
           return;
         }
-        this.begin();
+        this.openStart();
       },
       s,
     );
+    $('archive-btn').addEventListener('click', () => this.openArchive(), s);
     $('cine-skip').addEventListener('click', () => this.finishIntro(), s);
     $('board-btn').addEventListener('click', () => this.openBoard(), s);
     $('objective-btn').addEventListener(
@@ -380,6 +400,28 @@ class Game {
       s,
     );
     window.addEventListener('pagehide', () => this.persist(), s);
+    window.addEventListener(
+      'storage',
+      (event) => {
+        if (
+          !archive ||
+          (event.key !== null &&
+            ![ACTIVE_SLOT_KEY, slotKey(archive.activeId), slotBackupKey(archive.activeId)].includes(
+              event.key,
+            ))
+        )
+          return;
+        this.archiveChanged = true;
+        $('save-status').textContent = 'ARCHIVE UPDATED IN ANOTHER TAB';
+        this.panel(
+          'This file changed elsewhere.',
+          'CASE ARCHIVE',
+          '<p>Another tab updated the archive. Saving is paused here to protect those notes. Reload to use the newest saved file; any unfiled changes in this tab will not be kept.</p><button class="primary" data-action="archive-reload">Reload saved archive</button>',
+          'archive',
+        );
+      },
+      s,
+    );
     $<HTMLDialogElement>('panel').addEventListener(
       'close',
       () => {
@@ -482,7 +524,7 @@ class Game {
     if (!this.started) {
       if (e.code === 'Enter' && this.ready) {
         e.preventDefault();
-        this.begin();
+        this.openStart();
       }
       return;
     }
@@ -536,13 +578,196 @@ class Game {
       this.queuedRoute = null;
     }
   }
+  openStart() {
+    if (this.archiveChanged) {
+      this.archiveError();
+      return;
+    }
+    if (!archive) {
+      this.begin();
+      return;
+    }
+    const slot = archive.list().find((slot) => slot.id === archive!.activeId);
+    if (slot?.save) this.openResume(slot.id);
+    else this.openArchive();
+  }
+  archiveError() {
+    let message = document.getElementById('archive-error');
+    if (!message) {
+      message = document.createElement('p');
+      message.id = 'archive-error';
+      message.setAttribute('role', 'alert');
+      $('panel-content').append(message);
+    }
+    message.textContent =
+      'The case could not be filed. Storage may be full or unavailable. Your current session is still open; no other case was replaced.';
+  }
+  openArchive() {
+    if (this.transitioning || !this.ready) return;
+    if (this.started && !this.persist()) {
+      this.panel(
+        'Your notes are still open.',
+        'CASE ARCHIVE',
+        '<p>Device storage is unavailable. Keep this session open to retain your progress.</p><button class="primary" data-action="close">Return to investigation</button>',
+        'archive',
+      );
+      return;
+    }
+    if (!archive) {
+      this.panel(
+        'Archive unavailable.',
+        'CASE ARCHIVE',
+        '<p>Device storage is unavailable. You can continue this session, but cases cannot be saved on this device.</p>',
+        'archive',
+      );
+      return;
+    }
+    this.panel(
+      'The case archive.',
+      'GRAVITY · PRIVATE FILES',
+      renderArchive(archive.list(), archive.activeId),
+      'archive',
+    );
+  }
+  openResume(id: number) {
+    const slot = archive?.list().find((slot) => slot.id === id);
+    if (!slot?.save) return;
+    this.panel(
+      'Where we left off.',
+      'CASE ARCHIVE · RETURN TO THE FIELD',
+      renderResume(slot),
+      'archive',
+    );
+  }
+  loadCase(save: SaveData, recovered: boolean) {
+    clearTimeout(this.toastTimer);
+    $('toast').classList.remove('show');
+    $('toast').textContent = '';
+    $('save-status').innerHTML = `<i class="save-dot"></i> NOTES FILED · 0${archive!.activeId}`;
+    this.model.save = save;
+    this.closePanel();
+    this.clearInput();
+    checkpoint = { save, recovered };
+    this.player = {
+      x: save.x,
+      y: AREAS[save.area].ground,
+      vx: 0,
+      vy: 0,
+      grounded: true,
+      facing: 1,
+    };
+    this.combat = null;
+    this.combatStory = false;
+    this.cinematic = null;
+    this.cineWalk = null;
+    this.lines = [];
+    this.lineIndex = 0;
+    this.reveal = 0;
+    this.dialogueDone = null;
+    this.nearest = null;
+    this.discovery = null;
+    this.examining = false;
+    this.scan = false;
+    this.selected = [];
+    this.inspectedClue = null;
+    this.accumulator = 0;
+    this.stepTime = 0;
+    $('world').style.transform = '';
+    $('cinematic').hidden = true;
+    $('shell').classList.remove('in-cinematic');
+    $('dialogue').hidden = true;
+    $('evidence-closeup').hidden = true;
+    $('dialogue-announcement').textContent = '';
+    $('stage').classList.remove('in-dialogue', 'scanning');
+    $('hotspots').classList.remove('inactive');
+    $('focus-btn').setAttribute('aria-pressed', 'false');
+    $('focus-status').hidden = true;
+    this.camera = clamp(save.x - this.viewW * 0.48, 0, this.currentArea.width - this.viewW);
+    this.refreshArea();
+    this.renderDirty = true;
+    this.begin();
+  }
+  resumeCase(id: number, recovered = false) {
+    const slot = archive!.list().find((slot) => slot.id === id);
+    if (!slot?.save || slot.corrupt) throw new Error('Case unavailable');
+    archive!.select(id);
+    // No further storage reads after selection: the model must follow the selected file.
+    this.model.save = slot.save;
+    this.loadCase(slot.save, recovered || slot.recovered);
+  }
+  archiveAction(el: HTMLElement) {
+    if (!archive || !this.ready || this.transitioning || this.archiveChanged) return;
+    const id = Number(el.dataset.slot);
+    if (![1, 2, 3].includes(id)) return;
+    try {
+      switch (el.dataset.action) {
+        case 'archive-open':
+          this.openResume(id);
+          break;
+        case 'archive-create':
+          this.panel(
+            'Open a new file.',
+            `CASE ARCHIVE · FOLDER 0${id}`,
+            `<div class="archive-new"><label for="archive-new-name">Case file name</label><input id="archive-new-name" maxlength="40" value="Case file 0${id}" autocomplete="off"><p>A separate investigation. Your other case folders stay in the archive.</p><button class="primary" data-action="archive-create-confirm" data-slot="${id}">Open case &amp; begin</button><button class="text-button" data-action="archive">Back to archive</button></div>`,
+            'archive',
+          );
+          break;
+        case 'archive-create-confirm':
+          if (!this.persist()) {
+            this.archiveError();
+            return;
+          }
+          archive.create(id, $<HTMLInputElement>('archive-new-name').value);
+          this.resumeCase(id);
+          break;
+        case 'resume-slot':
+          if (!this.persist()) {
+            this.archiveError();
+            return;
+          }
+          this.resumeCase(id);
+          break;
+        case 'archive-rename':
+          archive.rename(id, $<HTMLInputElement>('archive-name').value);
+          this.openResume(id);
+          break;
+        case 'archive-history': {
+          const slot = archive.list().find((slot) => slot.id === id)!;
+          this.panel(
+            'Earlier field notes.',
+            'CASE ARCHIVE · RECOVERY',
+            renderRecovery(slot),
+            'archive',
+          );
+          break;
+        }
+        case 'archive-restore':
+          if (!this.persist()) {
+            this.archiveError();
+            return;
+          }
+          archive.restore(id, el.dataset.checkpoint ?? '');
+          // If loading fails after restore, block autosave until reload so old notes cannot replace it.
+          this.archiveChanged = true;
+          this.resumeCase(id, true);
+          this.archiveChanged = false;
+          this.toast(
+            'FIELD NOTES RESTORED',
+            'Your previous progress is still available in Earlier checkpoints.',
+          );
+          break;
+      }
+    } catch {
+      this.archiveError();
+    }
+  }
   begin() {
     this.started = true;
     $('title-screen').hidden = true;
     $('shell').classList.add('started');
     void this.audio.init().then(() => this.audio.area(this.model.save.area));
     this.sync();
-    if (!hasSave && !checkpoint.recovered) {
+    if (!this.model.save.introSeen && !checkpoint.recovered) {
       this.playIntro();
       return;
     }
@@ -892,14 +1117,18 @@ class Game {
     el.classList.add('show');
   }
   persist(reset = false) {
+    if (this.archiveChanged) return false;
     // Mid-cinematic positions are staging, not progress.
-    if (!this.started || this.cinematic) return;
+    if (!this.started || this.cinematic || this.combat) return true;
     this.model.save.x = this.player.x;
     try {
-      writeCheckpoint(localStorage, this.model.save, reset);
-      $('save-status').innerHTML = '<i class="save-dot"></i> CHECKPOINT SAVED';
+      if (!archive) throw new Error('Storage unavailable');
+      archive.write(this.model.save, reset);
+      $('save-status').innerHTML = `<i class="save-dot"></i> NOTES FILED · 0${archive.activeId}`;
+      return true;
     } catch {
       $('save-status').textContent = 'SESSION ONLY · STORAGE UNAVAILABLE';
+      return false;
     }
   }
   caseMarginNote() {
@@ -1066,7 +1295,7 @@ class Game {
     this.panel(
       this.started ? 'A moment in the rain.' : 'Before you step outside.',
       'GRAVITY',
-      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>Shift</kbd> / Hold » + direction</span><b>Sprint</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Notebook / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Continue into The First One after the Graves case.</p></div>`,
+      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>Shift</kbd> / Hold » + direction</span><b>Sprint</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Notebook / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="archive">Case archive · saves &amp; recovery</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Continue into The First One after the Graves case.</p></div>`,
       'pause',
     );
   }
@@ -1215,6 +1444,20 @@ class Game {
       '[data-action],[data-clue],[data-route],[data-topic],[data-inspect]',
     );
     if (!el) return;
+    if (
+      [
+        'archive-open',
+        'archive-create',
+        'archive-create-confirm',
+        'archive-rename',
+        'archive-history',
+        'archive-restore',
+        'resume-slot',
+      ].includes(el.dataset.action ?? '')
+    ) {
+      this.archiveAction(el);
+      return;
+    }
     if (el.dataset.inspect) {
       this.inspectRecord(el.dataset.inspect as ClueId);
       return;
@@ -1247,6 +1490,9 @@ class Game {
       return;
     }
     switch (el.dataset.action) {
+      case 'archive-reload':
+        location.reload();
+        break;
       case 'file-graves':
       case 'file-first':
         this.boardFile = el.dataset.action === 'file-first' ? 'first-one' : 'graves';
@@ -1324,50 +1570,11 @@ class Game {
         break;
       }
       case 'new':
-        this.panel(
-          'Start over?',
-          'NEW INVESTIGATION',
-          `<div class="story-choice"><p>Begin the Graves case again.</p><small>This replaces the checkpoint for this version on this device.</small><button class="primary" data-action="restart">Start a new case ${icon('arrow')}</button><button class="text-button" data-action="pause">Keep my progress</button></div>`,
-          'restart',
-        );
+      case 'archive':
+        this.openArchive();
         break;
       case 'pause':
         this.openPause();
-        break;
-      case 'restart':
-        // End staging before persisting the replacement checkpoint.
-        this.cinematic = null;
-        this.cineWalk = null;
-        this.model.save = freshSave();
-        this.player = {
-          x: 440,
-          y: AREAS.street.ground,
-          vx: 0,
-          vy: 0,
-          grounded: true,
-          facing: 1,
-        };
-        this.camera = 0;
-        this.combat = null;
-        this.lines = [];
-        $('dialogue').hidden = true;
-        $('stage').classList.remove('in-dialogue');
-        this.closePanel();
-        this.started = true;
-        $('title-screen').hidden = true;
-        $('shell').classList.add('started');
-        this.scan = false;
-        $('focus-btn').setAttribute('aria-pressed', 'false');
-        $('stage').classList.remove('scanning');
-        $('focus-status').hidden = true;
-        this.refreshArea();
-        this.sync();
-        this.discovery = null;
-        this.examining = false;
-        $('evidence-closeup').hidden = true;
-        this.persist(true);
-        void this.audio.init().then(() => this.audio.area('street'));
-        this.playIntro();
         break;
       case 'accept-lyra':
         this.model.save.companion = true;
@@ -1398,6 +1605,7 @@ class Game {
   }
   startCombat(story: boolean) {
     if (this.model.save.area !== 'street') return;
+    this.persist();
     this.clearInput();
     this.combatStory = story;
     this.combat = new Combat(this.currentArea.width, this.player.x);
