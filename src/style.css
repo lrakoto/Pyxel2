@@ -1,6 +1,6 @@
 @import './fonts.css';
 :root {
-  font-family: 'DM Sans', Arial, sans-serif;
+  font-family: var(--mono);
   color: #e9e5d9;
   background: #101517;
   font-synthesis: none;
@@ -10,7 +10,7 @@
   --line: #364040;
   --red: #ed654c;
   --teal: #8bcac2;
-  --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --mono: 'DejaVu Sans Mono', Menlo, Consolas, monospace;
   --display: 'Barlow Condensed', 'Arial Narrow', Impact, sans-serif;
 }
 * {
@@ -1341,10 +1341,7 @@ button {
   flex-wrap: nowrap;
 }
 .switch-row > span {
-  font:
-    14px 'DM Sans',
-    Arial,
-    sans-serif;
+  font: 14px var(--mono);
   color: var(--paper);
 }
 .switch-row small {

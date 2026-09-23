@@ -34,7 +34,7 @@ The middle-distance buildings and rail deck, moving train, near-camera objects, 
 
 ## Fonts
 
-Barlow Condensed and DM Sans are served from local font files. Their SIL Open Font License texts are included in `public/fonts/barlowcondensed-OFL.txt` and `public/fonts/dmsans-OFL.txt`. No third-party font requests are required at runtime.
+Barlow Condensed and DejaVu Sans Mono are served from local font files. Barlow Condensed's SIL Open Font License is included in `public/fonts/barlowcondensed-OFL.txt`. DejaVu Sans Mono (2.37, the face macOS ships as Menlo) is the interface's general text face; its Bitstream Vera / DejaVu license is included in `public/fonts/dejavu-LICENSE.txt`. The `dejavu-mono*.woff2` files are subsets limited to the Latin, punctuation, arrow and symbol ranges the game uses. No third-party font requests are required at runtime.
 
 
 ## Notebook handwriting and paper
