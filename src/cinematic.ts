@@ -103,6 +103,7 @@ export function cuesBetween(script: Script, from: number, to: number) {
 /** Playback state for one run of a script. */
 export class Cinematic {
   time = 0;
+  private started = false;
   constructor(readonly script: Script) {}
   get done() {
     return this.time >= this.script.duration;
@@ -110,8 +111,12 @@ export class Cinematic {
   /** Advances the clock and returns the cues that fired during the step. */
   step(dt: number) {
     const from = this.time;
-    this.time = Math.min(this.script.duration, this.time + dt);
-    return cuesBetween(this.script, from, this.time);
+    this.time = Math.min(this.script.duration, this.time + Math.max(0, dt));
+    const cues = cuesBetween(this.script, from, this.time).filter(
+      (cue) => cue.at !== 0 || !this.started,
+    );
+    this.started = true;
+    return cues;
   }
   get shot() {
     return sample(this.script, this.time);

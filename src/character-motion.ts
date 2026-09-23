@@ -61,7 +61,8 @@ export const FOOTFALLS: Record<string, number[]> = {
   sprint: [0.25, 0.75],
 };
 /** True when the motion clock passed a footfall between two samples. */
-export function footfallBetween(tag: string, from: number, to: number) {
+export function footfallBetween(tag: string, from: number, to: number, previousTag = tag) {
+  if (previousTag !== tag && !FOOTFALLS[previousTag]) from = 0;
   const marks = FOOTFALLS[tag];
   if (!marks || to <= from) return false;
   // A clock that restarts at zero lands the first foot straight away.

@@ -91,6 +91,7 @@ export class Renderer {
   cue: ((kind: 'traffic' | 'train' | 'drip' | 'step', strength: number) => void) | null = null;
   /** The player's motion clock at the last frame, for placing footfalls. */
   private footClock = 0;
+  private footTag = '';
   private trainHead = 0;
   private crowd = new Crowd(CROWD, AREAS.street.width);
   private traffic = new Traffic();
@@ -333,9 +334,14 @@ export class Renderer {
       v.reducedMotion,
     );
     // Footsteps follow the feet: a tap each time the drawn stride lands.
-    if (!v.combat && p.grounded && footfallBetween(motion.tag, this.footClock, motion.time))
+    if (
+      !v.combat &&
+      p.grounded &&
+      footfallBetween(motion.tag, this.footClock, motion.time, this.footTag)
+    )
       this.cue?.('step', motion.tag === 'sprint' ? 1 : 0.7);
     this.footClock = motion.time;
+    this.footTag = motion.tag;
     if (!v.combat) {
       const againstWall =
         area !== 'street' || (p.x > 70 && p.x < 500) || (p.x > 800 && p.x < 1140) || p.x > 1400;

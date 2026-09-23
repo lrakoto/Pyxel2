@@ -77,3 +77,13 @@ test('skipping resolves the staging the rest of the scene would have done', () =
   assert.equal(cine.done, true);
   assert.deepEqual(cine.remainder(), []);
 });
+
+test('initial placement fires once even when setup samples time zero repeatedly', () => {
+  const cine = new Cinematic(INTRO);
+  assert.equal(cine.step(0).filter((c) => c.at === 0).length, 1);
+  assert.deepEqual(cine.step(0), []);
+  assert.deepEqual(cine.step(1 / 60), []);
+  const time = cine.time;
+  assert.deepEqual(cine.step(-1), []);
+  assert.equal(cine.time, time);
+});

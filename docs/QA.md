@@ -334,3 +334,11 @@ unchanged. The study now compares original colors against Gravity's palette.
 Production build and formatting pass. Browser verified the side-by-side palettes,
 default Gravity on the street and Lyra's “I'm here, Gravity” dialogue. Existing local
 progress loaded successfully. Investigation-specific gestures still use idle art.
+
+## September 22 — intro integration
+
+Reviewed the intro-cinematic branch after the title/font/footstep changes. Fixed intro completion persistence at the initial spawn, restarting during an active cinematic, duplicate time-zero cues, and the first footfall after idle/turn. Old saves infer intro completion from existing progress; the save key and version remain compatible.
+
+Validation: 60 tests pass, TypeScript/Vite build and formatting pass. On an isolated browser origin, verified fresh intro start, skip → reload → Continue without replay, new-case replay, and restart during intro → reload retaining the fresh checkpoint. The isolated origin avoids changing existing player saves.
+
+Pages now follows `feat/intro-cinematic`; the previous deployment branch did not include the other agent's new work.

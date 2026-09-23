@@ -72,3 +72,20 @@ test('hints distinguish missing records from a pair already available without gi
   assert.match(hint, /already hold/);
   assert.doesNotMatch(hint, /Ada Vale|Meridian/);
 });
+
+test('intro completion survives a checkpoint at the starting position and resets with a new case', () => {
+  const s = storage(),
+    save = freshSave();
+  save.introSeen = true;
+  writeCheckpoint(s, save);
+  assert.equal(readCheckpoint(s).save.introSeen, true);
+  writeCheckpoint(s, freshSave(), true);
+  assert.equal(readCheckpoint(s).save.introSeen, false);
+});
+
+test('older saves infer intro completion from existing progress', () => {
+  const { introSeen, ...legacy } = freshSave();
+  assert.equal(parseSave(JSON.stringify(legacy)).introSeen, false);
+  assert.equal(parseSave(JSON.stringify({ ...legacy, x: 600 })).introSeen, true);
+  assert.equal(parseSave(JSON.stringify({ ...legacy, clues: ['painting'] })).introSeen, true);
+});

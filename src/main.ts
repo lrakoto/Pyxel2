@@ -57,7 +57,11 @@ try {
   /* Device storage can be unavailable. */
 }
 const model = new CaseModel(checkpoint.save);
-const hasSave = model.save.clues.length > 0 || model.save.x !== 440 || model.save.area !== 'street';
+const hasSave =
+  model.save.introSeen ||
+  model.save.clues.length > 0 ||
+  model.save.x !== 440 ||
+  model.save.area !== 'street';
 document.getElementById('app')!.innerHTML = `
  <main class="shell" id="shell">
   <header class="topbar">
@@ -608,6 +612,7 @@ class Game {
     }
     if (this.cineWalk !== null) this.player.x = this.cineWalk;
     this.player.vx = 0;
+    this.model.save.introSeen = true;
     this.cinematic = null;
     this.cineWalk = null;
     $('world').style.transform = '';
@@ -1330,6 +1335,9 @@ class Game {
         this.openPause();
         break;
       case 'restart':
+        // End staging before persisting the replacement checkpoint.
+        this.cinematic = null;
+        this.cineWalk = null;
         this.model.save = freshSave();
         this.player = {
           x: 440,

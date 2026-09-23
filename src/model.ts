@@ -12,6 +12,7 @@ import {
 } from './content.ts';
 import { INSIGHTS } from './narrative.ts';
 export interface SaveData {
+  introSeen: boolean;
   version: 1;
   area: AreaId;
   x: number;
@@ -36,6 +37,7 @@ export function nextRouteHotspot(area: AreaId, destination: string): Hotspot | n
 export function freshSave(): SaveData {
   return {
     version: 1,
+    introSeen: false,
     area: 'street',
     x: 440,
     clues: [],
@@ -92,6 +94,11 @@ export function parseSave(raw: string | null): SaveData {
     const area = s.area === 'den' && !contact ? 'street' : s.area;
     return {
       version: 1,
+      introSeen:
+        s.introSeen === true ||
+        clues.length > 0 ||
+        area !== 'street' ||
+        (typeof s.x === 'number' && s.x !== 440),
       area,
       x:
         typeof s.x === 'number' && Number.isFinite(s.x)

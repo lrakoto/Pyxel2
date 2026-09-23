@@ -40,3 +40,10 @@ test('a dropped frame still sounds the step it skipped over, once', () => {
   assert.equal(footfallBetween('stride', 0.35, 0.45), true);
   assert.equal(count(145, 3.9, 1 / 20), 10);
 });
+
+test('walking after an idle or turn uses the restarted animation clock', () => {
+  assert.equal(footfallBetween('stride', 8.2, 0.016, 'breathe'), true);
+  assert.equal(footfallBetween('stride', 0.15, 0.016, 'turn'), true);
+  assert.equal(footfallBetween('sprint', 0.4, 0.41, 'stride'), false);
+  assert.equal(footfallBetween('stride', 8.2, 0, 'breathe'), false);
+});
