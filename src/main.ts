@@ -177,6 +177,7 @@ class Game {
     this.renderer.cue = (kind, strength) => {
       if (kind === 'traffic') this.audio.traffic(strength);
       else if (kind === 'drip') this.audio.drip();
+      else if (kind === 'step') this.audio.step(strength);
       else this.audio.train();
     };
     this.renderer
@@ -1533,9 +1534,10 @@ class Game {
           (!this.combat && this.keys.has('touch-sprint')),
         this.currentArea.ground,
       );
-    if (Math.abs(this.player.vx) > 20 && this.player.grounded) {
+    // Exploration footsteps come from the renderer, on the animation's footfalls.
+    if (this.combat && Math.abs(this.player.vx) > 20 && this.player.grounded) {
       this.stepTime += dt;
-      if (this.stepTime > (!this.combat && Math.abs(this.player.vx) > 200 ? 0.28 : 0.38)) {
+      if (this.stepTime > 0.38) {
         this.stepTime = 0;
         this.audio.step();
       }

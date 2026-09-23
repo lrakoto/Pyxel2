@@ -12,6 +12,11 @@ export class AudioEngine {
   private rumble: GainNode | null = null;
   /** Shared noise, so every one-shot doesn't rebuild four seconds of it. */
   private noise: AudioBuffer | null = null;
+  /**
+   * Flat noise for transients. The shared buffer is a random walk, dark by
+   * design for rain and rumble, with almost nothing up where a tap lives.
+   */
+  private white: AudioBuffer | null = null;
   private interior = false;
   volume = 0.5;
   muted = false;
@@ -31,6 +36,9 @@ export class AudioEngine {
       last = (last + Math.random() * 0.08 - 0.04) / 1.02;
       samples[i] = last * 3;
     }
+    const white = (this.white = c.createBuffer(1, c.sampleRate, c.sampleRate));
+    const flat = white.getChannelData(0);
+    for (let i = 0; i < flat.length; i++) flat[i] = Math.random() * 2 - 1;
     const noise = c.createBufferSource();
     noise.buffer = buffer;
     noise.loop = true;
@@ -224,16 +232,46 @@ export class AudioEngine {
   deduction() {
     [261.63, 329.63, 392, 523.25].forEach((f, i) => this.tone(f, 0.7, 0.08, 'sine', i * 0.12));
   }
+  /** A short, sharp-edged burst of the shared noise through a band. */
+  private burst(duration: number, gain: number, frequency: number, q: number, delay = 0) {
+    if (!this.ctx || !this.master || !this.white) return;
+    const c = this.ctx;
+    const t = c.currentTime + delay;
+    const src = c.createBufferSource();
+    src.buffer = this.white;
+    // Start somewhere different in the buffer so no two taps are identical.
+    const offset = Math.random() * (this.white.duration - duration - 0.05);
+    const filter = c.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = frequency;
+    filter.Q.value = q;
+    const g = c.createGain();
+    g.gain.setValueAtTime(gain, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    src.connect(filter);
+    filter.connect(g);
+    g.connect(this.master);
+    src.start(t, offset);
+    src.stop(t + duration + 0.02);
+    src.onended = () => {
+      src.disconnect();
+      filter.disconnect();
+      g.disconnect();
+    };
+  }
   /**
-   * A boot landing. Indoors it is a dry knock on board; on the street the
-   * same knock lands in standing water, so it gets a wet slap over it.
+   * A light footfall: a bright heel tick with a little body under it, pitched
+   * high enough to read on laptop speakers. Indoors it knocks on board; on the
+   * street the tick lands in water and throws a small splash after it.
    */
-  step() {
-    this.tone(70 + Math.random() * 25, 0.055, 0.055, 'triangle');
+  step(strength = 1) {
+    const vary = 0.8 + Math.random() * 0.4;
+    this.burst(0.035, 0.6 * strength * vary, 2600 + Math.random() * 900, 1.4);
+    this.tone(140 + Math.random() * 40, 0.05, 0.09 * strength, 'triangle');
     if (this.interior) {
-      this.tone(150 + Math.random() * 60, 0.035, 0.02, 'square');
+      this.tone(260 + Math.random() * 60, 0.03, 0.03 * strength, 'square');
     } else {
-      this.sweep(0.09, 0.05, 2400 + Math.random() * 900, 900, 'bandpass', 1.4);
+      this.burst(0.08, 0.22 * strength * vary, 4200 + Math.random() * 1200, 0.9, 0.012);
     }
   }
   shot() {

@@ -28,7 +28,7 @@ import { buildSheen } from './sheen.ts';
 import { drawFlare } from './flare.ts';
 import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
 import { FootWater, drawInteriorForeground, drawMei } from './visual-details.ts';
-import { CharacterMotion } from './character-motion.ts';
+import { CharacterMotion, footfallBetween } from './character-motion.ts';
 export const W = 960,
   H = 540;
 /** Carriages in the elevated train, and how fast it crosses the city. */
@@ -88,7 +88,9 @@ export class Renderer {
    * frame or the train arrives; it should not know what a speaker is, so it
    * reports and lets the caller decide.
    */
-  cue: ((kind: 'traffic' | 'train' | 'drip', strength: number) => void) | null = null;
+  cue: ((kind: 'traffic' | 'train' | 'drip' | 'step', strength: number) => void) | null = null;
+  /** The player's motion clock at the last frame, for placing footfalls. */
+  private footClock = 0;
   private trainHead = 0;
   private crowd = new Crowd(CROWD, AREAS.street.width);
   private traffic = new Traffic();
@@ -330,6 +332,10 @@ export class Renderer {
       !!v.speaker,
       v.reducedMotion,
     );
+    // Footsteps follow the feet: a tap each time the drawn stride lands.
+    if (!v.combat && p.grounded && footfallBetween(motion.tag, this.footClock, motion.time))
+      this.cue?.('step', motion.tag === 'sprint' ? 1 : 0.7);
+    this.footClock = motion.time;
     if (!v.combat) {
       const againstWall =
         area !== 'street' || (p.x > 70 && p.x < 500) || (p.x > 800 && p.x < 1140) || p.x > 1400;

@@ -49,6 +49,28 @@ export class CharacterMotion {
   }
 }
 
+/** Motion-clock seconds per stride or sprint loop; the sprite picks frames over the same span. */
+export const MOTION_LOOP = 0.8;
+/**
+ * Where a foot lands, as fractions of each loop. Measured off Gravity's
+ * frames: the walk strikes on its two widest strides (frames 1 and 9 of 16),
+ * the run on the frame after each airborne stretch (3 and 7 of 8).
+ */
+export const FOOTFALLS: Record<string, number[]> = {
+  stride: [0, 0.5],
+  sprint: [0.25, 0.75],
+};
+/** True when the motion clock passed a footfall between two samples. */
+export function footfallBetween(tag: string, from: number, to: number) {
+  const marks = FOOTFALLS[tag];
+  if (!marks || to <= from) return false;
+  // A clock that restarts at zero lands the first foot straight away.
+  if (from === 0 && marks.includes(0)) return true;
+  const a = from / MOTION_LOOP,
+    b = to / MOTION_LOOP;
+  return marks.some((m) => Math.floor(a - m) !== Math.floor(b - m));
+}
+
 /** Authored frame timing; holds an examination's settled pose rather than waving forever. */
 export function storyFrameIndex(tag: string, seconds: number, count: number) {
   if (count <= 1) return 0;
