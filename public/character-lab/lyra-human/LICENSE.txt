@@ -13,7 +13,9 @@ base.png = base/base_pale.png
 hair.png = hair/hair_bob_black.png
 suit.png = outfits/outfit_ninja_blue.png
 
-The game and Lyra comparison study composite the layers and apply a cyan palette in
-src/lyra-candidate.ts. They use the first authored idle pose and six walking frames.
+The game and Lyra comparison study composite the layers and apply a navy/gunmetal
+palette with cyan visor and circuit details in src/lyra-candidate.ts. Source
+silhouettes and transparency are preserved. The lab also retains the previous
+pale palette for comparison. Both use the first idle pose and six walking frames.
 Subtle breathing is applied in code around a stationary foot pivot; it is not a
 new hand-authored idle animation.

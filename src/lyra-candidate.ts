@@ -47,7 +47,8 @@ export type LyraCandidate = Awaited<ReturnType<typeof loadLyraCandidate>>;
 
 /** Current Lyra model: MoikMellah's CC0 MV Platformer Female. */
 export const LYRA_HUMAN_CROP = { x: 0, y: 16, width: 32, height: 48, pivotX: 16, cellHeight: 48 };
-const HUMAN_COLORS: Record<number, number> = {
+export type LyraHumanoidStyle = 'cyber' | 'projection';
+const HUMAN_PROJECTION_COLORS: Record<number, number> = {
   0x4c0000: 0x153a52, // shared contour
   0xd9c9b8: 0xc4ffff, // face and hands
   0xd9b3ab: 0x82c8dc,
@@ -57,17 +58,66 @@ const HUMAN_COLORS: Record<number, number> = {
   0x46467d: 0x347f9d,
   0x645d96: 0x69bfd1,
 };
-export function applyLyraHumanoidPalette(data: Uint8ClampedArray) {
+const HUMAN_CYBER_COLORS: Record<number, number> = {
+  0x4c0000: 0x0a1725, // crisp contours, shared by the face and hands
+  0xd9c9b8: 0x8fb7bc, // restrained cool skin, distinct from the hardware
+  0xd9b3ab: 0x60868f,
+  0x474747: 0x293d52, // dark bob with a readable crown highlight
+  0x2f2f2f: 0x182839,
+  0x121240: 0x101f35, // navy suit and boot outlines
+  0x46467d: 0x263c51,
+  0x645d96: 0x3f5867, // gunmetal panels
+};
+// Points measured on each authored pose: two pixels at the eye/temple, then
+// a chest trace, sleeve seam, belt contact and knee trace. No geometry is added.
+// Pose 0 is idle; poses 1–6 are the six walking frames in source order.
+const CYBER_DETAILS = [
+  { eye: 16, chest: 17, wrist: [11, 39], knee: [17, 50], belt: 16 },
+  { eye: 18, chest: 18, wrist: [12, 39], knee: [18, 50], belt: 17 },
+  { eye: 17, chest: 18, wrist: [13, 40], knee: [17, 50], belt: 17 },
+  { eye: 17, chest: 18, wrist: [18, 39], knee: [14, 50], belt: 16 },
+  { eye: 18, chest: 19, wrist: [21, 39], knee: [12, 50], belt: 17 },
+  { eye: 17, chest: 18, wrist: [18, 39], knee: [14, 50], belt: 16 },
+  { eye: 17, chest: 18, wrist: [13, 40], knee: [16, 50], belt: 17 },
+] as const;
+export function applyLyraHumanoidPalette(
+  data: Uint8ClampedArray,
+  style: LyraHumanoidStyle = 'cyber',
+  frame = 0,
+) {
+  const colors = style === 'projection' ? HUMAN_PROJECTION_COLORS : HUMAN_CYBER_COLORS;
   for (let i = 0; i < data.length; i += 4) {
     if (!data[i + 3]) continue;
-    const color = HUMAN_COLORS[(data[i] << 16) | (data[i + 1] << 8) | data[i + 2]];
+    const color = colors[(data[i] << 16) | (data[i + 1] << 8) | data[i + 2]];
     if (color === undefined) continue;
     data[i] = color >> 16;
     data[i + 1] = (color >> 8) & 255;
     data[i + 2] = color & 255;
   }
+  if (style !== 'cyber' || data.length !== 32 * 64 * 4) return;
+  const detail = CYBER_DETAILS[Math.max(0, Math.min(6, Math.floor(frame)))];
+  const suit = [0x101f35, 0x263c51, 0x3f5867];
+  const accent = (x: number, y: number, color: number, material: readonly number[]) => {
+    const at = (y * 32 + x) * 4;
+    const existing = (data[at] << 16) | (data[at + 1] << 8) | data[at + 2];
+    if (!data[at + 3] || !material.includes(existing)) return;
+    data[at] = color >> 16;
+    data[at + 1] = (color >> 8) & 255;
+    data[at + 2] = color & 255;
+  };
+  accent(detail.eye - 1, 23, 0x72fbe8, [0x182839]);
+  accent(detail.eye, 23, 0xa6fff0, [0x8fb7bc]);
+  accent(detail.chest - 1, 30, 0x299cab, suit);
+  accent(detail.chest, 31, 0x72fbe8, suit);
+  accent(detail.chest, 32, 0x299cab, suit);
+  accent(detail.chest, 33, 0x299cab, suit);
+  accent(detail.wrist[0], detail.wrist[1], 0x72fbe8, suit);
+  accent(detail.wrist[0], detail.wrist[1] + 1, 0x299cab, suit);
+  accent(detail.belt, 37, 0x72fbe8, suit);
+  accent(detail.knee[0], detail.knee[1], 0x299cab, suit);
+  accent(detail.knee[0], detail.knee[1] + 1, 0x72fbe8, suit);
 }
-export async function loadLyraHumanoid(original = false) {
+export async function loadLyraHumanoid(original = false, style: LyraHumanoidStyle = 'cyber') {
   const layers = await Promise.all(
     ['base', 'suit', 'hair'].map(async (name) => {
       const image = new Image();
@@ -84,7 +134,7 @@ export async function loadLyraHumanoid(original = false) {
     for (const layer of layers) context.drawImage(layer, index * 32, 0, 32, 64, 0, 0, 32, 64);
     if (!original) {
       const pixels = context.getImageData(0, 0, 32, 64);
-      applyLyraHumanoidPalette(pixels.data);
+      applyLyraHumanoidPalette(pixels.data, style, index);
       context.putImageData(pixels, 0, 0);
     }
     return canvas;

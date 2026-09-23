@@ -65,8 +65,10 @@ https://opengameart.org/content/mv-platformer-female-32x64
 Three unchanged source layers (pale base, black bob hair, blue ninja outfit)
 are retained in `public/character-lab/lyra-human/` with provenance and license
 notes. `src/lyra-candidate.ts` composites the layers and applies a deterministic
-cyan palette without changing the authored silhouettes. Lyra uses one
+navy/gunmetal palette with authored cyan visor and circuit pixels mapped to each
+pose, without changing source silhouettes or transparency. Lyra uses one
 authored idle pose with subtle code-driven breathing around a fixed foot pivot,
 plus six authored walking frames available in the comparison lab. It is a
-different model from Gravity and the previous Warped Caves Lyra, which remains
-in the lab for comparison.
+different model from Gravity and the previous Warped Caves Lyra. The lab now
+compares the approved humanoid model's previous pale projection with its current
+cyber finish. `src/lyra-projection.ts` supplies the shared emitter and scan effects.

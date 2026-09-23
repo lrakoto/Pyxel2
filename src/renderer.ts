@@ -28,6 +28,7 @@ import { buildSheen } from './sheen.ts';
 import { drawFlare } from './flare.ts';
 import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
 import { leakImpacts } from './water-events.ts';
+import { drawLyraEmitter } from './lyra-projection.ts';
 import { FootWater, drawInteriorForeground, drawMei } from './visual-details.ts';
 import { CharacterMotion, footfallBetween } from './character-motion.ts';
 import { streetWind, streetWindDisplacement } from './wind.ts';
@@ -1005,28 +1006,14 @@ export class Renderer {
       y = ground;
     // Halo and sprite stay within this bound; skip off-camera projection work.
     if (x < -80 * figure || x > c.canvas.width + 80 * figure) return;
-    c.save();
-    c.globalCompositeOperation = 'screen';
-    c.globalAlpha = 0.13 + Math.sin(t * 2) * 0.025;
-    c.drawImage(this.mist, x - 55 * figure, y - 100 * figure, 110 * figure, 120 * figure);
-    c.restore();
+    drawLyraEmitter(c, x, y, 70 * figure, t);
     const rim = rimAt(lights, worldX, y - 40 * figure, facing, t);
     c.save();
-    c.globalAlpha = 0.9;
+    c.globalAlpha = 1;
     c.translate(x, y);
     c.transform(1, 0, speaking ? Math.sin(t * 1.2) * 0.008 * facing : 0, 1, 0, 0);
     c.translate(-x, -y);
     this.sprites.draw(c, 'lyra', speaking ? 'listen' : 'idle', t, x, y, facing, 70 * figure, rim);
-    c.restore();
-    // A restrained projector footprint replaces the weight of a physical shadow.
-    c.save();
-    c.globalCompositeOperation = 'screen';
-    c.strokeStyle = '#88cfe0';
-    c.globalAlpha = 0.22;
-    c.lineWidth = 0.6;
-    c.beginPath();
-    c.ellipse(x, y + 1, 12 * figure, 2 * figure, 0, 0, Math.PI * 2);
-    c.stroke();
     c.restore();
   }
   private weather(

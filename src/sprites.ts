@@ -1,4 +1,5 @@
 import { loadLyraHumanoid, LYRA_HUMAN_CROP } from './lyra-candidate.ts';
+import { drawLyraSignal } from './lyra-projection.ts';
 import { LYRA_REFINED_FRAMES, lyraFrameIndex } from './lyra-art.ts';
 import {
   COLE_FRAMES,
@@ -330,6 +331,17 @@ export class Sprites {
       ctx.restore();
     }
     if (rim && rim.strength > 0.001) paintRim(ctx, this.masks(frame), rim, dx, dy, dw, dh);
+    if (id === 'lyra' && this.lyraCandidate)
+      drawLyraSignal(
+        ctx,
+        frame.src,
+        { x: frame.sx, y: frame.sy, width: frame.sw, height: frame.sh },
+        dx,
+        dy,
+        dw,
+        dh,
+        time,
+      );
     ctx.restore();
   }
 }
