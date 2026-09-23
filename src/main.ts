@@ -4,6 +4,7 @@ import './desk.css';
 import './fullscreen.css';
 import './patina.css';
 import './field-feedback.css';
+import './cinematic.css';
 import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint, writeCheckpoint } from './checkpoint.ts';
@@ -23,6 +24,7 @@ import { CaseModel, freshSave, clamp, stepBody, nextRouteHotspot, type Body } fr
 import { Renderer, H } from './renderer.ts';
 import { AudioEngine } from './audio.ts';
 import { Combat } from './combat.ts';
+import { Cinematic, INTRO } from './cinematic.ts';
 import {
   INSIGHTS,
   boardHint,
@@ -84,6 +86,7 @@ document.getElementById('app')!.innerHTML = `
     <div id="companion" class="companion" hidden><button id="companion-btn"><span class="waveform">▂▆▃▇▂</span><span>LYRA <small>CHANNEL OPEN</small></span></button></div>
     <aside id="evidence-closeup" class="evidence-closeup" hidden aria-label="Evidence illustration"></aside><div id="dialogue" class="dialogue" hidden aria-label="Conversation"><div class="portrait-mark" id="portrait-mark">G<span>/</span></div><div class="dialogue-copy"><div class="dialogue-top"><span id="speaker" class="eyebrow">GRAVITY</span><span id="line-count" class="eyebrow"></span></div><p id="dialogue-text" aria-hidden="true"></p><p id="dialogue-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p><div class="dialogue-bottom"><span id="dialogue-context">DETECTIVE’S OBSERVATION</span><button id="advance-btn">Continue <kbd>E</kbd>${icon('arrow')}</button></div></div></div>
     <div id="transition" class="transition" aria-hidden="true"></div>
+    <section id="cinematic" class="cinematic" hidden aria-label="Opening scene"><div class="cine-bar top"></div><div class="cine-bar bottom"></div><div class="cine-fade" id="cine-fade"></div><div class="cine-caption" id="cine-caption" aria-live="polite"><span class="eyebrow" id="cine-kicker"></span><p id="cine-text"></p></div><button class="cine-skip" id="cine-skip">Skip <kbd>Esc</kbd></button></section>
     <section id="title-screen" class="title-screen" aria-label="Start game"><div class="title-content"><div class="eyebrow title-kicker"><span>AN INTERACTIVE NOIR</span><i></i> NEW ANGELES, 2077</div><h1 class="game-title">EVERYBODY<span class="title-slash">/</span><br><span class="nobody">NOBODY</span><span class="title-period">.</span></h1><div class="issue-label"><span>ISSUE 01</span><i></i><strong>Fragments</strong></div><p class="opening">One dead artist. A thousand stolen minds.<br>Someone has to remember.</p><button class="primary" id="begin-btn" disabled><span id="begin-text">Entering New Angeles</span>${icon('arrow')}</button><div class="title-footnote">${icon('headphones')} HEADPHONES RECOMMENDED <span>·</span> SAVED ON THIS DEVICE</div></div><div class="title-coordinates"><span>SECTOR</span><strong>07</strong><span>34°03′ N<br>118°15′ W</span></div></section>
     <div class="touch-controls" id="touch-controls"><button data-hold="left" aria-label="Move left">←</button><button data-hold="right" aria-label="Move right">→</button><button data-hold="jump" aria-label="Jump">↑</button><button data-hold="sprint" aria-label="Hold to sprint">»</button><button id="touch-act" aria-label="Examine">E</button><button data-hold="fire" aria-label="Fire toward nearest enemy">◎</button></div>
    </div>
@@ -115,6 +118,9 @@ class Game {
   reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   combat: Combat | null = null;
   combatStory = false;
+  cinematic: Cinematic | null = null;
+  /** Where the running cinematic is walking Gravity, if anywhere. */
+  cineWalk: number | null = null;
   aim = { x: 700, y: 400 };
   firing = false;
   keys = new Set<string>();
@@ -231,6 +237,7 @@ class Game {
       },
       s,
     );
+    $('cine-skip').addEventListener('click', () => this.finishIntro(), s);
     $('board-btn').addEventListener('click', () => this.openBoard(), s);
     $('objective-btn').addEventListener(
       'click',
@@ -291,7 +298,14 @@ class Game {
     $('world').addEventListener(
       'pointerdown',
       (e) => {
-        if (!this.started || this.modal || this.lines.length || this.transitioning) return;
+        if (
+          !this.started ||
+          this.cinematic ||
+          this.modal ||
+          this.lines.length ||
+          this.transitioning
+        )
+          return;
         const p = this.pointer(e);
         this.aim = p;
         if (this.combat) {
@@ -441,6 +455,11 @@ class Game {
     if (action === 'fire') this.firing = false;
   }
   keydown(e: KeyboardEvent) {
+    if (this.cinematic && !this.modal) {
+      if (['Escape', 'Enter'].includes(e.code) && !e.repeat) this.finishIntro();
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault();
+      return;
+    }
     if (e.code === 'Escape') {
       if ($('objective-btn').getAttribute('aria-expanded') === 'true') {
         $('objective-btn').setAttribute('aria-expanded', 'false');
@@ -517,8 +536,12 @@ class Game {
     $('title-screen').hidden = true;
     $('shell').classList.add('started');
     void this.audio.init().then(() => this.audio.area(this.model.save.area));
-    this.areaCard();
     this.sync();
+    if (!hasSave && !checkpoint.recovered) {
+      this.playIntro();
+      return;
+    }
+    this.areaCard();
     if (this.model.awaitingAmbush) this.openAmbush();
     else if (this.model.save.resumeHotspot) {
       const h = this.currentArea.hotspots.find((h) => h.id === this.model.save.resumeHotspot);
@@ -526,10 +549,78 @@ class Game {
     }
     if (checkpoint.recovered)
       this.toast('CHECKPOINT RECOVERED', 'Resumed the last intact local save.');
-    else if (!hasSave) this.toast('Marlon Graves is dead. His last work is still inside.');
+  }
+  playIntro() {
+    this.clearInput();
+    this.cinematic = new Cinematic(INTRO);
+    this.cineWalk = null;
+    $('shell').classList.add('in-cinematic');
+    $('cinematic').hidden = false;
+    this.stepIntro(0);
+  }
+  /** Advances the opening, applying its cues and framing. */
+  stepIntro(dt: number) {
+    const cine = this.cinematic!;
+    for (const cue of cine.step(dt)) {
+      if (cue.kind === 'place') {
+        this.player.x = cue.x;
+        this.player.vx = 0;
+        this.player.facing = cue.facing;
+      } else if (cue.kind === 'walk') this.cineWalk = cue.x;
+      else if (cue.sound === 'dispatch') this.audio.dispatch();
+      else this.audio.sting();
+    }
+    const shot = cine.shot;
+    const still = this.reducedMotion;
+    this.camera = clamp(
+      (still ? this.player.x : shot.focus) - this.viewW * (still ? 0.48 : 0.5),
+      0,
+      this.currentArea.width - this.viewW,
+    );
+    // Zoom is a display transform over the native canvas: the pixels simply
+    // get larger, and the origin keeps the subject where the camera put it.
+    const canvas = $('world');
+    const zoom = still ? 1 : shot.zoom;
+    canvas.style.transform = zoom > 1.001 ? `scale(${zoom})` : '';
+    canvas.style.transformOrigin = `${((shot.focus - this.camera) / this.viewW) * 100}% ${12 + shot.lift * 60}%`;
+    $('cine-fade').style.opacity = String(shot.fade);
+    $('cinematic').style.setProperty('--bars', String(shot.bars));
+    const caption = shot.caption;
+    const box = $('cine-caption');
+    box.style.opacity = String(caption?.alpha ?? 0);
+    if (caption) {
+      box.dataset.voice = caption.voice;
+      $('cine-kicker').textContent = caption.kicker;
+      const text = caption.text.slice(0, still ? caption.text.length : caption.shown);
+      if ($('cine-text').textContent !== text) $('cine-text').textContent = text;
+    }
+    if (cine.done) this.finishIntro();
+  }
+  /** Ends the opening, whether it ran out or was skipped, and hands over control. */
+  finishIntro() {
+    const cine = this.cinematic;
+    if (!cine) return;
+    // A skip lands Gravity where the scene would have left her.
+    for (const cue of cine.remainder()) {
+      this.player.x = cue.x;
+      if (cue.kind === 'place') this.player.facing = cue.facing;
+    }
+    if (this.cineWalk !== null) this.player.x = this.cineWalk;
+    this.player.vx = 0;
+    this.cinematic = null;
+    this.cineWalk = null;
+    $('world').style.transform = '';
+    $('shell').classList.remove('in-cinematic');
+    $('cinematic').hidden = true;
+    $('cine-text').textContent = '';
+    this.clearInput();
+    this.areaCard();
+    this.sync();
+    this.persist();
+    this.toast('Marlon Graves is dead. His last work is still inside.');
   }
   toggleScan() {
-    if (!this.started || this.combat || this.modal) return;
+    if (!this.started || this.cinematic || this.combat || this.modal) return;
     this.scan = !this.scan;
     $('stage').classList.toggle('scanning', this.scan);
     $('focus-status').hidden = !this.scan;
@@ -571,7 +662,14 @@ class Game {
     }
   }
   goTo(h: Hotspot, route: string | null = null) {
-    if (!this.started || this.modal || this.combat || this.lines.length || this.transitioning)
+    if (
+      !this.started ||
+      this.cinematic ||
+      this.modal ||
+      this.combat ||
+      this.lines.length ||
+      this.transitioning
+    )
       return;
     this.keys.clear();
     this.queuedRoute = route;
@@ -788,7 +886,8 @@ class Game {
     el.classList.add('show');
   }
   persist(reset = false) {
-    if (!this.started) return;
+    // Mid-cinematic positions are staging, not progress.
+    if (!this.started || this.cinematic) return;
     this.model.save.x = this.player.x;
     try {
       writeCheckpoint(localStorage, this.model.save, reset);
@@ -848,7 +947,7 @@ class Game {
     this.clearInput();
   }
   openBoard() {
-    if (!this.started) return;
+    if (!this.started || this.cinematic) return;
     this.selected = [];
     this.boardFile = this.model.save.followup ? 'first-one' : 'graves';
     this.renderBoard();
@@ -938,7 +1037,7 @@ class Game {
     this.inspectedClue = null;
   }
   openMap() {
-    if (!this.started) return;
+    if (!this.started || this.cinematic) return;
     const sites = [
       {
         x: 15,
@@ -993,7 +1092,7 @@ class Game {
     );
   }
   companionTalk() {
-    if (this.combat || this.lines.length || this.modal) return;
+    if (this.cinematic || this.combat || this.lines.length || this.modal) return;
     const topics = lyraTopics(this.model);
     this.panel(
       'An open channel.',
@@ -1259,6 +1358,7 @@ class Game {
         $('evidence-closeup').hidden = true;
         this.persist(true);
         void this.audio.init().then(() => this.audio.area('street'));
+        this.playIntro();
         break;
       case 'accept-lyra':
         this.model.save.companion = true;
@@ -1335,7 +1435,8 @@ class Game {
         steps++;
       }
       if (steps === 6) this.accumulator = 0;
-      if (active && (!this.lines.length || (this.discovery && !this.reducedMotion))) {
+      if (active && this.cinematic) this.stepIntro(elapsed);
+      else if (active && (!this.lines.length || (this.discovery && !this.reducedMotion))) {
         const desired = clamp(
           (this.discovery && !this.reducedMotion
             ? this.player.x * 0.65 + this.discovery.x * 0.35
@@ -1356,7 +1457,7 @@ class Game {
           reducedMotion: this.reducedMotion,
           combat: this.combat,
           aim: this.aim,
-          title: !this.started,
+          title: !this.started || !!this.cinematic,
           examining: this.examining,
           discovery: this.discovery,
           speaker: this.lines[this.lineIndex]?.speaker ?? null,
@@ -1377,6 +1478,17 @@ class Game {
     this.raf = requestAnimationFrame((t) => this.frame(t));
   }
   update(dt: number) {
+    if (this.cinematic) {
+      const d = this.cineWalk === null ? 0 : this.cineWalk - this.player.x;
+      const arrived = Math.abs(d) < Math.max(4, Math.abs(this.player.vx) * dt + 1);
+      if (arrived && this.cineWalk !== null) {
+        this.player.x = this.cineWalk;
+        this.player.vx = 0;
+        this.cineWalk = null;
+      }
+      stepBody(this.player, arrived ? 0 : Math.sign(d), false, dt, this.currentArea.width);
+      return;
+    }
     if (this.combat?.down || this.combat?.complete) return;
     let axis =
       (this.keys.has('KeyD') || this.keys.has('ArrowRight') || this.keys.has('touch-right')
@@ -1461,6 +1573,7 @@ class Game {
     $('stage').classList.toggle('walking', walking);
     const show =
       this.started &&
+      !this.cinematic &&
       !this.modal &&
       !this.lines.length &&
       !this.combat &&
@@ -1487,7 +1600,7 @@ class Game {
       );
     }
     $<HTMLButtonElement>('touch-act').disabled = !show;
-    $('hotspots').hidden = !this.started || !!this.combat || this.transitioning;
+    $('hotspots').hidden = !this.started || !!this.cinematic || !!this.combat || this.transitioning;
     if (this.combat) {
       $('hp-text').textContent = String(this.combat.hp);
       $('hp-fill').style.width = this.combat.hp + '%';

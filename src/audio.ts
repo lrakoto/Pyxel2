@@ -205,6 +205,18 @@ export class AudioEngine {
       g.disconnect();
     };
   }
+  /** A police radio opening: squelch, then the two-tone call. */
+  dispatch() {
+    this.sweep(0.22, 0.09, 3200, 900, 'bandpass', 2.2);
+    this.tone(1175, 0.08, 0.05, 'square', 0.18);
+    this.tone(880, 0.1, 0.05, 'square', 0.3);
+  }
+  /** Under the chapter card: a low fifth that decays with the rain. */
+  sting() {
+    this.tone(55, 2.8, 0.14, 'sine');
+    this.tone(82.41, 2.4, 0.07, 'sine', 0.06);
+    this.tone(659.25, 1.6, 0.025, 'triangle', 0.1);
+  }
   clue() {
     this.tone(523.25, 0.22, 0.12);
     this.tone(783.99, 0.35, 0.08, 'sine', 0.13);

@@ -1,0 +1,121 @@
+/* Scripted scenes: letterbox, fade and captions over the live canvas. */
+.cinematic {
+  --bars: 1;
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+}
+.cine-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(var(--bars) * 11%);
+  background: #040809;
+  z-index: 2;
+}
+.cine-bar.top {
+  top: 0;
+}
+.cine-bar.bottom {
+  bottom: 0;
+}
+.cine-fade {
+  position: absolute;
+  inset: 0;
+  background: #040809;
+  opacity: 1;
+}
+/* Subtitles live in the lower letterbox, clear of the figures on the pavement. */
+.cine-caption {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 1.6%;
+  z-index: 3;
+  opacity: 0;
+  text-align: center;
+  text-shadow: 0 1px 8px #000;
+}
+.cine-caption p {
+  margin: 4px auto 0;
+  max-width: 34em;
+  min-height: 1.4em;
+  font-size: clamp(13px, 1.7cqw, 24px);
+  line-height: 1.3;
+  color: #e9e5d9;
+}
+.cine-caption[data-voice='dispatch'] .eyebrow {
+  color: var(--red);
+}
+.cine-caption[data-voice='dispatch'] p {
+  font: clamp(12px, 1.5cqw, 21px) / 1.5 var(--mono);
+  letter-spacing: 0.04em;
+  color: #cfd8cf;
+}
+.cine-caption[data-voice='dispatch'] p::after {
+  content: '▌';
+  color: var(--red);
+  animation: cine-cursor 0.8s steps(1) infinite;
+}
+.cine-caption[data-voice='gravity'] .eyebrow {
+  color: #c2a17e;
+}
+.cine-caption[data-voice='gravity'] p {
+  font-style: italic;
+}
+.cine-caption[data-voice='card'] {
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.cine-caption[data-voice='card'] .eyebrow {
+  color: var(--red);
+  letter-spacing: 3px;
+}
+.cine-caption[data-voice='card'] p {
+  font: 600 clamp(38px, 6.4cqw, 110px) / 0.95 var(--display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.cine-skip {
+  position: absolute;
+  right: 2.5%;
+  top: 2%;
+  z-index: 4;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  font: 11px var(--mono);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #8e9997;
+  opacity: 0.7;
+}
+.cine-skip:hover,
+.cine-skip:focus-visible {
+  opacity: 1;
+}
+@keyframes cine-cursor {
+  50% {
+    opacity: 0;
+  }
+}
+/* The play interface steps aside while a scene runs. */
+.in-cinematic .scene-hud,
+.in-cinematic .hotspots,
+.in-cinematic .interaction,
+.in-cinematic .companion,
+.in-cinematic .focus-status,
+.in-cinematic .touch-controls,
+.in-cinematic .area-card {
+  visibility: hidden;
+}
+.in-cinematic .stage canvas {
+  cursor: default;
+}
+.reduced-motion .cine-caption[data-voice='dispatch'] p::after {
+  animation: none;
+}
