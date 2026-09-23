@@ -4,7 +4,7 @@ import { stepBody, type Body } from '../src/model.ts';
 import { CharacterMotion } from '../src/character-motion.ts';
 import { AREAS } from '../src/content.ts';
 
-test('faster sprint returns to walking, brakes and respects bounds', () => {
+test('outdoor sprint retains its original pace, returns to walking, brakes and respects bounds', () => {
   const make = (): Body => ({ x: 500, y: 438, vx: 0, vy: 0, grounded: true, facing: 1 });
   const walk = make(),
     run = make();
@@ -12,7 +12,7 @@ test('faster sprint returns to walking, brakes and respects bounds', () => {
     stepBody(walk, 1, false, 1 / 60, 3000);
     stepBody(run, 1, false, 1 / 60, 3000, true);
   }
-  assert.ok(Math.abs((run.x - 500) / (walk.x - 500) - 330 / 145) < 0.01);
+  assert.ok(Math.abs((run.x - 500) / (walk.x - 500) - 290 / 145) < 0.01);
   for (let i = 0; i < 60; i++) stepBody(run, 1, false, 1 / 60, 3000);
   assert.ok(Math.abs(run.vx - 145) < 0.01);
   for (let i = 0; i < 60; i++) stepBody(run, 0, false, 1 / 60, 3000, true);
@@ -24,7 +24,8 @@ test('faster sprint returns to walking, brakes and respects bounds', () => {
 test('interior sprint keeps the same boosted pace and floor contact; combat keeps its old pace', () => {
   for (const area of [AREAS.studio, AREAS.den]) {
     const run: Body = { x: 100, y: area.ground, vx: 0, vy: 0, grounded: true, facing: 1 };
-    for (let i = 0; i < 120; i++) stepBody(run, 1, false, 1 / 60, area.width, true, area.ground);
+    for (let i = 0; i < 120; i++)
+      stepBody(run, 1, false, 1 / 60, area.width, true, area.ground, 330);
     assert.ok(Math.abs(run.vx - 330) < 0.01);
     assert.ok(run.x > 740 && run.x < 760);
     assert.equal(run.y, area.ground);

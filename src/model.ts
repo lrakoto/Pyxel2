@@ -301,7 +301,7 @@ export function stepBody(
   width: number,
   dash = false,
   ground = 438,
-  sprintSpeed = 330,
+  sprintSpeed = 290,
 ) {
   const speed = dash ? sprintSpeed : 145;
   p.vx += (axis * speed - p.vx) * Math.min(1, dt * (axis ? 18 : 24));

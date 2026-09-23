@@ -1758,8 +1758,8 @@ class Game {
           this.keys.has('ShiftRight') ||
           (!this.combat && this.keys.has('touch-sprint')),
         this.currentArea.ground,
-        // Exploration gets a modest boost; combat keeps its existing tuning.
-        this.combat ? 290 : 330,
+        // The faster pace is for interior exploration only.
+        this.combat || this.currentArea.id === 'street' ? 290 : 330,
       );
     // Exploration footsteps come from the renderer, on the animation's footfalls.
     if (this.combat && Math.abs(this.player.vx) > 20 && this.player.grounded) {
