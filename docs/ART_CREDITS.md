@@ -30,7 +30,9 @@ Use case: background-extraction. Edit target: the provided wide pixel art cyberp
 
 ## Code-rendered elements
 
-The middle-distance buildings and rail deck, moving train, near-camera objects, rain, mist, glints, scarf, dynamic water reflection pass, combat projectiles, and light overlays are rendered in code. Procedural sound is generated locally with Web Audio; no recorded music or third-party sound library is bundled.
+The middle-distance buildings and rail deck, moving train, near-camera objects, rain, mist, glints, scarf, dynamic water reflection pass, combat projectiles, and light overlays are rendered in code. Most sound is generated locally with Web Audio; no recorded music is bundled.
+
+Interior water impacts use three edited excerpts of [“water dripping in bathroom tub 1” by FOSSarts](https://freesound.org/people/FOSSarts/sounds/740288/), released under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). The public HQ preview was cropped, filtered, faded and level-matched for short, quiet one-shots. Source and derivative details are retained in `public/audio/CREDITS.txt`. The WAVs are served locally with the game, without external sound requests.
 
 ## Fonts
 

@@ -17,6 +17,9 @@ export class AudioEngine {
    * design for rain and rumble, with almost nothing up where a tap lives.
    */
   private white: AudioBuffer | null = null;
+  private dripBuffers: AudioBuffer[] = [];
+  private dripIndex = 0;
+  private lastDripAt = -Infinity;
   private interior = false;
   volume = 0.5;
   muted = false;
@@ -102,7 +105,20 @@ export class AudioEngine {
     low.connect(rumble);
     roll.start();
 
+    // Optional foley must not hold up entering the game on a slow connection.
+    void this.loadDrips(c);
     await c.resume();
+  }
+  private async loadDrips(context: AudioContext) {
+    // Bundled CC0 field recordings: no runtime third-party requests.
+    await Promise.allSettled(
+      ['a', 'b', 'c'].map(async (variant) => {
+        const response = await fetch(`${import.meta.env.BASE_URL}audio/drip-${variant}.wav`);
+        if (!response.ok) throw new Error('Drip sample unavailable');
+        const buffer = await context.decodeAudioData(await response.arrayBuffer());
+        this.dripBuffers.push(buffer);
+      }),
+    );
   }
   setVolume(value: number) {
     this.volume = value;
@@ -187,11 +203,35 @@ export class AudioEngine {
       this.tone(1850 + i * 420, 0.5, 0.012, 'sine', duration * (0.25 + i * 0.16));
   }
 
-  /** Water landing in a puddle. */
-  drip() {
-    const f = 700 + Math.random() * 500;
-    this.tone(f, 0.09, 0.035, 'sine');
-    this.tone(f * 0.5, 0.14, 0.02, 'sine', 0.02);
+  /** A quiet recorded water impact, with slight variation between landings. */
+  drip(strength = 1) {
+    if (!this.ctx || !this.master || this.muted || this.ctx.state !== 'running') return;
+    const c = this.ctx;
+    const t = c.currentTime;
+    // Two leaks landing in one frame should not double the foreground volume.
+    if (t - this.lastDripAt < 0.075) return;
+    this.lastDripAt = t;
+    const level = Math.max(0, Math.min(1, strength)) * (0.8 + Math.random() * 0.2);
+    const buffer = this.dripBuffers.length
+      ? this.dripBuffers[this.dripIndex++ % this.dripBuffers.length]
+      : null;
+    if (!buffer) {
+      // A failed asset request should leave a soft wet tap, not a UI chime.
+      this.burst(0.045, 0.035 * level, 1600, 0.55);
+      return;
+    }
+    const source = c.createBufferSource();
+    source.buffer = buffer;
+    source.playbackRate.value = 0.96 + Math.random() * 0.08;
+    const gain = c.createGain();
+    gain.gain.value = 0.075 * level;
+    source.connect(gain);
+    gain.connect(this.master);
+    source.onended = () => {
+      source.disconnect();
+      gain.disconnect();
+    };
+    source.start(t);
   }
   tone(frequency: number, duration = 0.12, gain = 0.08, type: OscillatorType = 'sine', delay = 0) {
     if (!this.ctx || !this.master) return;

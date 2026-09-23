@@ -1,0 +1,17 @@
+Water drip foley
+
+Source: "water dripping in bathroom tub 1" by FOSSarts (June 9, 2024)
+https://freesound.org/people/FOSSarts/sounds/740288/
+
+License: CC0 1.0 Universal / Public Domain Dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+The creator describes a raw recording made with a Zoom H1 Essential.
+
+Source download (public HQ MP3 preview):
+https://cdn.freesound.org/previews/740/740288_14631530-hq.mp3
+
+Game derivatives: drip-a.wav, drip-b.wav, drip-c.wav
+Mono 44.1 kHz / 16-bit PCM; high-pass at 180 Hz, low-pass at 3600 Hz,
+light noise reduction, isolated impacts, DC removal, short fades, and
+matched quiet levels. Crops: 0.000–0.215 s, 2.635–2.835 s, 4.480–4.638 s.
+No external audio requests are made during gameplay.

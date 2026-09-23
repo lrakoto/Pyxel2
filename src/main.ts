@@ -202,7 +202,7 @@ class Game {
     // decides what it sounds like.
     this.renderer.cue = (kind, strength) => {
       if (kind === 'traffic') this.audio.traffic(strength);
-      else if (kind === 'drip') this.audio.drip();
+      else if (kind === 'drip') this.audio.drip(strength);
       else if (kind === 'step') this.audio.step(strength);
       else this.audio.train();
     };
