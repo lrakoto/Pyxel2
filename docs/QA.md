@@ -341,4 +341,6 @@ Reviewed the intro-cinematic branch after the title/font/footstep changes. Fixed
 
 Validation: 60 tests pass, TypeScript/Vite build and formatting pass. On an isolated browser origin, verified fresh intro start, skip → reload → Continue without replay, new-case replay, and restart during intro → reload retaining the fresh checkpoint. The isolated origin avoids changing existing player saves.
 
-Pages now follows `feat/intro-cinematic`; the previous deployment branch did not include the other agent's new work.
+The Pages environment only permits `feat/case-board`. Keep that release filter and advance the approved release branch from validated development commits; the intro branch itself was rejected by the environment protection rule. The previous release did not include the other agent’s new work.
+
+Also verified uninterrupted intro completion and the return to gameplay with a saved checkpoint.

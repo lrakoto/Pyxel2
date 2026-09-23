@@ -117,7 +117,7 @@ Rain thins beneath awnings and collects at gutter edges; the studio doorway catc
 
 Play at **https://lrakoto.github.io/Pyxel2/**.
 
-The `Publish playable preview` workflow deploys pushes to `feat/intro-cinematic`, the current development branch. It installs locked dependencies, checks formatting, runs tests, builds, and publishes `dist` through GitHub Pages. Repository Settings → Pages must use **GitHub Actions** as its source. To move releases to another branch later, update the workflow's push filter.
+The `Publish playable preview` workflow deploys pushes to `feat/case-board`, the approved Pages release branch. It installs locked dependencies, checks formatting, runs tests, builds, and publishes `dist` through GitHub Pages. Repository Settings → Pages must use **GitHub Actions** as its source. To move releases to another branch later, update the workflow's push filter.
 
 The workflow sets `GITHUB_PAGES=true` to build with `/Pyxel2/` as the base path. Ordinary local builds keep `/`, so a future host can use the same project without the Pages setting. Saves remain local to each browser and origin; localhost progress does not transfer to the online preview.
 
@@ -130,6 +130,6 @@ The interface now follows Cole's field notebook: cloth cover, paper case tabs, p
 
 ## September 22 integration checkpoint
 
-The active branch is `feat/intro-cinematic`. GRAVITY is the game title; Everybody / Nobody remains Marlon’s painting. The opening is a skippable 35.5-second scripted scene. Completing or skipping it is saved, and existing investigation saves continue without replaying it. Starting a new investigation resets the opening along with case progress.
+The active development branch is `feat/intro-cinematic`. Publish by advancing `feat/case-board` after validation; GitHub Pages environment protection allows that release branch. GRAVITY is the game title; Everybody / Nobody remains Marlon’s painting. The opening is a skippable 35.5-second scripted scene. Completing or skipping it is saved, and existing investigation saves continue without replaying it. Starting a new investigation resets the opening along with case progress.
 
 Gravity and Lyra use the downloaded Ansimuz character assets; compare them in `character-lab.html` and `lyra-lab.html`. Lyra’s asset has idle and run cycles, but no dedicated speaking poses. Interface text uses bundled DejaVu Sans Mono. Exploration footsteps follow Gravity’s animation footfalls.
