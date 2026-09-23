@@ -410,3 +410,7 @@ Preserved the approved humanoid model and its animation geometry. Replaced the p
 The lab compares the same humanoid model's previous pale treatment against the cyber version. Both use the same six walking frames and one idle pose, and share the new palette, emitter and scan functions with the game.
 
 Validation: **112 tests pass**, including both palette variants' original alpha and foot baseline, preserved walking silhouettes, sparse accent coverage and visor alignment across the authored poses. Formatting, diff checks and the Pages production build pass. Browser inspection covered the actual renderer at Den and street scales, reduced motion, and the lab's idle/walk and mirrored facing. No captured browser warnings/errors. The temporary renderer preview was removed and did not access player saves.
+
+## September 22 — a little glow restored
+
+Raised the shared emitter's cyan aura and added a soft middle gradient stop, keeping the same radius and opaque cyber sprite. Inspected the lab comparison in the browser; the game uses the same emitter. Formatting, TypeScript/Pages build and diff checks pass. No animation, lighting-system or save changes.

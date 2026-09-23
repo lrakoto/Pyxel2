@@ -11,7 +11,8 @@ export function drawLyraEmitter(
   c.translate(Math.round(x), Math.round(floor) + unit);
   c.globalCompositeOperation = 'screen';
   const glow = c.createRadialGradient(0, -height * 0.42, 0, 0, -height * 0.42, height * 0.56);
-  glow.addColorStop(0, '#38c8df0a');
+  glow.addColorStop(0, '#54dbe824');
+  glow.addColorStop(0.4, '#43d3e610');
   glow.addColorStop(1, '#38c8df00');
   c.fillStyle = glow;
   c.fillRect(-height * 0.56, -height, height * 1.12, height * 1.12);
