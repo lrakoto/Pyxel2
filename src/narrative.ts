@@ -246,7 +246,13 @@ export function boardHint(model: CaseModel, second: boolean): string {
   if (!open.length)
     return second
       ? 'The records agree. Return to Lyra in the Den to decide how to keep the archive safe.'
-      : 'The central questions are answered. The street camera and studio lock can still tell you more about the arrival.';
+      : model.save.deductions.includes('entry')
+        ? `All four connections are recorded. ${model.objective}`
+        : !model.save.clues.includes('camera')
+          ? 'The central questions are answered. For the optional arrival question, return to Sector 07 and examine the street camera to the left of the studio entrance. Compare that record with the studio lock. This does not block the next lead.'
+          : !model.save.clues.includes('lock')
+            ? 'The central questions are answered. For the optional arrival question, examine the door lock just inside Graves’ studio. Compare that record with the street camera. This does not block the next lead.'
+            : 'The central questions are answered. The optional arrival question is still open: you already hold the street camera and studio lock records. Select them and connect the evidence. This does not block the next lead.';
   const ready = open.find((d) => d.pair.every((id) => model.save.clues.includes(id)));
   if (ready)
     return `You already hold two records relevant to this question: ${ready.question} ${ready.hint}`;

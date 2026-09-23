@@ -15,6 +15,7 @@ import { storyFrameIndex } from './character-motion.ts';
 import {
   loadCandidate,
   candidateIndex,
+  candidateFloorOffset,
   CANDIDATE_CROP,
   scarfSocket,
   type CandidateFrames,
@@ -37,6 +38,10 @@ export class Sprites {
   private lyraCandidate: LyraCandidate | null = null;
   get candidateActive() {
     return this.candidate !== null;
+  }
+  /** The imported character's presentation pivot includes padding below her boots. */
+  floorOffset(height: number) {
+    return this.candidate ? candidateFloorOffset(height) : 0;
   }
   private atlas: HTMLImageElement | null = null;
   private manifest: SpriteManifest | null = null;
@@ -213,6 +218,7 @@ export class Sprites {
     lightDirection: number,
     lift: number,
     wall = false,
+    floorOffset = 0,
   ) {
     const frame = this.resolve('cole', tag, time);
     let silhouette = this.shadows.get(frame.key);
@@ -239,7 +245,13 @@ export class Sprites {
       wall ? -4 : 0,
     );
     ctx.globalAlpha = wall ? 0.16 : Math.max(0.06, 0.24 - lift * 0.002);
-    ctx.drawImage(silhouette, -frame.pivotX * scale, -height, frame.sw * scale, frame.sh * scale);
+    ctx.drawImage(
+      silhouette,
+      -frame.pivotX * scale,
+      -height + floorOffset,
+      frame.sw * scale,
+      frame.sh * scale,
+    );
     ctx.restore();
   }
   draw(

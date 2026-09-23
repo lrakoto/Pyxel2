@@ -43,7 +43,7 @@ export class CharacterMotion {
     }
     const moving = tag === 'stride' || tag === 'sprint';
     if (!reduced || moving)
-      this.clock += Math.max(0, dt) * (moving ? Math.min(2, Math.abs(speed) / 145) : 1);
+      this.clock += Math.max(0, dt) * (moving ? Math.min(2.4, Math.abs(speed) / 145) : 1);
     this.turn = Math.max(0, this.turn - Math.max(0, dt));
     return { lean, tag, time: reduced && !moving ? 0 : this.clock };
   }

@@ -2732,6 +2732,12 @@ button {
   white-space: nowrap;
   border: 0;
 }
+.dialogue .sr-only {
+  top: 0;
+  left: 0;
+  min-height: 0;
+  margin: -1px;
+}
 summary:focus-visible {
   outline: 2px solid #b8d7b6;
   outline-offset: 3px;

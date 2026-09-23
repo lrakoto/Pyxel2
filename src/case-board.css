@@ -1,0 +1,51 @@
+/* Established links remain legible, with a stamp and the actual paired record. */
+#panel[data-mode='board'] .evidence-card.matched {
+  cursor: default;
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px #81937466;
+}
+#panel[data-mode='board'] .matched-entry .evidence-art {
+  filter: saturate(0.6);
+}
+.evidence-art > .matched-stamp {
+  position: absolute;
+  z-index: 2;
+  right: 8px;
+  bottom: 14px;
+  padding: 6px 8px 4px;
+  transform: rotate(-7deg);
+  border: 2px solid #a8b38d;
+  color: #dbe0b9;
+  background: #23382dec;
+  box-shadow: 0 1px 5px #0a130d99;
+  font: 700 16px var(--mono);
+  letter-spacing: 1px;
+}
+.evidence-card .card-match {
+  display: grid;
+  gap: 5px;
+  margin: 0 3px 15px;
+  padding: 11px 0 0 10px;
+  border-left: 2px solid #637958;
+  text-align: left;
+}
+.card-match b {
+  color: #355345;
+  font: 9px var(--mono);
+  letter-spacing: 0.6px;
+}
+.card-match > span {
+  color: #233d35;
+  font: 12px/1.5 var(--mono);
+}
+.card-match small {
+  color: #43513e;
+  font: 10px/1.6 var(--mono);
+}
+#panel[data-mode='board'] .evidence-card.matched .card-select {
+  color: #40513b;
+}
+#panel[data-mode='board'] .matched-entry .inspect-record {
+  color: #274237;
+  background: #7a8c5d18;
+}

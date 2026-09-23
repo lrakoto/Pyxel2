@@ -3,6 +3,28 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { applyGravityPalette } from '../src/gravity-palette.ts';
+import { CANDIDATE_CROP, candidateFloorOffset } from '../src/character-candidate.ts';
+
+test('interior art pivot places every planted idle and walk sole on the physical floor', () => {
+  const directory = new URL('../public/character-lab/warped/', import.meta.url);
+  const files = readdirSync(directory).filter((name) => /^(idle|walk)-\d+\.png$/.test(name));
+  assert.equal(files.length, 20);
+  for (const file of files) {
+    const frame = PNG.sync.read(readFileSync(new URL(file, directory)));
+    let sole = 0;
+    for (let y = 0; y < frame.height; y++)
+      for (let x = 0; x < frame.width; x++)
+        if (frame.data[(y * frame.width + x) * 4 + 3]) sole = Math.max(sole, y + 1);
+    for (const figure of [2.8, 2.85]) {
+      const height = 73 * figure;
+      const drawnSole =
+        -height +
+        ((sole - CANDIDATE_CROP.y) * height) / CANDIDATE_CROP.cellHeight +
+        candidateFloorOffset(height);
+      assert.ok(Math.abs(drawnSole) < 0.000001, `${file}: sole meets floor at scale ${figure}`);
+    }
+  }
+});
 
 test('Gravity palette preserves alpha, skin and geometry in every authored frame', () => {
   const directory = new URL('../public/character-lab/warped/', import.meta.url);

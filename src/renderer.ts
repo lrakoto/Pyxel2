@@ -167,6 +167,11 @@ export class Renderer {
       cam = Math.round(v.camera),
       figure = world.figureScale,
       t = v.reducedMotion ? 0 : v.time;
+    // Interior close-ups expose the imported sprite's three-pixel pivot padding.
+    // Player.y remains the physical sole/floor position; only the art's anchor
+    // changes, shared by the figure, scarf, light sampling, and cast shadows.
+    const floorOffset = area !== 'street' && !v.combat ? this.sprites.floorOffset(73 * figure) : 0;
+    const actorY = v.player.y + floorOffset;
     const ambientWind = area === 'street' ? streetWind(t, v.reducedMotion) : 0;
     if (area === 'street' && !v.reducedMotion)
       for (const strength of this.traffic.step(v.dt, W)) this.cue?.('traffic', strength);
@@ -188,7 +193,7 @@ export class Renderer {
         ? [...sceneLights, ...movingLights, { x: 1008, y: 386, color: '#ecc18a', intensity: 0.75 }]
         : sceneLights;
     // The neon falling on Cole drives his wet rim and the scarf's edge glow.
-    const rim = rimAt(actorLights, v.player.x, v.player.y - 40 * figure, v.player.facing, t);
+    const rim = rimAt(actorLights, v.player.x, actorY - 40 * figure, v.player.facing, t);
     if (this.lastArea !== area) {
       this.lastArea = area;
       this.scarf.reset();
@@ -312,6 +317,7 @@ export class Renderer {
         cam,
         t,
         figure,
+        438,
         world.lights,
         v.speaker === 'LYRA',
         v.player.x < 1280 ? -1 : 1,
@@ -323,6 +329,7 @@ export class Renderer {
         cam,
         t,
         figure,
+        world.ground,
         world.lights,
         v.speaker === 'LYRA',
         v.player.x < 1150 ? -1 : 1,
@@ -361,6 +368,7 @@ export class Renderer {
           (rim?.dirX ?? 0.3) * p.facing,
           0,
           true,
+          floorOffset,
         );
       this.sprites.drawGroundShadow(
         c,
@@ -372,16 +380,36 @@ export class Renderer {
         73 * figure,
         (rim?.dirX ?? 0.3) * p.facing,
         Math.abs(p.y - world.ground),
+        false,
+        floorOffset,
       );
       c.save();
       c.globalAlpha = Math.max(0.08, 0.45 - Math.abs(p.y - world.ground) * 0.004);
+      const contactWidth = area === 'street' ? 40 : 24;
       c.drawImage(
         this.contactShadow,
-        p.x - cam - 20 * figure,
-        world.ground - 3 * figure,
-        40 * figure,
-        8 * figure,
+        p.x - cam - (contactWidth / 2) * figure,
+        world.ground - (area === 'street' ? 3 : 2) * figure,
+        contactWidth * figure,
+        (area === 'street' ? 8 : 5) * figure,
       );
+      if (area !== 'street' && p.grounded) {
+        // A small, dense contact core keeps the soles attached to the slab;
+        // the larger projected silhouette still supplies the direction of light.
+        c.globalAlpha = 0.34;
+        c.fillStyle = '#020708';
+        c.beginPath();
+        c.ellipse(
+          p.x - cam,
+          world.ground + 0.6 * figure,
+          8 * figure,
+          1.1 * figure,
+          0,
+          0,
+          Math.PI * 2,
+        );
+        c.fill();
+      }
       c.restore();
     } else {
       c.globalAlpha = v.combat ? 0.4 : Math.max(0.12, 0.48 - Math.abs(p.y - world.ground) * 0.004);
@@ -399,7 +427,7 @@ export class Renderer {
     this.scarf.step(
       v.reducedMotion ? 0 : v.dt,
       p.x + neck.x * p.facing + (!v.combat ? neck.y * motion.lean : 0),
-      p.y + neck.y,
+      actorY + neck.y,
       p.vx,
       73 * figure,
       ambientWind * (area === 'street' && underShelter(p.x, p.y - 25) ? 0.22 : 1),
@@ -408,9 +436,9 @@ export class Renderer {
       if (this.sprites.candidateActive) this.scarf.draw(c, cam, rim);
       c.save();
       if (!v.combat && motion.lean) {
-        c.translate(p.x - cam, p.y);
+        c.translate(p.x - cam, actorY);
         c.transform(1, 0, motion.lean, 1, 0, 0);
-        c.translate(-(p.x - cam), -p.y);
+        c.translate(-(p.x - cam), -actorY);
       }
       // The coat's original pixel silhouette and red scarf remain recognizable.
       this.sprites.draw(
@@ -419,7 +447,7 @@ export class Renderer {
         v.combat ? tag : motion.tag,
         v.combat ? t : motion.time,
         p.x - cam,
-        p.y,
+        actorY,
         p.facing,
         73 * figure,
         rim,
@@ -966,12 +994,13 @@ export class Renderer {
     cam: number,
     t: number,
     figure: number,
+    ground: number,
     lights: SignLight[],
     speaking = false,
     facing = 1,
   ) {
     const x = worldX - cam,
-      y = 438;
+      y = ground;
     // Halo and sprite stay within this bound; skip off-camera projection work.
     if (x < -80 * figure || x > c.canvas.width + 80 * figure) return;
     c.save();

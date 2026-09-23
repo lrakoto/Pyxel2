@@ -72,3 +72,8 @@ export function candidateIndex(time: number, count: number, duration: number) {
 }
 // Every frame shares its original canvas. A fixed crop/pivot prevents foot jitter.
 export const CANDIDATE_CROP = { x: 0, y: 12, width: 71, height: 55, cellHeight: 58, pivotX: 38 };
+
+/** Convert the presentation pivot to the authored soles without resizing the art. */
+export function candidateFloorOffset(height: number) {
+  return ((CANDIDATE_CROP.cellHeight - CANDIDATE_CROP.height) * height) / CANDIDATE_CROP.cellHeight;
+}

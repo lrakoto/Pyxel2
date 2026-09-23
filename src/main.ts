@@ -6,12 +6,15 @@ import './patina.css';
 import './field-feedback.css';
 import './cinematic.css';
 import './archive.css';
+import './case-board.css';
+import './examination-crt.css';
 import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint } from './checkpoint.ts';
 import { SaveArchive, ACTIVE_SLOT_KEY, slotKey, slotBackupKey } from './save-archive.ts';
 import { renderArchive, renderResume, renderRecovery } from './archive-ui.ts';
 import { evidenceArt } from './evidence-art.ts';
+import { evidenceBoardState, renderEvidenceCard } from './case-board.ts';
 import {
   AREAS,
   CLUES,
@@ -678,7 +681,7 @@ class Game {
     $('dialogue').hidden = true;
     $('evidence-closeup').hidden = true;
     $('dialogue-announcement').textContent = '';
-    $('stage').classList.remove('in-dialogue', 'scanning');
+    $('stage').classList.remove('in-dialogue', 'scanning', 'examining-clue');
     $('hotspots').classList.remove('inactive');
     $('focus-btn').setAttribute('aria-pressed', 'false');
     $('focus-status').hidden = true;
@@ -979,6 +982,7 @@ class Game {
         insight ? 'RE-EXAMINATION · ' + insight.title.toUpperCase() : clue.category,
       );
       this.examining = true;
+      $('stage').classList.add('examining-clue');
       this.discovery = { id: h.clue, x: h.x, y: h.y };
       const art = evidenceArt(h.clue);
       $('evidence-closeup').innerHTML = art
@@ -1026,6 +1030,7 @@ class Game {
     this.examining = false;
     this.discovery = null;
     $('evidence-closeup').hidden = true;
+    $('stage').classList.remove('examining-clue');
     this.lines = lines;
     this.lineIndex = 0;
     this.reveal = 0;
@@ -1074,7 +1079,7 @@ class Game {
     $('evidence-closeup').hidden = true;
     this.dialogueDone = null;
     $('dialogue').hidden = true;
-    $('stage').classList.remove('in-dialogue');
+    $('stage').classList.remove('in-dialogue', 'examining-clue');
     $('dialogue-announcement').textContent = '';
     $('hotspots').classList.remove('inactive');
     this.clearInput();
@@ -1190,21 +1195,19 @@ class Game {
   renderBoard(message = 'Select two pieces of evidence. Find what connects them.') {
     const focusedClue = (document.activeElement as HTMLElement | null)?.dataset.clue;
     const scrollTop = $('panel').scrollTop;
+    this.selected = this.selected.filter(
+      (id) => evidenceBoardState(this.model.save, id).selectable,
+    );
     const second = this.boardFile === 'first-one';
     const clues = this.model.save.clues.filter((id) =>
       second ? id === 'fragment' || FOLLOWUP_CLUES.includes(id) : !FOLLOWUP_CLUES.includes(id),
     );
     const theories = DEDUCTIONS.filter((d) => second === FOLLOWUP_DEDUCTIONS.includes(d.id));
     const cards = clues
-      .map((id) => {
-        const c = CLUES[id],
-          selected = this.selected.includes(id),
-          linked = DEDUCTIONS.some(
-            (d) => this.model.save.deductions.includes(d.id) && d.pair.includes(id),
-          );
-        return `<article class="evidence-entry" data-material="${RECORD_MOUNTS[id].material}"><button class="evidence-card ${selected ? 'selected' : ''} ${linked ? 'linked' : ''}" data-clue="${id}" aria-pressed="${selected}"><div class="evidence-art evidence-${id}">${evidenceArt(id) || `<span>${c.glyph}</span>`}<small>${String(Object.keys(CLUES).indexOf(id) + 1).padStart(2, '0')}</small></div><span class="card-category">${c.category}${linked ? ' · LINKED' : ''}</span><h3>${c.title}</h3><p>${c.body}</p><span class="hand-note">${RECORD_MOUNTS[id].note}</span><span class="card-select">${selected ? 'SELECTED −' : linked ? 'READ / CONNECT +' : 'SELECT EVIDENCE +'}</span></button><button class="inspect-record" data-inspect="${id}" aria-label="Inspect ${c.title}">View record <span aria-hidden="true">↗</span></button></article>`;
-      })
+      .map((id) => renderEvidenceCard(this.model.save, id, this.selected.includes(id)))
       .join('');
+    const required = theories.filter((d) => d.id !== 'entry');
+    const progress = `${required.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${required.length} CORE CONNECTIONS${second ? '' : ` · OPTIONAL ENTRY ${this.model.save.deductions.includes('entry') ? '✓' : 'OPEN'}`}`;
     const deductions = theories
       .map((d, i) => {
         const solved = this.model.save.deductions.includes(d.id);
@@ -1219,7 +1222,7 @@ class Game {
     this.panel(
       second ? 'The first one' : 'The Graves case',
       second ? 'CASE FILE 07–032 · ARCHIVE 001' : 'CASE FILE 07–031 · MARLON GRAVES',
-      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${theories.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${theories.length} CONNECTIONS</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>Gravity / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
+      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${progress}</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>Gravity / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
       'board',
     );
     const notes = INSIGHTS.filter(
@@ -1238,7 +1241,11 @@ class Game {
     }
     if (focusedClue) {
       document
-        .querySelector<HTMLElement>(`[data-clue="${focusedClue}"]`)
+        .querySelector<HTMLElement>(
+          evidenceBoardState(this.model.save, focusedClue as ClueId).selectable
+            ? `[data-clue="${focusedClue}"]`
+            : `[data-inspect="${focusedClue}"]`,
+        )
         ?.focus({ preventScroll: true });
       $('panel').scrollTop = scrollTop;
     }
@@ -1472,6 +1479,7 @@ class Game {
     }
     if (el.dataset.clue) {
       const id = el.dataset.clue as ClueId;
+      if (!evidenceBoardState(this.model.save, id).selectable) return;
       if (this.selected.includes(id)) this.selected = this.selected.filter((c) => c !== id);
       else {
         if (this.selected.length === 2) this.selected.shift();
@@ -1564,7 +1572,8 @@ class Game {
             this.toast('THE RECORDS AGREE', 'Return to Lyra in the Den.');
         } else {
           const miss = this.model.explain(a, b);
-          this.audio.tone(miss.reason === 'warm' ? 196 : 147, 0.18, 0.05, 'sine');
+          if (miss.reason !== 'matched')
+            this.audio.tone(miss.reason === 'warm' ? 196 : 147, 0.18, 0.05, 'sine');
           this.renderBoard(miss.text);
         }
         break;
@@ -1749,6 +1758,8 @@ class Game {
           this.keys.has('ShiftRight') ||
           (!this.combat && this.keys.has('touch-sprint')),
         this.currentArea.ground,
+        // Exploration gets a modest boost; combat keeps its existing tuning.
+        this.combat ? 290 : 330,
       );
     // Exploration footsteps come from the renderer, on the animation's footfalls.
     if (this.combat && Math.abs(this.player.vx) > 20 && this.player.grounded) {

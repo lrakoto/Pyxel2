@@ -208,8 +208,11 @@ export class CaseModel {
     if (a === b || !this.save.clues.includes(a) || !this.save.clues.includes(b)) return null;
     const match = DEDUCTIONS.find((d) => d.pair.includes(a) && d.pair.includes(b));
     if (match && FOLLOWUP_DEDUCTIONS.includes(match.id) && !this.save.followup) return null;
-    if (match && !this.save.deductions.includes(match.id)) this.save.deductions.push(match.id);
-    return match ?? null;
+    // A successful return means a newly established connection. Replaying an
+    // old pair must not replay the discovery sound, save, or story reactions.
+    if (!match || this.save.deductions.includes(match.id)) return null;
+    this.save.deductions.push(match.id);
+    return match;
   }
 
   /**
@@ -228,7 +231,22 @@ export class CaseModel {
    *    bridge two different sorts of evidence;
    *  - `cold` — neither leads anywhere.
    */
-  explain(a: ClueId, b: ClueId): { reason: 'spent' | 'warm' | 'kind' | 'cold'; text: string } {
+  explain(
+    a: ClueId,
+    b: ClueId,
+  ): {
+    reason: 'matched' | 'spent' | 'warm' | 'kind' | 'cold';
+    text: string;
+  } {
+    const recorded = DEDUCTIONS.find(
+      (d) =>
+        a !== b && d.pair.includes(a) && d.pair.includes(b) && this.save.deductions.includes(d.id),
+    );
+    if (recorded)
+      return {
+        reason: 'matched',
+        text: `Already recorded: ${recorded.title}. You can read this connection in the margin notes.`,
+      };
     const open = DEDUCTIONS.filter(
       (d) =>
         !this.save.deductions.includes(d.id) &&
@@ -283,8 +301,9 @@ export function stepBody(
   width: number,
   dash = false,
   ground = 438,
+  sprintSpeed = 330,
 ) {
-  const speed = dash ? 290 : 145;
+  const speed = dash ? sprintSpeed : 145;
   p.vx += (axis * speed - p.vx) * Math.min(1, dt * (axis ? 18 : 24));
   if (axis) p.facing = Math.sign(axis);
   if (jump && p.grounded) {
