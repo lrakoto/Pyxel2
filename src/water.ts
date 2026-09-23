@@ -1,5 +1,6 @@
 import type { SignLight } from './content.ts';
 import { flickerOf } from './lighting.ts';
+import { leakPhase } from './water-events.ts';
 
 /** Deterministic per-index noise, so nothing has to carry state. */
 function hash(i: number, salt: number): number {
@@ -152,28 +153,17 @@ export function drawPanes(c: CanvasRenderingContext2D, cam: number, t: number, p
 }
 
 /**
- * A ceiling leak. Returns the leaks that landed this frame so the caller can
- * sound them; the fall itself is a pure function of time.
+ * A ceiling leak. Audio is scheduled separately so culling or reduced motion
+ * cannot silence the room. Both share the same deterministic fall phase.
  */
-export function drawLeaks(
-  c: CanvasRenderingContext2D,
-  cam: number,
-  t: number,
-  dt: number,
-  leaks: Leak[],
-): number {
-  let landed = 0;
+export function drawLeaks(c: CanvasRenderingContext2D, cam: number, t: number, leaks: Leak[]) {
   for (const leak of leaks) {
     const x = leak.x - cam;
     if (x < -20 || x > c.canvas.width + 20) continue;
     // Water falls fast. A drop crossing a room-height gap over two and a half
     // seconds averages well under walking pace, which is what reads as floaty
     // however hard the easing works.
-    const period = 1.05 + (leak.x % 13) * 0.055;
-    const offset = leak.x * 0.017;
-    const now = (t + offset) / period;
-    if (Math.floor(now) !== Math.floor((t - dt + offset) / period)) landed++;
-    const progress = now - Math.floor(now);
+    const { progress } = leakPhase(t, leak.x);
     const drop = leak.from + (leak.to - leak.from) * progress * progress;
 
     c.save();
@@ -198,7 +188,6 @@ export function drawLeaks(
     }
     c.restore();
   }
-  return landed;
 }
 
 /**

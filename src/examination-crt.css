@@ -1,5 +1,5 @@
-/* The field scanner is separate from the paper notebook and spoken dialogue. */
-#stage.examining-clue #dialogue,
+/* All spoken lines use the same CRT channel; case files remain paper. */
+#stage #dialogue,
 #stage.examining-clue #evidence-closeup {
   --crt-ink: #c4ddc5;
   --crt-muted: #8ba890;
@@ -26,7 +26,7 @@
 }
 
 /* Replace the taped-paper pseudo-element with a quiet, stationary raster. */
-#stage.examining-clue #dialogue::before,
+#stage #dialogue::before,
 #stage.examining-clue #evidence-closeup::before {
   content: '';
   position: absolute;
@@ -41,7 +41,7 @@
   pointer-events: none;
 }
 
-#stage.examining-clue #dialogue::after,
+#stage #dialogue::after,
 #stage.examining-clue #evidence-closeup::after {
   content: '';
   position: absolute;
@@ -56,18 +56,18 @@
   pointer-events: none;
 }
 
-#stage.examining-clue #dialogue {
+#stage #dialogue {
   gap: 19px;
   padding: 18px 22px 14px;
 }
 
-#stage.examining-clue #dialogue .dialogue-copy,
-#stage.examining-clue #dialogue .portrait-mark {
+#stage #dialogue .dialogue-copy,
+#stage #dialogue .portrait-mark {
   position: relative;
   z-index: 1;
 }
 
-#stage.examining-clue #dialogue .portrait-mark {
+#stage #dialogue .portrait-mark {
   width: 49px;
   height: 64px;
   margin-top: 2px;
@@ -83,33 +83,33 @@
   text-shadow: 0 0 8px #7bb67f33;
 }
 
-#stage.examining-clue #dialogue .portrait-mark span {
+#stage #dialogue .portrait-mark span {
   right: 3px;
   bottom: -4px;
   color: #65896d;
   font-size: 27px;
 }
 
-#stage.examining-clue #dialogue .dialogue-top {
+#stage #dialogue .dialogue-top {
   padding-bottom: 9px;
   border-bottom: 1px solid var(--crt-line);
 }
 
-#stage.examining-clue #dialogue .dialogue-top .eyebrow {
+#stage #dialogue .dialogue-top .eyebrow {
   color: #b6cba2;
   font: 500 10px/1.4 var(--mono);
   letter-spacing: 1.8px;
   text-shadow: 0 0 6px #8daf6a26;
 }
 
-#stage.examining-clue #dialogue .dialogue-top .eyebrow:last-child {
+#stage #dialogue .dialogue-top .eyebrow:last-child {
   color: var(--crt-muted);
   font-size: 9px;
   letter-spacing: 1px;
   font-variant-numeric: tabular-nums;
 }
 
-#stage.examining-clue #dialogue #dialogue-text {
+#stage #dialogue #dialogue-text {
   margin: 12px 0 15px;
   color: var(--crt-ink);
   font: 400 clamp(13px, 1.25cqw, 18px) / 1.65 var(--mono);
@@ -117,17 +117,17 @@
   overflow-wrap: anywhere;
 }
 
-#stage.examining-clue #dialogue .dialogue-bottom {
+#stage #dialogue .dialogue-bottom {
   gap: 12px;
 }
 
-#stage.examining-clue #dialogue .dialogue-bottom > span {
+#stage #dialogue .dialogue-bottom > span {
   color: var(--crt-muted);
   font: 400 8px/1.5 var(--mono);
   letter-spacing: 1px;
 }
 
-#stage.examining-clue #dialogue .dialogue-bottom button {
+#stage #dialogue .dialogue-bottom button {
   flex-shrink: 0;
   min-height: 36px;
   padding: 5px 10px;
@@ -145,18 +145,18 @@
     background-color 120ms ease;
 }
 
-#stage.examining-clue #dialogue .dialogue-bottom button:hover {
+#stage #dialogue .dialogue-bottom button:hover {
   color: #e2edce;
   border-color: #adbf91;
   background-color: #38543c;
 }
 
-#stage.examining-clue #dialogue .dialogue-bottom button:focus-visible {
+#stage #dialogue .dialogue-bottom button:focus-visible {
   outline: 2px solid #c6d8a5;
   outline-offset: 3px;
 }
 
-#stage.examining-clue #dialogue kbd {
+#stage #dialogue kbd {
   border-color: #76916d66;
   background: #0a1912;
   color: #b6ccac;
@@ -205,17 +205,23 @@
   }
 }
 
-/* Reserve separate columns at every desktop/tablet height, including windowed play. */
+/* A single conversation screen is centered; an illustrated examination adds a second screen. */
 @media (min-width: 651px) {
-  #stage.examining-clue #dialogue {
-    left: 3%;
-    right: auto;
+  #stage #dialogue {
+    left: 9%;
+    right: 9%;
     bottom: 5%;
-    width: 65%;
+    width: auto;
     max-height: 90%;
     overflow-y: auto;
     scrollbar-color: #617962 #15251c;
     scrollbar-width: thin;
+  }
+
+  #stage.examining-clue:has(#evidence-closeup:not([hidden])) #dialogue {
+    left: 3%;
+    right: auto;
+    width: 65%;
   }
 
   #stage.examining-clue #evidence-closeup {
@@ -225,16 +231,18 @@
 }
 
 @media (max-width: 650px) {
-  #stage.examining-clue #dialogue,
+  #stage #dialogue,
   #stage.examining-clue #evidence-closeup {
     border-width: 5px;
     border-bottom-width: 7px;
     border-radius: 9px;
   }
 
-  #stage.examining-clue #dialogue {
+  #stage #dialogue {
+    left: 12px;
+    right: 12px;
     bottom: 14px;
-    max-height: calc(50% - 20px);
+    max-height: calc(84% - 28px);
     overflow-y: auto;
     padding: 12px 12px 10px;
     gap: 12px;
@@ -243,21 +251,25 @@
     overscroll-behavior: contain;
   }
 
-  #stage.examining-clue #dialogue .portrait-mark {
+  #stage.examining-clue:has(#evidence-closeup:not([hidden])) #dialogue {
+    max-height: calc(50% - 20px);
+  }
+
+  #stage #dialogue .portrait-mark {
     display: none;
   }
 
-  #stage.examining-clue #dialogue .dialogue-top {
+  #stage #dialogue .dialogue-top {
     padding-bottom: 7px;
   }
 
-  #stage.examining-clue #dialogue #dialogue-text {
+  #stage #dialogue #dialogue-text {
     margin: 10px 0;
     font-size: 12px;
     line-height: 1.6;
   }
 
-  #stage.examining-clue #dialogue .dialogue-bottom > span {
+  #stage #dialogue .dialogue-bottom > span {
     font-size: 7px;
     letter-spacing: 0.6px;
   }
@@ -293,15 +305,15 @@
 }
 
 @media (orientation: landscape) and (max-height: 600px) and (min-width: 651px) {
-  #stage.examining-clue #dialogue {
+  #stage #dialogue {
     padding: 10px 13px;
   }
 
-  #stage.examining-clue #dialogue .portrait-mark {
+  #stage #dialogue .portrait-mark {
     display: none;
   }
 
-  #stage.examining-clue #dialogue #dialogue-text {
+  #stage #dialogue #dialogue-text {
     min-height: 3.3em;
     margin-block: 8px;
     font-size: 12px;
@@ -324,27 +336,27 @@
 }
 
 @media (pointer: coarse) {
-  #stage.examining-clue #dialogue .dialogue-bottom button {
+  #stage #dialogue .dialogue-bottom button {
     min-height: 44px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #stage.examining-clue #dialogue,
+  #stage #dialogue,
   #stage.examining-clue #evidence-closeup {
     animation: none;
   }
 
-  #stage.examining-clue #dialogue .dialogue-bottom button {
+  #stage #dialogue .dialogue-bottom button {
     transition: none;
   }
 }
 
-.reduced-motion #stage.examining-clue #dialogue,
+.reduced-motion #stage #dialogue,
 .reduced-motion #stage.examining-clue #evidence-closeup {
   animation: none;
 }
 
-.reduced-motion #stage.examining-clue #dialogue .dialogue-bottom button {
+.reduced-motion #stage #dialogue .dialogue-bottom button {
   transition: none;
 }

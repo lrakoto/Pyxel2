@@ -390,3 +390,15 @@ Validation: **107 tests pass**, including WAV format, duration, headroom, fade e
 ## September 22 — interior-only sprint correction
 
 Following the user's clarification, restored street sprint to its original 290 px/s. The 330 px/s boost applies only to studio and Den exploration. Combat remains at 290 px/s. Updated the existing sprint checks to distinguish the restored default from the explicit interior boost; animation continues to follow actual movement speed. All 107 tests, formatting and the Pages build pass. No new browser playthrough was needed for this movement-parameter correction.
+
+## September 22 — clear water impacts, global dialogue CRT and new Lyra
+
+Two previous water crops contained the low room/tub rumble between real drops, amplified during level matching. Recut three actual splash onsets, removed bass rumble, preserved transient headroom and raised their mix level. Versioned asset requests replace cached clips. Water audio now uses the shared landing phase independently of visual culling and reduced motion, attenuates continuously with player distance, and remains suppressed during paused redraws and the title sequence.
+
+The CRT glass, bezel and phosphor text now apply to every in-world conversation. Illustrated clue examinations retain their separate image screen; the notebook remains paper. Matched evidence uses a red handwritten check with an accessible matched label, while keeping its partner/conclusion and enabled reader. Field notes receive left, right and bottom padding at desktop and phone sizes.
+
+Lyra now uses MoikMellah's CC0 MV Platformer Female base, composited from three original source layers with bob hair, a fitted suit and a cyan palette. Her authored idle pose has restrained breathing around a fixed sole pivot; six authored walk frames are available. Her light, floor projection and reflection remain. The lab compares the previous Warped Caves model with the new game model and labels the source animation accurately.
+
+Validation: **111 tests pass**, including splash onset/bass-energy checks, water landing counts at 30/60/144 fps, pause behavior, continuous distance attenuation, and the new sprite's source alpha/palette and identical sole baseline across all seven poses. Formatting, diff checks and the Pages production build pass.
+
+Browser checks covered ordinary CRT dialogue on desktop and 390×844 portrait, red checks, and field-note margins on both sizes. A temporary non-saving renderer preview verified the new Lyra at Den gameplay scale, floor contact, light and reflection; drip cues continued while reduced motion was enabled. A temporary fixture using the actual AudioEngine at 50% volume decoded and played all three variants, checked source/gain cleanup, mute suppression, suspended-call suppression and clean resume. No captured warnings/errors. Both fixtures were removed. These checks verify playback and signal properties, not a listening assessment on the user's speakers. Live player records were not changed by the checks.

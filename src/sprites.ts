@@ -1,4 +1,4 @@
-import { loadLyraCandidate, LYRA_CROP, type LyraCandidate } from './lyra-candidate.ts';
+import { loadLyraHumanoid, LYRA_HUMAN_CROP } from './lyra-candidate.ts';
 import { LYRA_REFINED_FRAMES, lyraFrameIndex } from './lyra-art.ts';
 import {
   COLE_FRAMES,
@@ -35,7 +35,7 @@ interface Frame {
 
 export class Sprites {
   private candidate: CandidateFrames | null = null;
-  private lyraCandidate: LyraCandidate | null = null;
+  private lyraCandidate: Awaited<ReturnType<typeof loadLyraHumanoid>> | null = null;
   get candidateActive() {
     return this.candidate !== null;
   }
@@ -57,7 +57,7 @@ export class Sprites {
 
   async load() {
     try {
-      this.lyraCandidate = await loadLyraCandidate();
+      this.lyraCandidate = await loadLyraHumanoid();
     } catch {
       console.warn('Lyra asset unavailable; using procedural fallback.');
     }
@@ -124,11 +124,12 @@ export class Sprites {
       };
     }
     if (id === 'lyra' && this.lyraCandidate) {
-      const frames = this.lyraCandidate.idle;
-      const index = candidateIndex(time, frames.length, 1.2);
-      const crop = LYRA_CROP;
+      const clip = tag === 'walk' || tag === 'stride' ? 'walk' : 'idle';
+      const frames = this.lyraCandidate[clip];
+      const index = candidateIndex(time, frames.length, 0.75);
+      const crop = LYRA_HUMAN_CROP;
       return {
-        key: `lyra-warped:${index}`,
+        key: `lyra-human:${clip}:${index}`,
         src: frames[index],
         sx: crop.x,
         sy: crop.y,
@@ -269,6 +270,11 @@ export class Sprites {
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.scale(facing, 1);
+    if (id === 'lyra' && this.lyraCandidate && tag !== 'walk' && tag !== 'stride') {
+      // A quiet breath around the soles, matching the single-pose lab preview.
+      const breath = Math.sin(time * 1.7);
+      ctx.transform(1, 0, breath * 0.002, 1 + breath * 0.004, 0, 0);
+    }
     const frame = this.resolve(id, tag, time);
     const scale = height / frame.cellH;
     const dx = -frame.pivotX * scale;

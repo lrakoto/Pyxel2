@@ -1,0 +1,19 @@
+MV Platformer Female (32x64), by MoikMellah
+Source: https://opengameart.org/content/mv-platformer-female-32x64
+Download: https://opengameart.org/sites/default/files/mvHumanWoman.zip
+License: CC0 1.0 Universal / public domain dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+Retrieved September 22, 2026.
+
+The creator explicitly releases this pack as CC0. Commercial use, modification,
+and redistribution are permitted. Attribution is optional; we credit the creator.
+
+These three original source layers are unchanged copies from mvHumanWoman.zip:
+base.png = base/base_pale.png
+hair.png = hair/hair_bob_black.png
+suit.png = outfits/outfit_ninja_blue.png
+
+The game and Lyra comparison study composite the layers and apply a cyan palette in
+src/lyra-candidate.ts. They use the first authored idle pose and six walking frames.
+Subtle breathing is applied in code around a stationary foot pivot; it is not a
+new hand-authored idle animation.

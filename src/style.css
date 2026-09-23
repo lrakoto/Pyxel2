@@ -2432,7 +2432,7 @@ button {
 .field-notes {
   margin-top: 30px;
   border-top: 1px solid #374c51;
-  padding-top: 22px;
+  padding: 22px 35px 36px 43px;
 }
 .field-notes article {
   padding: 12px 0;
@@ -2464,6 +2464,9 @@ button {
   color: #ffe1a4;
 }
 @media (max-width: 650px) {
+  .field-notes {
+    padding: 20px 22px 28px;
+  }
   .case-tabs {
     gap: 6px;
   }

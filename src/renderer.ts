@@ -27,6 +27,7 @@ import { rimAt, flickerOf } from './lighting.ts';
 import { buildSheen } from './sheen.ts';
 import { drawFlare } from './flare.ts';
 import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
+import { leakImpacts } from './water-events.ts';
 import { FootWater, drawInteriorForeground, drawMei } from './visual-details.ts';
 import { CharacterMotion, footfallBetween } from './character-motion.ts';
 import { streetWind, streetWindDisplacement } from './wind.ts';
@@ -504,8 +505,9 @@ export class Renderer {
       if (water.openings) drawOpenings(c, cam, t, water.openings);
       if (water.panes) drawPanes(c, cam, t, water.panes);
       if (water.leaks) {
-        const landed = drawLeaks(c, cam, t, v.reducedMotion ? 0 : v.dt, water.leaks);
-        for (let i = 0; i < landed; i++) this.cue?.('drip', 1);
+        drawLeaks(c, cam, t, water.leaks);
+        for (const impact of leakImpacts(water.leaks, v.time, v.title ? 0 : v.dt, v.player.x))
+          this.cue?.('drip', impact.strength);
       }
     }
     if (area === 'street') {

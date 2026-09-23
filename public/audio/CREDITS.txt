@@ -11,7 +11,10 @@ Source download (public HQ MP3 preview):
 https://cdn.freesound.org/previews/740/740288_14631530-hq.mp3
 
 Game derivatives: drip-a.wav, drip-b.wav, drip-c.wav
-Mono 44.1 kHz / 16-bit PCM; high-pass at 180 Hz, low-pass at 3600 Hz,
-light noise reduction, isolated impacts, DC removal, short fades, and
-matched quiet levels. Crops: 0.000–0.215 s, 2.635–2.835 s, 4.480–4.638 s.
+Mono 44.1 kHz / 16-bit PCM; high-pass at 500 Hz, low-pass at 6500 Hz,
+isolated faucet impacts, DC removal, 2 ms onset / 35 ms tail fades,
+and peak matching to 0.65 for mixing headroom.
+Crops: 0.714–0.954 s, 1.429–1.669 s, 3.579–3.819 s.
+These capture the actual splash transients rather than the low tub/room
+resonance between drops. No synthesized tones are mixed into the recordings.
 No external audio requests are made during gameplay.

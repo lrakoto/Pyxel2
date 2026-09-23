@@ -10,16 +10,19 @@
 .evidence-art > .matched-stamp {
   position: absolute;
   z-index: 2;
-  right: 8px;
-  bottom: 14px;
-  padding: 6px 8px 4px;
+  top: 8px;
+  right: 10px;
+  bottom: auto;
+  left: auto;
+  padding: 0;
   transform: rotate(-7deg);
-  border: 2px solid #a8b38d;
-  color: #dbe0b9;
-  background: #23382dec;
-  box-shadow: 0 1px 5px #0a130d99;
-  font: 700 16px var(--mono);
-  letter-spacing: 1px;
+  border: 0;
+  color: #b32e25;
+  background: none;
+  box-shadow: none;
+  font: 700 46px/1 var(--hand);
+  letter-spacing: 0;
+  text-shadow: 1px 1px #ead5ac99;
 }
 .evidence-card .card-match {
   display: grid;

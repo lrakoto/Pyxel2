@@ -55,3 +55,18 @@ The original PNGs and creator license are retained in `public/character-lab/warp
 when loading frames; source pixels, alpha and animation geometry are preserved.
 No music from the pack is used. Gravity’s name and narrative direction were
 chosen by the project owner. The former Cole design is a historical prototype.
+
+## Lyra — current humanoid character
+
+Lyra’s game model and the comparison in `lyra-lab.html` use **MV Platformer Female (32x64)** by
+MoikMellah, released under CC0 1.0:
+https://opengameart.org/content/mv-platformer-female-32x64
+
+Three unchanged source layers (pale base, black bob hair, blue ninja outfit)
+are retained in `public/character-lab/lyra-human/` with provenance and license
+notes. `src/lyra-candidate.ts` composites the layers and applies a deterministic
+cyan palette without changing the authored silhouettes. Lyra uses one
+authored idle pose with subtle code-driven breathing around a fixed foot pivot,
+plus six authored walking frames available in the comparison lab. It is a
+different model from Gravity and the previous Warped Caves Lyra, which remains
+in the lab for comparison.

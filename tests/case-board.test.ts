@@ -74,7 +74,8 @@ test('matched cards name their partner and keep a separate enabled record reader
     assert.match(select, /aria-pressed="false"/);
     assert.doesNotMatch(inspect, /\bdisabled\b/);
     assert.ok(html.includes(CLUES[partner].title));
-    assert.match(html, /MATCHED ✓/);
+    assert.match(html, /class="matched-stamp" role="img" aria-label="Matched">✓<\/span>/);
+    assert.doesNotMatch(html, />MATCHED ✓</);
     assert.match(html, /Read matched record/);
   }
 });

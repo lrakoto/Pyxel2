@@ -113,7 +113,7 @@ export class AudioEngine {
     // Bundled CC0 field recordings: no runtime third-party requests.
     await Promise.allSettled(
       ['a', 'b', 'c'].map(async (variant) => {
-        const response = await fetch(`${import.meta.env.BASE_URL}audio/drip-${variant}.wav`);
+        const response = await fetch(`${import.meta.env.BASE_URL}audio/drip-${variant}.wav?v=2`);
         if (!response.ok) throw new Error('Drip sample unavailable');
         const buffer = await context.decodeAudioData(await response.arrayBuffer());
         this.dripBuffers.push(buffer);
@@ -203,28 +203,31 @@ export class AudioEngine {
       this.tone(1850 + i * 420, 0.5, 0.012, 'sine', duration * (0.25 + i * 0.16));
   }
 
-  /** A quiet recorded water impact, with slight variation between landings. */
+  /** Recorded faucet impacts with the tub rumble removed, varied between landings. */
   drip(strength = 1) {
     if (!this.ctx || !this.master || this.muted || this.ctx.state !== 'running') return;
     const c = this.ctx;
     const t = c.currentTime;
+    const level = Math.max(0, Math.min(1, strength)) * (0.8 + Math.random() * 0.2);
+    if (!level) return;
     // Two leaks landing in one frame should not double the foreground volume.
     if (t - this.lastDripAt < 0.075) return;
     this.lastDripAt = t;
-    const level = Math.max(0, Math.min(1, strength)) * (0.8 + Math.random() * 0.2);
     const buffer = this.dripBuffers.length
       ? this.dripBuffers[this.dripIndex++ % this.dripBuffers.length]
       : null;
     if (!buffer) {
       // A failed asset request should leave a soft wet tap, not a UI chime.
-      this.burst(0.045, 0.035 * level, 1600, 0.55);
+      this.burst(0.045, 0.1 * level, 2800, 0.65);
       return;
     }
     const source = c.createBufferSource();
     source.buffer = buffer;
     source.playbackRate.value = 0.96 + Math.random() * 0.08;
     const gain = c.createGain();
-    gain.gain.value = 0.075 * level;
+    // These are short, high-crest-factor transients. Leave their peak intact so
+    // the actual splash is audible above the much longer interior hum/rain bed.
+    gain.gain.value = 0.22 * level;
     source.connect(gain);
     gain.connect(this.master);
     source.onended = () => {

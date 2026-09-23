@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-test('recorded drips are short mono PCM with quiet boundaries and matched levels', () => {
+test('recorded drips contain audible splash attacks rather than amplified room rumble', () => {
   const recordings: Buffer[] = [];
   for (const variant of ['a', 'b', 'c']) {
     const file = readFileSync(new URL(`../public/audio/drip-${variant}.wav`, import.meta.url));
@@ -31,15 +31,24 @@ test('recorded drips are short mono PCM with quiet boundaries and matched levels
     let peak = 0;
     let energy = 0;
     let total = 0;
+    let low = 0;
+    let lowEnergy = 0;
+    let attackEnergy = 0;
+    const lowpass = 1 - Math.exp((-2 * Math.PI * 200) / rate);
     for (let i = 0; i < data.length; i += 2) {
       const sample = data.readInt16LE(i) / 32768;
       peak = Math.max(peak, Math.abs(sample));
       energy += sample * sample;
       total += sample;
+      low += lowpass * (sample - low);
+      lowEnergy += low * low;
+      if (i / 2 < rate * 0.08) attackEnergy += sample * sample;
     }
     const rms = Math.sqrt(energy / (data.length / 2));
-    assert.ok(peak < 0.41, 'mixing headroom');
-    assert.ok(rms > 0.045 && rms < 0.061, 'no unexpectedly loud or silent variant');
+    assert.ok(peak > 0.6 && peak < 0.66, 'consistent transient peaks with mixing headroom');
+    assert.ok(rms > 0.05 && rms < 0.09, 'no unexpectedly loud or silent variant');
+    assert.ok(lowEnergy / energy < 0.2, 'low-frequency tub rumble must not dominate the drop');
+    assert.ok(attackEnergy / energy > 0.85, 'the crop starts on a splash, not a gap between drops');
     assert.ok(Math.abs(total / (data.length / 2)) < 0.003, 'no significant DC offset');
     recordings.push(data);
   }
