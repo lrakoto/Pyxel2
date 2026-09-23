@@ -358,3 +358,13 @@ Browser checks on an isolated origin: legacy file appears in folder 01; create/n
 Reduced the broad cyan fog wash and lowered drifting mist toward building bases. Darkened middle-distance facade/rail masses, added shadowed side faces, and tightened warm window halos. The train now has a dark body and recessed windows, door seams, a dim pane per carriage, and a narrower, weaker metal reflection. The far skyline veil and four parallax speeds are preserved.
 
 Validation: compared live street play with the previous release and inspected a temporary deterministic frame with all seven train carriages visible, including an enlarged pixel detail. The temporary preview was removed. All 86 tests, formatting, TypeScript/Vite production build, and diff checks pass.
+
+## September 22 — grounded city and shared weather
+
+All 17 middle-distance facades now extend to a shared ground line, with a continuous embankment and solid lower courses. Rail piers reach footings and rooftop tank legs connect to their roofs. Low, localized fog banks soften these foundations while retaining the darker upper floors. Train windows have sparse seated/standing silhouettes, with small bogies and couplers tying the carriages to the rail.
+
+A deterministic street wind drives rain trajectory, scarf cloth and rising vapor together, with calm intervals covering most of each cycle. Rain uses integrated wind displacement to avoid jumping when gusts change; foundation mist remains locally anchored even after long sessions. Shelter attenuates scarf wind; interiors have no ambient gust; reduced motion disables it. Large same-area anchor jumps reset the scarf, preventing stretched cloth after loading a distant saved position.
+
+Earned environmental details derive directly from the active save: examined studio objects receive paper tabs, recovered archive status lamps settle on, and a preserved memory changes an existing Den CRT. Restoring a checkpoint or switching cases immediately restores the corresponding visuals.
+
+Validation: 96 tests pass, including gust continuity/integrated motion, reduced-motion behavior, scarf teleport recovery and normal walking, and story gating. Formatting and TypeScript/Vite production build pass. Browser inspection on an isolated, non-saving preview covered street centre/right foundations, a train pass, an animated gust, reduced motion, examined studio objects and the resolved Den. The temporary inspection page was removed; no live player progress was changed by those tests.

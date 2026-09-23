@@ -20,8 +20,11 @@ export class NearWeather {
     time: number,
     lights: SignLight[],
     reduced: boolean,
+    ambientWind = 0,
   ) {
     c.save();
+    const wind =
+      reduced || !Number.isFinite(ambientWind) ? 0 : Math.max(-1, Math.min(1, ambientWind));
     // Sparse vents occupy the bottom plane and move faster than the actors.
     for (const anchor of [590, 1510]) {
       const x = anchor - cam * 1.12;
@@ -35,7 +38,15 @@ export class NearWeather {
         const life = reduced ? (i + 0.4) / 4 : (time * 0.14 + i * 0.25 + anchor * 0.001) % 1;
         c.globalAlpha = Math.sin(life * Math.PI) * 0.2;
         const width = 42 + life * 100;
-        c.drawImage(this.vapor, x - width / 2 + life * 32, 507 - life * 44, width, 25 + life * 25);
+        // New vapor remains pinned to its grate; the higher billows catch more
+        // of the same gust that bends rain and Gravity's scarf.
+        c.drawImage(
+          this.vapor,
+          x - width / 2 + life * 32 + wind * life * life * 60,
+          507 - life * 44 - Math.abs(wind) * life * 7,
+          width,
+          25 + life * 25,
+        );
       }
       c.globalCompositeOperation = 'source-over';
       c.globalAlpha = 1;

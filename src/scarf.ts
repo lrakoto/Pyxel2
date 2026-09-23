@@ -2,20 +2,20 @@ import type { RimLight } from './lighting.ts';
 import { rimColor } from './lighting.ts';
 
 /**
- * Cole's scarf tail, ported from the original prototype's cloth ribbon.
+ * Gravity's scarf tail, ported from the original prototype's cloth ribbon.
  *
- * A thin ribbon simulated as a verlet chain of point masses pinned at his
+ * A thin ribbon simulated as a verlet chain of point masses pinned at her
  * neck. Gravity pulls it down, air drag damps it, and a wind force
- * proportional to his velocity — plus turbulent gusts — pushes it back and
+ * proportional to her velocity — plus shared street gusts — pushes it back and
  * aloft. Distance constraints keep the segments together. Because each point
  * carries its own momentum the motion propagates down the cloth: the tip lags
- * and overshoots, a wave runs through it when he starts or stops, and the
+ * and overshoots, a wave runs through it when she starts or stops, and the
  * gusts make it flutter, rather than the whole thing swinging as one rigid
  * flap. At rest it simply hangs.
  *
  * The original ran in three.js world units with Cole 1.92 units tall. Here the
  * chain lives in world pixels, so every length is expressed as a fraction of
- * his on-screen height and multiplied up. Speed-proportional forces (wind,
+ * her on-screen height and multiplied up. Speed-proportional forces (wind,
  * loft) need no conversion: the height cancels out of `loft * speed`.
  */
 const TUNING = {
@@ -26,16 +26,18 @@ const TUNING = {
   length: 0.58,
   /** Half-width, same fraction (0.045 / 1.92). */
   halfWidth: 0.045 / 1.92,
-  /** Downward pull, in Cole-heights per second squared. */
+  /** Downward pull, in figure-heights per second squared. */
   gravity: 4.5 / 1.92,
   /** Verlet velocity retained per step. */
   damping: 0.8,
-  /** Backward drag proportional to his speed. */
+  /** Backward drag proportional to her speed. */
   wind: 0.8,
-  /** How far his speed lifts the tail toward horizontal. */
+  /** How far her speed lifts the tail toward horizontal. */
   loft: 1.6,
-  /** Gust strength, in Cole-heights per second squared. */
+  /** Movement turbulence, in figure-heights per second squared. */
   flutter: 3 / 1.92,
+  /** Street gust acceleration, kept weaker than gravity for the long idle drape. */
+  ambient: 1.1,
   /** Constraint relaxation passes: more passes read as cloth, not rope. */
   stiffness: 14,
   /** Multiplier on the neon edge glow along the lit side. */
@@ -80,15 +82,24 @@ export class Scarf {
   }
 
   /**
-   * Advances the cloth. `anchor` is the neck in world pixels, `vx` his
-   * velocity in pixels per second, `height` his current on-screen height.
+   * Advances the cloth. `anchor` is the neck in world pixels, `vx` her
+   * velocity in pixels per second, `height` her current on-screen height.
+   * `ambientWind` is the shared signed street gust; pass zero inside rooms.
    */
-  step(dt: number, anchorX: number, anchorY: number, vx: number, height: number) {
+  step(dt: number, anchorX: number, anchorY: number, vx: number, height: number, ambientWind = 0) {
     if (dt <= 0) {
       this.build(anchorX, anchorY, height);
       return;
     }
-    if (!this.rows || this.height !== height) this.build(anchorX, anchorY, height);
+    // Save-file switches and same-area teleports do not necessarily reset the
+    // renderer. Discard the old chain before it can stretch across the scene.
+    if (
+      !this.rows ||
+      this.height !== height ||
+      Math.hypot(anchorX - this.x[0], anchorY - this.y[0]) > height * 1.5
+    ) {
+      this.build(anchorX, anchorY, height);
+    }
     this.t += dt;
     const h = Math.min(dt, 1 / 30); // a stall must not explode the sim
 
@@ -100,15 +111,21 @@ export class Scarf {
     const speed = Math.abs(vx);
     const gravity = TUNING.gravity * height;
     const windX = -Math.sign(vx) * speed * TUNING.wind;
+    const ambient = Number.isFinite(ambientWind) ? Math.max(-1, Math.min(1, ambientWind)) : 0;
+    const streetForce = ambient * TUNING.ambient * height;
     const loft = speed * TUNING.loft;
-    const flutter = TUNING.flutter * height;
+    // Local ripples need a cause: running or a street gust. Calm and interiors
+    // settle back to the full ankle-length drape rather than waving constantly.
+    const activity = Math.min(1, speed / Math.max(1, height) + Math.abs(ambient) * 0.32);
+    const flutter = TUNING.flutter * height * activity;
     for (let i = 1; i < this.rows; i++) {
       const tip = i / (this.rows - 1);
       const gust =
         (Math.sin(this.t * 3.2 + i * 0.7) * 0.6 + Math.sin(this.t * 6.4 + i * 1.3) * 0.35) *
         flutter;
       const breeze = Math.sin(this.t * 1.3 + i * 0.45) * 0.25 * flutter;
-      const fx = windX * tip + (gust + breeze) * (0.35 + 0.55 * tip);
+      const fx =
+        windX * tip + streetForce * (0.25 + 0.75 * tip) + (gust + breeze) * (0.35 + 0.55 * tip);
       // Canvas y grows downward, so gravity adds and loft subtracts.
       const fy = gravity - loft * tip - gust * 0.35;
       const vX = (this.x[i] - this.ox[i]) * TUNING.damping;

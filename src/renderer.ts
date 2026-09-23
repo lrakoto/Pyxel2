@@ -29,6 +29,8 @@ import { drawFlare } from './flare.ts';
 import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
 import { FootWater, drawInteriorForeground, drawMei } from './visual-details.ts';
 import { CharacterMotion, footfallBetween } from './character-motion.ts';
+import { streetWind, streetWindDisplacement } from './wind.ts';
+import { drawStoryDetails } from './story-details.ts';
 export const W = 960,
   H = 540;
 /** Carriages in the elevated train, and how fast it crosses the city. */
@@ -165,6 +167,7 @@ export class Renderer {
       cam = Math.round(v.camera),
       figure = world.figureScale,
       t = v.reducedMotion ? 0 : v.time;
+    const ambientWind = area === 'street' ? streetWind(t, v.reducedMotion) : 0;
     if (area === 'street' && !v.reducedMotion)
       for (const strength of this.traffic.step(v.dt, W)) this.cue?.('traffic', strength);
     const movingLights =
@@ -289,6 +292,7 @@ export class Renderer {
       if (area === 'street') edgeLight(c, cam, movingLights);
     }
     if (!v.combat) drawRoomFurniture(c, area, cam, this.plates.get(area));
+    if (!v.combat) drawStoryDetails(c, v.model, cam, t, v.reducedMotion);
     if (area === 'street' && !v.combat) {
       if (this.distantReflection.width !== W) {
         this.distantReflection.width = W;
@@ -398,6 +402,7 @@ export class Renderer {
       p.y + neck.y,
       p.vx,
       73 * figure,
+      ambientWind * (area === 'street' && underShelter(p.x, p.y - 25) ? 0.22 : 1),
     );
     if (!v.combat || v.combat.invulnerable <= 0 || Math.floor(t * 18) % 2 === 0) {
       if (this.sprites.candidateActive) this.scarf.draw(c, cam, rim);
@@ -464,7 +469,7 @@ export class Renderer {
       c.fillStyle = '#89d5c804';
       c.fillRect(sx - 65, 0, 65, H);
     }
-    if (area === 'street') this.weather(c, t, cam, v.reducedMotion);
+    if (area === 'street') this.weather(c, t, cam, v.reducedMotion, ambientWind);
     else this.interiorAir(c, cam, t, sceneLights);
     const water = world.water;
     if (water && area !== 'street') {
@@ -515,7 +520,7 @@ export class Renderer {
     }
     if (!v.combat) drawNearArchitecture(c, area, cam, t);
     if (!v.combat && area === 'street')
-      this.nearWeather.draw(c, cam, t, actorLights, v.reducedMotion);
+      this.nearWeather.draw(c, cam, t, actorLights, v.reducedMotion, ambientWind);
     if (!v.combat) drawInteriorForeground(c, area, cam, t, this.plates.get(area));
     this.discoveryLight +=
       ((v.discovery ? 1 : 0) - this.discoveryLight) *
@@ -674,6 +679,16 @@ export class Renderer {
       c.globalAlpha = 0.03 + 0.012 * Math.sin(t * 0.3 + i * 1.7);
       c.drawImage(this.mist, x, y, 680 + i * 80, 190 + i * 20);
     }
+
+    // Low banks sit against the foundations, below the train and upper floors.
+    // Keep the dark feet visible through the mist so it never hides a sky gap.
+    for (let i = 0; i < 6; i++) {
+      const x = layerX(-140 + i * 390, cam, PARALLAX.midground);
+      const drift = Math.sin(t * 0.09 + i * 1.8) * 24 + streetWind(t) * 20;
+      if (x + drift > width || x + drift + 520 < 0) continue;
+      c.globalAlpha = 0.13 + Math.sin(t * 0.16 + i) * 0.015;
+      c.drawImage(this.mist, x + drift, 368 + (i % 3) * 9, 520, 82);
+    }
     c.restore();
   }
 
@@ -726,7 +741,19 @@ export class Renderer {
         c.fillRect(wx - 1, 180, 8, 7);
         c.fillStyle = j === (i * 3 + 1) % 6 ? '#4e5040' : '#a78a50';
         c.fillRect(wx, 181, 6, 5);
+        // Sparse seated/standing silhouettes stay inside the tiny warm panes.
+        // Stable per carriage: passengers travel with their seats, not the city.
+        if ((i * 7 + j * 3) % 11 < 3) {
+          const seated = (i + j) % 2 === 0;
+          c.fillStyle = '#27302b';
+          c.fillRect(wx + 2, seated ? 183 : 182, 1, 1);
+          c.fillRect(wx + 1, seated ? 184 : 183, 3, seated ? 2 : 3);
+        }
       }
+      c.fillStyle = '#061219';
+      c.fillRect(x + 12, 193, 10, 2);
+      c.fillRect(x + 51, 193, 10, 2);
+      if (i < TRAIN_CARS - 1) c.fillRect(x + 71, 189, 3, 2);
       c.fillStyle = '#354f5b';
       c.fillRect(x + 2, 177, 66, 1);
 
@@ -971,22 +998,32 @@ export class Renderer {
     c.stroke();
     c.restore();
   }
-  private weather(c: CanvasRenderingContext2D, t: number, cam: number, reduced: boolean) {
+  private weather(
+    c: CanvasRenderingContext2D,
+    t: number,
+    cam: number,
+    reduced: boolean,
+    ambientWind: number,
+  ) {
     const W = this.canvas.width;
     if (!reduced) {
+      // Integrated wind moves drops continuously; the instantaneous force
+      // changes their streak angle in step with cloth and vent steam.
+      const windTravel = streetWindDisplacement(t) * 150;
+      const slant = -3 + ambientWind * 6;
       c.lineWidth = 0.65;
       // Batch the cool rain and the streaks crossing the studio's warm doorway.
       for (const warm of [false, true]) {
         c.strokeStyle = warm ? '#edc88e78' : '#aad3d440';
         c.beginPath();
         for (const [index, r] of this.rain.entries()) {
-          const x = (((r.x - t * 48 * r.s - cam * 0.12) % W) + W) % W,
+          const x = (((r.x + (windTravel - t * 48) * r.s - cam * 0.12) % W) + W) % W,
             y = (r.y + t * 330 * r.s) % H;
           if (index % 3 !== 0 && underShelter(x + cam, y)) continue;
           const inDoorLight = Math.abs(x + cam - 1008) < 34 && y > 332 && y < 441;
           if (inDoorLight !== warm) continue;
           c.moveTo(x, y);
-          c.lineTo(x - 3 * r.s, y + 12 * r.s);
+          c.lineTo(x + slant * r.s, y + 12 * r.s);
         }
         c.stroke();
       }
@@ -1011,7 +1048,7 @@ export class Renderer {
       c.globalAlpha = 0.1 * (1 - cycle);
       c.drawImage(
         this.mist,
-        x - 32 + Math.sin(t + i) * 9,
+        x - 32 + Math.sin(t + i) * 9 + ambientWind * cycle * 36,
         440 - cycle * 85,
         95 + cycle * 60,
         70 + cycle * 35,
