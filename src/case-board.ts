@@ -7,9 +7,23 @@ import {
   type ClueId,
   type Deduction,
 } from './content.ts';
-import { theoryOpen, type SaveData } from './model.ts';
+import { theoryOpen, type CaseModel, type SaveData } from './model.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { evidenceArt } from './evidence-art.ts';
+
+/** Earlier files retain their own conclusion rather than borrowing a later objective. */
+export function caseFileNote(model: CaseModel, file: CaseFileId) {
+  const save = model.save;
+  if (file === 'graves' && save.escaped)
+    return 'Graves case filed. Archive 001 is safe, and Lyra’s channel is open.';
+  if (file === 'first-one' && save.resolution)
+    return save.resolution === 'protect'
+      ? 'Ada Vale’s identity is preserved in Lyra’s private archive. Her memory has a witness.'
+      : 'Ada Vale’s identity and the evidence are preserved in a sealed witness statement.';
+  if (file === 'shipment' && save.buyerNamed)
+    return 'Shipment traced. Marlon reached intake B; the Broker paid for the collection.';
+  return model.objective;
+}
 
 /** A record is spent only when every currently available use has been solved. */
 export function evidenceBoardState(

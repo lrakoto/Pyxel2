@@ -33,6 +33,15 @@ export interface SaveData {
   buyerNamed: boolean;
 }
 export const SAVE_KEY = 'everybody-nobody:fragments:v1';
+/** A locked Den route leads to its known contact once Gravity has earned that lead. */
+export function mapDestination(model: CaseModel, destination: string) {
+  return destination === 'den-door' && model.deduced && !model.save.contact ? 'lyra' : destination;
+}
+
+export function routeLabel(destination: string | null) {
+  if (!destination) return null;
+  return AREAS.street.hotspots.find((h) => h.id === destination)?.label ?? null;
+}
 /**
  * The district is a hub: interior-to-interior routes pass through the street. Meridian Clinic is
  * off the hub, a train ride away, so its only way out also leads back to the street.

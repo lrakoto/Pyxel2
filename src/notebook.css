@@ -1256,3 +1256,33 @@ body {
     monospace;
   letter-spacing: 0.05em;
 }
+
+/* Connection feedback stays beside the player's current reading position. */
+.board-result {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 2px solid #78503c;
+  background: #d8cda9 url('/paper/fibers.svg');
+  color: #2d382f;
+  box-shadow: 0 -8px 24px #161b1733;
+}
+.board-result p {
+  margin: 0;
+  flex: 1;
+  max-height: 24vh;
+  overflow: auto;
+  font: 12px/1.7 var(--mono);
+}
+.board-result button {
+  flex: 0 0 44px;
+  min-height: 44px;
+  border: 1px solid #6c654766;
+  color: #4e4937;
+  background: #b7ad8b44;
+  font: 22px var(--mono);
+}

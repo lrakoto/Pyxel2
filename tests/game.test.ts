@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CaseModel, freshSave, parseSave, stepBody, segmentHits, type Body } from '../src/model.ts';
-import { AREAS, CLUES, DEDUCTIONS, type ClueId } from '../src/content.ts';
+import { AREAS, CLUES, CORE_DEDUCTIONS, DEDUCTIONS, type ClueId } from '../src/content.ts';
 import { Combat } from '../src/combat.ts';
 const body = (): Body => ({ x: 500, y: 438, vx: 0, vy: 0, grounded: true, facing: 1 });
 test('invalid, future, and hostile saves recover to a playable fresh case', () => {
@@ -256,4 +256,24 @@ test('map routes interiors through the hub and stops at the requested room', asy
   assert.equal(nextRouteHotspot('den', 'den-door'), null);
   assert.equal(nextRouteHotspot('den', 'studio-door')?.target, 'street');
   assert.equal(nextRouteHotspot('street', 'missing'), null);
+});
+
+test('the Den map route reaches Lyra when her lead is earned but access is still locked', async () => {
+  const { mapDestination, routeLabel, nextRouteHotspot } = await import('../src/model.ts');
+  const model = new CaseModel();
+  assert.equal(mapDestination(model, 'den-door'), 'den-door');
+  for (const deduction of DEDUCTIONS.filter((d) => CORE_DEDUCTIONS.includes(d.id))) {
+    deduction.pair.forEach((id) => model.collect(id));
+    model.connect(...deduction.pair);
+  }
+  assert.equal(model.deduced, true);
+  assert.equal(mapDestination(model, 'den-door'), 'lyra');
+  assert.equal(nextRouteHotspot('studio', 'lyra')?.target, 'street');
+  assert.equal(nextRouteHotspot('street', 'lyra')?.id, 'lyra');
+  assert.equal(routeLabel('lyra'), AREAS.street.hotspots.find((h) => h.id === 'lyra')!.label);
+  model.save.contact = true;
+  assert.equal(mapDestination(model, 'den-door'), 'den-door');
+  assert.equal(mapDestination(model, 'studio-door'), 'studio-door');
+  assert.equal(routeLabel(null), null);
+  assert.equal(routeLabel('missing'), null);
 });

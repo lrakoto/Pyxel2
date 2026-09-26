@@ -195,3 +195,15 @@ The studio windows, the Den's archive glass and Meridian's cold cabinet now have
 The studio's near easels gained chipped paint and contact shadows. The Den's near racks gained worn labels, vents, small fasteners, base shadows and loose cables. These details preserve the existing fade over Gravity.
 
 Lyra starts ambient machine visits only while Gravity is stationary. Once begun, a visit keeps its machine even if Gravity walks away, finishes its return once, and cannot resume halfway through after a dialogue, area change or clock reset. Story examinations take priority. The page's case label now follows the active investigation instead of always showing the Graves case number.
+
+
+## September 26 — clearer routes and notebook feedback
+
+Map walking now shows the destination with a Stop control. Once the Graves deductions earn
+Lyra’s lead, choosing the locked Memory Den routes to her first. Completed notebook files
+keep their own conclusions and margin notes as the investigation advances, and changing tabs
+returns to the top. Connection results stay in view until dismissed or another selection is
+made, including on narrow phone screens.
+
+Verified with 155 automated tests, TypeScript/Vite build, formatting, and an isolated browser
+playthrough of routes and notebook interactions. This checkpoint has not been published.

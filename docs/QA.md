@@ -550,3 +550,27 @@ Automated: **153 tests passed**, including new ambient-visit tests for movement 
 Browser: used the existing isolated test save at `127.0.0.1:4197`, folder 02. Resumed the completed case; followed the map route from clinic via the street into the studio, then from studio via street into the Den. Reviewed studio window/easel alignment at entry and moved to the portrait; inspected Den glazing/racks at entry and at the archive. Reduced-motion Den view checked; active masthead correctly reads case 07–033 while revisiting older locations. No live saves touched.
 
 Limits: the moving-target ambient regression is verified by automated state tests, not a frame-by-frame browser capture. No new full case playthrough or hardware phone/audio review in this pass. The prior full three-case playthrough remains the integration baseline. Local checkpoint only; not published to Pages.
+
+
+## September 26 — routes and notebook feedback
+
+Changes: temporary walking destination/Stop control; earned Den lead routes to Lyra before
+contact; per-file conclusions and margin notes; case-tab scroll reset; dismissible connection
+results pinned to the visible notebook bottom while preserving reading position.
+
+Automated: **155 tests passed**, including regressions for Den lead gating, routes through the
+street, destination labels, and completed-case summaries with both resolutions. TypeScript/
+Vite build and formatting passed. Save format, combat, movement speeds and art are unchanged.
+
+Browser, isolated `127.0.0.1:4197`: completed a Den → street → studio map route, checked its
+walking note, then started and cancelled a return route. Verified Graves and First One tabs
+retain their own conclusions. Restored test folder 01's earlier seven-connection checkpoint
+through the archive UI; completed a failed pairing and the residue/cold-storage pairing at
+390 × 844. Both results remained visible beside the reading position; dismissal worked and
+the matched records updated. Changing tabs reset scrollTop to 0; panel scrollWidth equalled
+clientWidth (341 px). Folder 02's completed test case was preserved; live Pages saves untouched.
+
+Limits: portrait phone emulation verified, not physical hardware. The landscape screenshot
+surface scaled incorrectly after changing viewport, so landscape rendering is not claimed.
+The browser session/server ended during a tool interruption after these checks; a normal-size
+preview was reopened. No new combat/audio/full-story retest. Local checkpoint only.

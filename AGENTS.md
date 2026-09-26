@@ -175,7 +175,9 @@ These were settled through review with the user. Keep them unless the user chang
 - The third case ends on the Broker's name; there is no fourth case yet. Save fields `shipment` and
   `buyerNamed` gate it, and `parseSave` defaults both to closed.
 - Map routing assumes a street hub (`nextRouteHotspot` in `model.ts`). A bigger district needs
-  graph routing.
+  graph routing. `mapDestination` redirects the Den to Lyra after the core deductions but before
+  contact; the temporary route note offers Stop. Completed notebook summaries come from
+  `caseFileNote`; connection feedback sticks to the visible panel bottom and can be dismissed.
 - Imported Aseprite playback only loops tags. It has no finite repeats or one-shot callbacks.
 - The street's foreground layer has a matte that is keyed out at load time. It needs a real
   alpha layer.

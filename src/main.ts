@@ -22,7 +22,7 @@ import {
   type CaseFileProposal,
 } from './archive-transfer.ts';
 import { evidenceArt } from './evidence-art.ts';
-import { evidenceBoardState, renderEvidenceCard } from './case-board.ts';
+import { caseFileNote, evidenceBoardState, renderEvidenceCard } from './case-board.ts';
 import {
   actorPerformance,
   interactionPosition,
@@ -48,6 +48,8 @@ import {
   clamp,
   stepBody,
   nextRouteHotspot,
+  mapDestination,
+  routeLabel,
   arrivalX,
   type Body,
   type SaveData,
@@ -125,6 +127,7 @@ document.getElementById('app')!.innerHTML = `
     <div id="hotspots" class="hotspots" aria-label="Nearby places and evidence"></div>
     <div id="focus-status" class="focus-status" hidden><i></i> FOCUS ACTIVE <span>Follow what the city leaves behind.</span></div>
     <div id="destination" class="destination" hidden>⌄</div>
+    <div id="route-status" class="route-status" hidden><span id="route-label" role="status"></span><button id="cancel-route" aria-label="Stop walking to destination">Stop ×</button></div>
     <div id="interaction" class="interaction" hidden><button id="interact-btn"><kbd>E</kbd><span id="interaction-label">Examine</span>${icon('arrow')}</button></div>
     <div id="area-card" class="area-card" aria-live="polite"></div>
     <div id="combat-hud" class="combat-hud" hidden><div><span class="eyebrow">GRAVITY · VITALS</span><strong id="hp-text">100</strong><div class="hp-track"><i id="hp-fill"></i></div></div><div><span class="eyebrow">HOSTILE CONTACT</span><strong id="wave-text">WAVE 01 / 02</strong><button id="withdraw-btn">Disengage <kbd>Q</kbd></button></div></div>
@@ -298,6 +301,14 @@ class Game {
     );
     $('archive-btn').addEventListener('click', () => this.openArchive(), s);
     $('cine-skip').addEventListener('click', () => this.finishIntro(), s);
+    $('cancel-route').addEventListener(
+      'click',
+      () => {
+        this.clearInput();
+        this.tickUI();
+      },
+      s,
+    );
     $('board-btn').addEventListener('click', () => this.openBoard(), s);
     $('objective-btn').addEventListener(
       'click',
@@ -1398,6 +1409,11 @@ class Game {
   }
   caseMarginNote() {
     const save = this.model.save;
+    if (this.boardFile === 'graves' && save.escaped) return 'No longer working alone.';
+    if (this.boardFile === 'first-one' && save.resolution)
+      return save.resolution === 'protect'
+        ? 'Keep her safe. Keep the record.'
+        : 'Put the truth on record.';
     if (save.buyerNamed) return 'A signature is still a hand.';
     if (this.model.shipmentSolved) return 'Say it out loud.';
     if (save.shipment) return 'Follow the cargo, not the story.';
@@ -1507,7 +1523,7 @@ class Game {
     this.panel(
       heading[0],
       heading[1],
-      `<nav class="case-tabs" aria-label="Case files">${tabs}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${progress}</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, file)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>Gravity / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p>${closing}</div></aside></div>`,
+      `<nav class="case-tabs" aria-label="Case files">${tabs}</nav><div class="case-summary"><p>${caseFileNote(this.model, file)}</p><span>${clues.length} RECORDS <b>/</b> ${progress}</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, file)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>Gravity / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback">${message}</p>${closing}</div></aside></div>`,
       'board',
     );
     const notes = INSIGHTS.filter(
@@ -1524,6 +1540,11 @@ class Game {
         `<div class="board-mobile-actions"><span>${this.selected.length} / 2 selected</span><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect ${icon('arrow')}</button></div>`,
       );
     }
+    if (message !== 'Select two pieces of evidence. Find what connects them.')
+      $('panel-content').insertAdjacentHTML(
+        'beforeend',
+        `<div id="board-result" class="board-result"><p role="status">${message}</p><button data-action="dismiss-result" aria-label="Dismiss connection result">×</button></div>`,
+      );
     if (focusedClue) {
       document
         .querySelector<HTMLElement>(
@@ -1532,8 +1553,9 @@ class Game {
             : `[data-inspect="${focusedClue}"]`,
         )
         ?.focus({ preventScroll: true });
-      $('panel').scrollTop = scrollTop;
     }
+    if (focusedClue || message !== 'Select two pieces of evidence. Find what connects them.')
+      $('panel').scrollTop = scrollTop;
   }
   inspectRecord(id: ClueId) {
     if (!this.model.save.clues.includes(id)) return;
@@ -1827,7 +1849,7 @@ class Game {
       return;
     }
     if (el.dataset.route) {
-      const id = el.dataset.route;
+      const id = mapDestination(this.model, el.dataset.route);
       this.closePanel();
       if (this.staging) this.cancelInteraction();
       if (id === 'meridian') {
@@ -1855,6 +1877,10 @@ class Game {
               : 'graves';
         this.selected = [];
         this.renderBoard();
+        $('panel').scrollTop = 0;
+        break;
+      case 'dismiss-result':
+        $('board-result').remove();
         break;
       case 'followup':
         this.startFollowup();
@@ -2207,7 +2233,19 @@ class Game {
       !this.combat &&
       !this.transitioning &&
       !!this.nearest;
-    $('interaction').hidden = !show;
+    const destination = routeLabel(this.queuedRoute);
+    const routing =
+      !!destination &&
+      this.started &&
+      !this.combat &&
+      this.target !== null &&
+      !this.modal &&
+      !this.lines.length &&
+      !this.transitioning;
+    $('route-status').hidden = !routing;
+    if (routing && $('route-label').textContent !== `Walking to ${destination}`)
+      $('route-label').textContent = `Walking to ${destination}`;
+    $('interaction').hidden = !show || routing;
     if (show) {
       const h = this.nearest!;
       const verb = !this.model.unlocked(h)

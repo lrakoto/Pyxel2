@@ -10,7 +10,7 @@ import {
 } from '../src/content.ts';
 import { CaseModel, parseSave } from '../src/model.ts';
 import { boardHint, lyraIntroduction, lyraTopics } from '../src/narrative.ts';
-import { evidenceBoardState, renderEvidenceCard } from '../src/case-board.ts';
+import { caseFileNote, evidenceBoardState, renderEvidenceCard } from '../src/case-board.ts';
 
 function collectEntry() {
   const model = new CaseModel();
@@ -149,4 +149,22 @@ test('a solved core case with the lock but no camera points to the missing stree
   model.collect('camera');
   assert.match(boardHint(model, false), /already hold the street camera and studio lock/);
   assert.equal(model.connect('lock', 'camera')?.id, 'entry');
+});
+
+test('completed notebook files retain their own conclusions while the investigation moves on', () => {
+  const model = new CaseModel();
+  assert.equal(caseFileNote(model, 'graves'), model.objective);
+  model.save.escaped = true;
+  model.save.followup = true;
+  assert.match(caseFileNote(model, 'graves'), /Graves case filed/);
+  assert.equal(caseFileNote(model, 'first-one'), model.objective);
+  model.save.resolution = 'protect';
+  model.save.shipment = true;
+  assert.match(caseFileNote(model, 'first-one'), /private archive/);
+  model.save.resolution = 'testify';
+  assert.match(caseFileNote(model, 'first-one'), /sealed witness statement/);
+  model.save.buyerNamed = true;
+  assert.match(caseFileNote(model, 'shipment'), /Broker/);
+  for (const file of ['graves', 'first-one'] as const)
+    assert.doesNotMatch(caseFileNote(model, file), /Broker|intake B/);
 });

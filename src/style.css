@@ -2846,3 +2846,43 @@ summary:focus-visible {
     min-height: 44px;
   }
 }
+
+/* A temporary route note replaces the nearby interaction while map walking is active. */
+.route-status {
+  position: absolute;
+  z-index: 8;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 5px 6px 5px 14px;
+  border: 1px solid #9d987166;
+  background: #29322bea;
+  color: #ded6b9;
+  box-shadow: 0 3px 12px #03090966;
+  font: 11px/1.5 var(--mono);
+}
+.route-status button {
+  flex-shrink: 0;
+  min-width: 64px;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid #aaa27a55;
+  color: inherit;
+  background: #c1b98913;
+  font: inherit;
+}
+.route-status[hidden] {
+  display: none;
+}
+@media (max-width: 650px), (pointer: coarse) {
+  .route-status {
+    bottom: 88px;
+    font-size: 10px;
+    gap: 8px;
+  }
+}
