@@ -1,4 +1,14 @@
-import { AREAS, DEDUCTIONS, type ClueId, type DeductionId } from './content.ts';
+import {
+  AREAS,
+  CORE_DEDUCTIONS,
+  DEDUCTIONS,
+  FOLLOWUP_DEDUCTIONS,
+  SHIPMENT_CLUES,
+  SHIPMENT_DEDUCTIONS,
+  type CaseFileId,
+  type ClueId,
+  type DeductionId,
+} from './content.ts';
 import type { CaseModel } from './model.ts';
 
 export interface Line {
@@ -83,6 +93,20 @@ export const INSIGHTS: Insight[] = [
     title: 'Beyond an ID number',
     text: 'Ada Vale is not just the name attached to a lesson. She is the voice that waited for the child to finish. The VOID stamp describes what the city did, not who she was.',
   },
+  {
+    id: 'hold-for-buyer',
+    clue: 'manifest',
+    requires: ['sale'],
+    title: 'An order being filled',
+    text: 'Every other line that week went into general stock. This one waited for somebody. Lot B-0419 wasn’t something they found. It was something they were asked for.',
+  },
+  {
+    id: 'talent-not-name',
+    clue: 'consent',
+    requires: ['cartridge'],
+    title: 'Where the names stop',
+    text: 'The forms have names on them. The cartridges don’t. Somewhere between this chair and the cold room, a person turns into “patience” or “hands.”',
+  },
 ];
 
 /** Most recently authored applicable insight wins; reading it is a separate mutation. */
@@ -132,25 +156,31 @@ export function lyraTopics(model: CaseModel): Topic[] {
         { speaker: 'GRAVITY', text: 'What am I missing?' },
         {
           speaker: 'LYRA',
-          text: model.save.resolution
-            ? 'A route to Meridian. We have a name to protect, a memory we can trust, and a destination. We go when you’re ready.'
-            : model.followupSolved
-              ? 'We can name her now. We can also prove the memory is real and trace the shipment. Come to me in the Den. We should decide how to keep this safe.'
-              : model.save.followup
-                ? !has('chime')
-                  ? 'Listen beneath her voice in the archive. Sometimes a place introduces itself when people don’t.'
-                  : !has('register')
-                    ? 'The old paper register is beside the tape stacks. The city’s database forgot those evening classes. Paper did not.'
-                    : !has('sketch')
-                      ? 'Marlon kept something behind her portrait. He told me it mattered more than the frame.'
-                      : !has('transfer')
-                        ? 'The receiver has its own spool, separate from the public log. Go back to the studio.'
-                        : !has('witness')
-                          ? 'Mei works the night shift at the noodle bar. Ask her what she saw. Give her a reason to trust you.'
-                          : 'You have independent records now. Compare a place with a name, a shipment with a witness, and the memory with something real.'
-                : model.save.escaped
-                  ? 'Go back to archive zero-zero-one. This time, listen to the room around her.'
-                  : 'Keep the memory safe. I will stay on your channel.',
+          text: model.save.buyerNamed
+            ? 'The Broker. I’ve watched that signature close sales I couldn’t stop. Next time we find the hand that holds the pen.'
+            : model.shipmentSolved
+              ? 'The records agree, Gravity. Say it out loud with me. Who paid for Marlon?'
+              : model.save.shipment
+                ? shipmentLead(model)
+                : model.save.resolution
+                  ? 'A route to Meridian. We have a name to protect, a memory we can trust, and a destination. We go when you’re ready.'
+                  : model.followupSolved
+                    ? 'We can name her now. We can also prove the memory is real and trace the shipment. Come to me in the Den. We should decide how to keep this safe.'
+                    : model.save.followup
+                      ? !has('chime')
+                        ? 'Listen beneath her voice in the archive. Sometimes a place introduces itself when people don’t.'
+                        : !has('register')
+                          ? 'The old paper register is beside the tape stacks. The city’s database forgot those evening classes. Paper did not.'
+                          : !has('sketch')
+                            ? 'Marlon kept something behind her portrait. He told me it mattered more than the frame.'
+                            : !has('transfer')
+                              ? 'The receiver has its own spool, separate from the public log. Go back to the studio.'
+                              : !has('witness')
+                                ? 'Mei works the night shift at the noodle bar. Ask her what she saw. Give her a reason to trust you.'
+                                : 'You have independent records now. Compare a place with a name, a shipment with a witness, and the memory with something real.'
+                      : model.save.escaped
+                        ? 'Go back to archive zero-zero-one. This time, listen to the room around her.'
+                        : 'Keep the memory safe. I will stay on your channel.',
         },
       ],
     },
@@ -212,6 +242,34 @@ export function lyraTopics(model: CaseModel): Topic[] {
         { speaker: 'GRAVITY', text: 'We’re not just carrying evidence.' },
       ],
     });
+  if (solved('front'))
+    topics.push({
+      id: 'veil',
+      title: 'The folded veil',
+      detail: 'Who runs intake B',
+      lines: [
+        { speaker: 'GRAVITY', text: 'You went quiet at the crates.' },
+        {
+          speaker: 'LYRA',
+          text: 'I keep out of the Veil’s machines. It’s how I stay invisible to them. Tonight I walked into two of them.',
+        },
+        { speaker: 'GRAVITY', text: 'Then we don’t stay long.' },
+      ],
+    });
+  if (solved('buyer'))
+    topics.push({
+      id: 'broker',
+      title: 'The Broker',
+      detail: 'A buyer who signs as nobody',
+      lines: [
+        { speaker: 'GRAVITY', text: 'You’ve seen that signature before.' },
+        {
+          speaker: 'LYRA',
+          text: 'On sales I couldn’t stop. Never from the same account twice. It might be one person. It might be a coat that people take turns wearing.',
+        },
+        { speaker: 'GRAVITY', text: 'Coats have pockets. Somebody’s hands are in them.' },
+      ],
+    });
   if (model.save.resolution)
     topics.push({
       id: 'archive-choice',
@@ -230,6 +288,23 @@ export function lyraTopics(model: CaseModel): Topic[] {
   return topics;
 }
 
+/** What Lyra would look at next in intake B, given the records already held. */
+function shipmentLead(model: CaseModel): string {
+  const has = (id: ClueId) => model.save.clues.includes(id);
+  if (model.save.area !== 'clinic' && !SHIPMENT_CLUES.some(has))
+    return 'Meridian is four stops out on the Fremont line. The fare is on your card. Open the map when you’re ready.';
+  if (!has('manifest'))
+    return 'Clinics write everything down. That’s what makes them clinics. Start at the intake counter.';
+  if (!has('consent'))
+    return 'The recliners by the curtain. Somebody left the paperwork clipped to them.';
+  if (!has('cartridge'))
+    return 'The cold room is running harder than a clinic needs. Look at what they keep cold.';
+  if (!has('seal')) return 'The crates by the loading door. Read the tape, not the labels.';
+  if (!has('sale'))
+    return 'The terminal by the bay talks to somebody outside the city. Examine it and I’ll let you in.';
+  return 'You have what arrived, who runs this place and what was sold. Put them together in the notebook.';
+}
+
 export const FOLLOWUP_OPENING: Line[] = [
   {
     speaker: 'LYRA',
@@ -242,15 +317,49 @@ export const FOLLOWUP_OPENING: Line[] = [
   { speaker: 'LYRA', text: 'Then come back to the Den. Let’s listen again.' },
 ];
 
+export const SHIPMENT_OPENING: Line[] = [
+  {
+    speaker: 'LYRA',
+    text: 'The spool gave us an address. Meridian Clinic, intake B. Four stops past the Sector 07 line.',
+  },
+  { speaker: 'GRAVITY', text: 'A clinic that takes deliveries at three in the morning.' },
+  {
+    speaker: 'LYRA',
+    text: 'So does the night train. Nobody counts who rides it after midnight. I’ve put a fare on your transit card that won’t be logged.',
+  },
+  { speaker: 'GRAVITY', text: 'Then we follow the shipment.' },
+];
+
+export const SHIPMENT_CLOSING: Line[] = [
+  {
+    speaker: 'GRAVITY',
+    text: 'Marlon was collected to order. Reserved, paid for, delivered to intake B.',
+  },
+  { speaker: 'LYRA', text: 'Kept cold under the Veil’s seal for a buyer who signs as the Broker.' },
+  { speaker: 'GRAVITY', text: 'Nobody signs for a sale like that. Somebody did.' },
+  { speaker: 'LYRA', text: 'Then we find out whose hand holds the pen.' },
+];
+
 /** Hints name a useful location or an open question, never an unearned conclusion. */
-export function boardHint(model: CaseModel, second: boolean): string {
-  const ids = second ? ['identity', 'seizure', 'continuity'] : ['harvest', 'voices', 'first'];
+export function boardHint(model: CaseModel, file: CaseFileId): string {
+  const ids =
+    file === 'shipment'
+      ? SHIPMENT_DEDUCTIONS
+      : file === 'first-one'
+        ? FOLLOWUP_DEDUCTIONS
+        : CORE_DEDUCTIONS;
   const open = DEDUCTIONS.filter(
     (d) => ids.includes(d.id) && !model.save.deductions.includes(d.id),
   );
+  if (!open.length && file === 'shipment')
+    return model.save.buyerNamed
+      ? 'The case is closed. The buyer signs as the Broker, and that is the next lead.'
+      : 'The records agree. Open Lyra’s channel and name the buyer together.';
   if (!open.length)
-    return second
-      ? 'The records agree. Return to Lyra in the Den to decide how to keep the archive safe.'
+    return file === 'first-one'
+      ? model.save.resolution
+        ? 'The records agree, and Ada’s name is kept safe. The shipment’s trail leads to Meridian Clinic.'
+        : 'The records agree. Return to Lyra in the Den to decide how to keep the archive safe.'
       : model.save.deductions.includes('entry')
         ? `All four connections are recorded. ${model.objective}`
         : !model.save.clues.includes('camera')
@@ -262,6 +371,9 @@ export function boardHint(model: CaseModel, second: boolean): string {
   if (ready)
     return `You already hold two records relevant to this question: ${ready.question} ${ready.hint}`;
   const missing = open.flatMap((d) => d.pair).filter((id) => !model.save.clues.includes(id));
+  // Meridian has no street door; point at the map rather than at a room the player can't walk to.
+  if (file === 'shipment' && missing.length && model.save.area !== 'clinic')
+    return 'Meridian Clinic still holds evidence. Open the district map [M]: your transit card has the fare for the night train.';
   const area = Object.values(AREAS).find((a) =>
     a.hotspots.some((h) => h.clue && missing.includes(h.clue) && model.available(h)),
   );

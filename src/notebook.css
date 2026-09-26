@@ -561,6 +561,7 @@ body {
   border-color: #67756488;
 }
 .panel .map-road span,
+.panel .map-line,
 .panel .map-north,
 .panel .map-caption {
   color: #526452;
@@ -1241,4 +1242,17 @@ body {
   .objective > span:nth-child(2) {
     font-size: 19px;
   }
+}
+
+/* A carried record keeps its provenance without reopening the original case. */
+.card-reference {
+  display: block;
+  margin: 12px 0 8px;
+  padding: 6px 0;
+  border-block: 1px dashed #75604766;
+  color: #65513c;
+  font:
+    9px/1.6 'DejaVu Sans Mono',
+    monospace;
+  letter-spacing: 0.05em;
 }

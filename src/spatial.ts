@@ -234,7 +234,7 @@ export function drawNearArchitecture(
       }
     }
   } else {
-    const x = (area === 'studio' ? 390 : 1300) - cam * 1.055;
+    const x = (area === 'studio' ? 390 : area === 'den' ? 1300 : 700) - cam * 1.055;
     c.strokeStyle = '#0b1416';
     c.lineWidth = 3;
     c.beginPath();
@@ -251,7 +251,7 @@ export function drawNearArchitecture(
       ],
       '#142123',
     );
-    c.fillStyle = area === 'studio' ? '#b69b69' : '#649e9d';
+    c.fillStyle = area === 'studio' ? '#b69b69' : area === 'den' ? '#649e9d' : '#b9d6de';
     c.fillRect(x - 18, 166, 36, 2);
     c.fillStyle = '#050d0f';
     c.fillRect(x - 24, 168, 48, 3);
@@ -269,6 +269,10 @@ export function drawRoomFurniture(
   plate?: HTMLCanvasElement,
 ) {
   if (area === 'street') return;
+  if (area === 'clinic') {
+    drawTrolley(c, 790 - cam * 1.025);
+    return;
+  }
   c.save();
   const anchor = area === 'studio' ? 240 : 440,
     x = anchor - cam * 1.025;
@@ -337,5 +341,32 @@ export function drawRoomFurniture(
       c.fillRect(x + 43, 347 + i * 23, 2, 2);
     }
   }
+  c.restore();
+}
+
+/** The clinic's instrument trolley, between the donor bay and the cold room. */
+function drawTrolley(c: CanvasRenderingContext2D, x: number) {
+  c.save();
+  c.fillStyle = '#08121488';
+  c.beginPath();
+  c.ellipse(x + 30, 451, 44, 6, 0, 0, Math.PI * 2);
+  c.fill();
+  for (const y of [376, 414]) {
+    c.fillStyle = '#56696b';
+    c.fillRect(x, y, 62, 3);
+    c.fillStyle = '#1c2729';
+    c.fillRect(x, y + 3, 62, 2);
+  }
+  c.fillStyle = '#3a4a4d';
+  for (const dx of [2, 58]) c.fillRect(x + dx, 376, 2, 70);
+  c.fillStyle = '#101719';
+  for (const dx of [0, 56]) c.fillRect(x + dx, 445, 6, 5);
+  // A tray of instruments and one capped vial of the iridescent carrier.
+  c.fillStyle = '#9fb3b8';
+  for (let i = 0; i < 4; i++) c.fillRect(x + 8 + i * 7, 373, 5, 1);
+  c.fillStyle = '#7fcfd6';
+  c.fillRect(x + 44, 368, 4, 8);
+  c.fillStyle = '#b99bd0';
+  c.fillRect(x + 44, 372, 4, 2);
   c.restore();
 }

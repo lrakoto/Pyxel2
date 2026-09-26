@@ -8,6 +8,7 @@ import {
   companionAnchor,
   hopState,
   lyraPresence,
+  lyraSignal,
   orbPixels,
   orbPose,
 } from '../src/lyra-orb.ts';
@@ -91,6 +92,22 @@ test('reduced motion skips the leap but keeps the machine lit', () => {
   assert.equal(state.phase, 'inside');
   assert.equal(state.spark, null);
   assert.equal(hopState(hop, 12, { x: 0, y: 0 }, true).phase, 'done');
+});
+
+test('Lyra carries her room lighting into a machine and brings it home', () => {
+  const shell = { x: 100, y: 300 };
+  const hop = { to: { x: 500, y: 250 }, start: 10, end: 13 };
+  const leaving = lyraSignal(hop, 10.2, shell, false);
+  assert.deepEqual(leaving.light, leaving.state?.spark);
+  assert.notDeepEqual(leaving.light, shell);
+  assert.deepEqual(lyraSignal(hop, 11, shell, false).light, hop.to);
+  const back = lyraSignal(hop, 13.2, shell, false);
+  assert.deepEqual(back.light, back.state?.spark);
+  assert.deepEqual(lyraSignal(hop, 14, shell, false), { hop: null, state: null, light: shell });
+  assert.deepEqual(lyraSignal(hop, 9, shell, false).light, shell);
+  assert.deepEqual(lyraSignal(null, 11, shell, false).light, shell);
+  assert.deepEqual(lyraSignal(hop, 10, shell, true).light, hop.to);
+  assert.deepEqual(lyraSignal(hop, 13, shell, true).light, shell);
 });
 
 test('ambient hops are periodic, nearby and deterministic', () => {

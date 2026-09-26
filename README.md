@@ -167,3 +167,22 @@ The archive projection becomes a beam from her eye. Her first meeting gains two 
 * Arriving in the Den starts clear of the cabinet.
 * One surplus E press no longer reopens what was just closed.
 * Observations and Mei's lines carry their own labels.
+
+## September 26 — Follow the shipment
+
+A third case follows Ada's. Continue from her case's closing panel, the notebook or Lyra's channel. Lyra puts a fare on Gravity's transit card, and **Meridian Clinic** appears on the district map. It is outside Sector 07, so there is no street door: choosing it rides the night train, and the clinic's own door rides back.
+
+Intake B holds five records: the intake ledger, the cold-storage cartridges, the donors' consent forms, the seals on the outbound crates and the sale terminal. They support three connections in notebook file 03, one of which reopens Marlon's residue from the Graves case. Lyra steps into the cold storage and the terminal while Gravity examines them. Connecting all three and naming the buyer with Lyra closes the case. There is no combat.
+
+The clinic now has a finished pixel-art plate, with measured evidence positions, layered privacy screens, cold glass and floor-level vapour. The exact generation prompt is in [the art notes](docs/meridian-art-prompt.md). Saves gain two fields, `shipment` and `buyerNamed`, which default to closed, so existing saves load unchanged.
+
+
+## September 26 · Meridian finish and integrated playthrough
+
+Meridian now shares the studio's dense noir pixel-art treatment: deep tiled recesses, neural recliners, a cold cartridge cabinet, sealed outbound cargo and a rain-lit service entrance. Lights, evidence, glass and the open shutter align with the finished plate. Low cold mist, stitched privacy screens, worn frames and grounded wheels add depth without a room-wide haze.
+
+Lyra's room light, reflected pool and light on Gravity follow her signal when she leaves the drone for a machine. A small cyan eye marks the occupied device. Reduced motion keeps that signal steady; the game and Lyra lab share the rendering.
+
+The notebook now treats matches within each case separately. Carried evidence has a source-file cross-reference, so the studio residue stays checked in the Graves case while remaining usable for Meridian. Opening the notebook resets to its case tabs; reading a record still preserves the board's place.
+
+Verified a fresh investigation through all three cases using the UI, with all 19 records and 10 deductions, the non-combat escape and night train. A real downloaded case was imported into empty folder 02 and resumed with the completed investigation intact. Browser checks include portrait/landscape layouts and reduced motion; physical iPhone behavior and the audio mix still need device review. See [QA](docs/QA.md) for exact checks and limits.

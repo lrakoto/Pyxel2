@@ -11,8 +11,9 @@ change alters something below, update this file in the same commit.
 
 ## What this is
 
-A browser-first cyberpunk noir investigation: one complete chapter plus a follow-up case.
-Three areas (Sector 07 street, Graves' studio, Memory Den), 14 evidence records, deductions on
+A browser-first cyberpunk noir investigation: one complete chapter plus two follow-up cases.
+Four areas (Sector 07 street, Graves' studio, Memory Den, and Meridian Clinic, reached by night
+train from the map), 19 evidence records, deductions on
 a case board, Lyra as a traveling companion, an optional two-wave combat encounter, a
 skippable 35.5 s intro, and three local save folders. No backend, accounts or telemetry.
 
@@ -37,7 +38,7 @@ Node ≥ 22.18.
 | `npm run build`                   | Imports art, strict `tsc --noEmit`, Vite build (game + both labs)  |
 | `npm run format` / `format:check` | Prettier over `src`, `tests`, `vite.config.ts`                     |
 | `npm run preview`                 | Serves `dist` on :4174                                             |
-| `npm run optimize-art`            | PNG masters → lossless WebP, verified pixel-for-pixel              |
+| `npm run optimize-art`            | PNG masters → lossless WebP, verified pixel-for-pixel; `-- clinic.png` limits it to named files |
 
 Before calling work done, run `npm test`, `npm run format:check`, `npm run build` and
 `git diff --check`. The Pages workflow runs the same checks, so any failure blocks a release.
@@ -115,13 +116,18 @@ These were settled through review with the user. Keep them unless the user chang
   stockings, and a red scarf that hangs near her ankles. Her idle plays three source poses over
   2.4 s and leaves out the deep crouch. The downloaded walk, sprint and jump art is preserved.
 - **Sprint speed:** 290 px/s on the street and in combat. The 330 px/s boost applies **only**
-  in the studio and the Den.
+  indoors: the studio, the Den and the clinic.
 - **Lyra:** an AI who lives in the city's machines. She travels in a small floating drone shell
   with one cyan eye (Guilty Spark–like, drawn in code, navy/gunmetal with cyan accents), and she
-  can leave it: her light hops into cameras, signs, screens and locks, then returns. Before she
+  can leave it: her light hops into cameras, signs, screens and locks, then returns. One
+  resolved signal position drives her sprite effects, room light, wet rim and reflection.
+  Occupied machines show a small cyan eye; reduced motion holds the light steady. Before she
   joins Gravity she keeps a post (the street outside the Den, her terminal inside it). As a
   companion she follows Gravity's shoulder everywhere, docking at her terminal in the Den. Her
   arc is locked: she was watching Gravity before they met (see the story bible).
+- **Case board:** completed cards are scoped to the displayed case. Records reused by a later
+  case keep a cross-reference to the source file, without reopening the earlier case’s matches.
+  Opening the notebook starts at the case tabs; returning from a record preserves its place.
 - **Screens:** in-world conversations use the CRT screen. The notebook (J) stays paper, in the
   olive case jacket.
 - **Type:** interface text uses the bundled DejaVu Sans Mono.
@@ -133,8 +139,9 @@ These were settled through review with the user. Keep them unless the user chang
 - For browser testing, use an isolated origin or a temporary fixture that doesn't save. Never
   change the user's live progress or settings. Those are the localStorage keys starting with
   `everybody-nobody:fragments:v1`, plus `en:preferences`. Remove temporary fixtures afterwards.
-- The last **full** chapter playthrough was on September 4. Everything since has been checked in
-  focused passes. Nothing has been tested on a physical iPhone.
+- The last full investigation playthrough was September 26: all three cases, 19 records, all
+  10 deductions, non-combat escape, train travel and a downloaded/imported checkpoint. Phone
+  layouts were checked at 390 × 844 and 844 × 390. Nothing has been tested on a physical iPhone.
 - Tests check audio signal properties. The user judges the mix by ear.
 
 ## Commits and docs
@@ -158,7 +165,11 @@ These were settled through review with the user. Keep them unless the user chang
 
 ## Known limits and next steps
 
-- The Meridian Clinic, the follow-up case's next lead, has no interior yet.
+- Meridian Clinic has a finished generated plate, aligned evidence/fixtures/glass, low cabinet
+  mist and worn foreground equipment. Its exact generation prompt is in
+  `docs/meridian-art-prompt.md`; the obsolete blockout generator was removed.
+- The third case ends on the Broker's name; there is no fourth case yet. Save fields `shipment` and
+  `buyerNamed` gate it, and `parseSave` defaults both to closed.
 - Map routing assumes a street hub (`nextRouteHotspot` in `model.ts`). A bigger district needs
   graph routing.
 - Imported Aseprite playback only loops tags. It has no finite repeats or one-shot callbacks.

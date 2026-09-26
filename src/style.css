@@ -718,6 +718,32 @@ button {
   opacity: 1;
   pointer-events: auto;
 }
+/* The night train to Meridian: the fade holds on the fare. */
+.transit-ticket {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-2deg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 26px;
+  min-width: 240px;
+  background: #d8cca8;
+  color: #2f3f3b;
+  border-left: 6px solid #8d3e32;
+  box-shadow: 0 8px 30px #0009;
+  text-align: left;
+}
+.transit-ticket span,
+.transit-ticket small {
+  font: 9px var(--mono);
+  letter-spacing: 2px;
+  color: #56665c;
+}
+.transit-ticket strong {
+  font: 500 30px var(--display);
+}
 .dialogue {
   position: absolute;
   left: 13%;
@@ -1471,6 +1497,14 @@ button {
   font: 14px/1.8 var(--mono);
   color: #b5c5a3;
 }
+.map-line {
+  position: absolute;
+  top: 8%;
+  right: 4%;
+  font: 9px var(--mono);
+  letter-spacing: 2px;
+  color: #82957b;
+}
 .map-caption {
   position: absolute;
   left: 35px;
@@ -2166,6 +2200,14 @@ button {
   .map-place:nth-of-type(3) {
     top: 76% !important;
     left: 68% !important;
+  }
+  /* Meridian, off the district along the rail, when the lead exists. */
+  .map-place:nth-of-type(4) {
+    top: 97% !important;
+    left: 45% !important;
+  }
+  .map-canvas:has(.map-transit) {
+    height: 580px;
   }
   .map-place > span {
     font-size: 6px;

@@ -8,6 +8,9 @@
 .shell[data-area='den'] {
   --spill: #6e9cba2b;
 }
+.shell[data-area='clinic'] {
+  --spill: #9cc9d42b;
+}
 .stage {
   box-shadow:
     0 0 20px 3px var(--spill),

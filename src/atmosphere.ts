@@ -88,6 +88,18 @@ export function drawInteriorMood(
     c.fillRect(1222 - cam, 202, 18, 85);
     c.globalAlpha = 0.2 * pulse;
     for (let i = 0; i < 4; i++) c.fillRect(1246 - cam + i * 5, 328 - (i % 2) * 3, 2, 2);
+  } else if (area === 'clinic') {
+    // Cold breath rolling off the storage glass, and the terminal's slow scan.
+    for (let i = 0; i < 16; i++) {
+      const life = (time * 0.12 + i * 0.137) % 1;
+      c.globalAlpha = 0.1 * Math.sin(life * Math.PI);
+      c.fillStyle = '#bfefff';
+      c.fillRect(860 + ((i * 29) % 145) - cam + life * 24, 428 + life * 18, 6 + (i % 3) * 3, 1);
+    }
+    const scan = (time * 22) % 62;
+    c.globalAlpha = 0.18 * eventEnvelope(time, 11, 6);
+    c.fillStyle = '#ff8a78';
+    c.fillRect(1330 - cam, 234 + scan, 68, 1);
   } else {
     // Signal bands stay inside the projection; screen light never strobes the room.
     const signal = eventEnvelope(time, 23, 4, 8);

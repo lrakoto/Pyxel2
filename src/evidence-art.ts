@@ -5,6 +5,9 @@ const ruled = Array.from(
   { length: 8 },
   (_, i) => `<path d="M77 ${75 + i * 14}H282" stroke="#5d746347"/>`,
 ).join('');
+/** The Veil's mark, a cloth folded over itself: the same on the consent form and the crate seal. */
+const veil = (x: number, y: number, scale: number, color: string) =>
+  `<g transform="translate(${x} ${y}) scale(${scale})" fill="none" stroke="${color}" stroke-width="${(1.6 / scale).toFixed(2)}" stroke-linejoin="round"><path d="M-12-9H12L7-3Q0 8 0 13Q0 8-7-3Z"/><path d="M-7-3Q0 1 7-3M0 1V13"/></g>`;
 const drawings: Partial<Record<ClueId, string>> = {
   camera: `<path d="M102 69H235L261 90V140H102Z" fill="#45565a" stroke="#7c8d8c"/><path d="M89 73H108V139H89Z" fill="#243638"/><circle cx="229" cy="108" r="24" fill="#14272d" stroke="#80948e"/><circle cx="229" cy="108" r="13" fill="#34505a"/><circle cx="226" cy="103" r="4" fill="#92b7b5"/><path d="M164 141V164H211" fill="none" stroke="#526465" stroke-width="9"/><circle cx="124" cy="91" r="3" fill="#bc6047"/><text x="91" y="194" fill="#adc3b8" font-size="12">02:14 — 02:25 / SIGNAL ABSENT</text>`,
   lock: `<path d="M104 26H257V207H104Z" fill="#303934"/><path d="M113 26V207M245 26V207" stroke="#646451"/><rect x="141" y="53" width="83" height="126" rx="5" fill="#8c805e" stroke="#b1a079"/><circle cx="183" cy="103" r="26" fill="#635b45" stroke="#c2ac7b"/><circle cx="183" cy="101" r="7" fill="#202823"/><path d="M181 102 176 119H191L186 102" fill="#202823"/><path d="M199 83l11-4m-9 9 13-3m-45 45-10 5" stroke="#d0b986"/><path d="M219 148Q227 170 222 177Q214 173 219 148" fill="#c3a86f" opacity=".6"/>`,
@@ -35,10 +38,49 @@ const drawings: Partial<Record<ClueId, string>> = {
     '',
   )}<text x="69" y="177" fill="#a6cdbb" font-size="12">♪   ♪   ♪   ♪     BELLWETHER</text>`,
   fragment: `<rect x="54" y="31" width="251" height="177" fill="#193e40" stroke="#629b90"/><g opacity=".65">${bird.replaceAll('#48473c', '#97d5bd')}</g><path d="M66 49h29m-29 0v25M292 49h-29m29 0v25M66 189h29m-29 0v-25M292 189h-29m29 0v-25" stroke="#9bbca1" fill="none"/><text x="77" y="67" fill="#9bbca1" font-size="10">001 / MEMORY RETAINED</text>`,
+  manifest: `<rect x="84" y="14" width="192" height="212" rx="4" fill="#3e3a2f"/><rect x="96" y="30" width="168" height="188" fill="#c4bd9c"/><rect x="150" y="8" width="60" height="18" rx="3" fill="#7f8580" stroke="#a9aea4"/><text x="106" y="50" fill="#394a43" font-size="10">MERIDIAN · INTAKE B</text><path d="M104 58H256" stroke="#6f7863"/>${[
+    76, 93, 110,
+  ]
+    .map(
+      (y) =>
+        `<text x="106" y="${y}" fill="#5a5a4a" font-size="8.5">DONOR SESSION · 2 CREDITS</text>`,
+    )
+    .join(
+      '',
+    )}<rect x="100" y="122" width="160" height="44" fill="#d9ceb0" stroke="#984f42" stroke-width="1.5"/><text x="106" y="139" fill="#33302a" font-size="9.5">COLLECTION · SECTOR 07</text><text x="106" y="157" fill="#33302a" font-size="9.5">V-17 · LOT B-0419</text><text x="110" y="194" fill="#984f42" font-size="15" font-style="italic">hold for buyer</text>`,
+  cartridge: `<rect x="56" y="20" width="248" height="196" fill="#13252b" stroke="#6d8f95"/><path d="M56 84H304M56 152H304" stroke="#3e5a60" stroke-width="4"/>${[
+    ['HANDS', 78, 30],
+    ['PATIENCE', 150, 30],
+    ['COLOUR', 222, 30],
+    ['HANDS', 78, 98],
+    ['M.G.', 150, 98],
+    ['PATIENCE', 222, 98],
+  ]
+    .map(([label, x, y]) => {
+      const newest = label === 'M.G.';
+      return `<rect x="${x}" y="${y}" width="58" height="46" rx="9" fill="#27434a" stroke="${newest ? '#bfe8e2' : '#56787d'}"/><path d="M${Number(x) + 8} ${Number(y) + 14}h42M${Number(x) + 8} ${Number(y) + 22}h42M${Number(x) + 8} ${Number(y) + 30}h42" stroke-width="5" stroke="${newest ? '#8fd9cf' : '#5f8f8c'}"/><path d="M${Number(x) + 8} ${Number(y) + 18}h42M${Number(x) + 8} ${Number(y) + 26}h42" stroke-width="2" stroke="${newest ? '#b99bd0' : '#7a7292'}" opacity=".8"/><rect x="${Number(x) + 6}" y="${Number(y) + 48}" width="46" height="12" fill="${newest ? '#d6d0b4' : '#9c9a86'}"/><text x="${Number(x) + 29}" y="${Number(y) + 57}" text-anchor="middle" fill="#2c3431" font-size="${newest ? 8 : 6.5}">${label}</text>`;
+    })
+    .join(
+      '',
+    )}${Array.from({ length: 26 }, (_, i) => `<rect x="${58 + ((i * 37) % 242)}" y="${i % 2 ? 22 + ((i * 11) % 9) : 206 - ((i * 7) % 9)}" width="${2 + (i % 4)}" height="2" fill="#cfe9ec" opacity=".35"/>`).join('')}<text x="66" y="200" fill="#8fb7b6" font-size="9">KEEP BELOW 4°C · DO NOT OPEN</text>`,
+  consent: `<path d="M66 16H294V224H66Z" fill="#cfc7a6"/><path d="M270 24h7v7h7v7h-7v7h-7v-7h-7v-7h7z" fill="#6f8f86"/><text x="80" y="36" fill="#394a43" font-size="8">MERIDIAN · COMMUNITY NEURAL HEALTH</text><text x="80" y="62" fill="#303c38" font-size="10">Therapeutic creativity archiving</text><text x="80" y="80" fill="#4b483d" font-size="9">PAYMENT · 2 MEAL CREDITS</text>${[
+    ['M86 118q12-12 22-2t24-4q12 6 26-3', 100],
+    ['M86 146q8-10 14 0l6-8q10 8 18-2l6 6q10-8 16 4', 128],
+    ['M86 174l6-6 4 7 5-9 3 8 7-5 2 6 6-7 3 9 5-4 4 3', 156],
+  ]
+    .map(
+      ([path, y]) =>
+        `<path d="M80 ${Number(y) + 24}H210" stroke="#8f876a"/><path d="${path}" fill="none" stroke="#2f3b46" stroke-width="1.5"/><text x="222" y="${Number(y) + 22}" fill="#6a6450" font-size="8">WEEK ${(Number(y) - 72) / 28}</text>`,
+    )
+    .join(
+      '',
+    )}${Array.from({ length: 5 }, (_, i) => `<path d="M80 ${196 + i * 5}h${150 - (i % 3) * 22}" stroke="#8d8568" stroke-width=".8"/>`).join('')}${veil(270, 205, 0.55, '#7d6f5a')}`,
+  seal: `<rect x="34" y="26" width="292" height="190" fill="#4a4034"/>${[62, 98, 170].map((y) => `<path d="M34 ${y}H326" stroke="#2f2923" stroke-width="3"/>`).join('')}<path d="M34 26H326M34 216H326" stroke="#2a241f" stroke-width="5"/><text x="56" y="52" fill="#a39777" font-size="15" font-family="monospace" letter-spacing="3">KEEP COLD</text><path d="M34 116H326V152H34Z" fill="#8e3b31"/><path d="M34 121H326M34 147H326" stroke="#b25a4d" opacity=".6"/><circle cx="180" cy="134" r="31" fill="#a8473a" stroke="#6d2a22" stroke-width="4"/><circle cx="180" cy="134" r="24" fill="none" stroke="#c9705f" opacity=".7"/>${veil(180, 133, 1.25, '#f0cdb8')}<text x="56" y="196" fill="#a39777" font-size="10">NO MANIFEST · COURIER 03:00</text>`,
+  sale: `<rect x="40" y="18" width="280" height="182" rx="8" fill="#1d2326" stroke="#5f6b6b"/><rect x="54" y="30" width="252" height="156" fill="#0c1112"/><text x="66" y="50" fill="#d9695a" font-size="10">OUTBOUND · SALES LOG</text><path d="M64 57H296" stroke="#3b2522"/><text x="66" y="76" fill="#c9a07a" font-size="11">LOT B-0419</text><text x="66" y="94" fill="#8f9c94" font-size="9">RESERVED</text><text x="150" y="94" fill="#8f9c94" font-size="9">T-3 DAYS</text><text x="66" y="110" fill="#8f9c94" font-size="9">STATUS</text><text x="150" y="110" fill="#8f9c94" font-size="9">PAID IN FULL</text><rect x="62" y="119" width="204" height="21" fill="#3a1714"/><text x="66" y="134" fill="#ff8a78" font-size="11">BUYER · THE BROKER</text><rect x="194" y="124" width="7" height="12" fill="#ff8a78"/><text x="66" y="160" fill="#6b7a73" font-size="8">“Nothing is sacred once someone is</text><text x="66" y="172" fill="#6b7a73" font-size="8">hungry enough to sell it.”</text>${Array.from({ length: 26 }, (_, i) => `<path d="M54 ${32 + i * 6}H306" stroke="#ffffff" opacity=".035"/>`).join('')}<path d="M158 200h44l9 18h-62z" fill="#2b3234"/>`,
 };
 /** Local vector illustrations shared by close-up inspection and evidence cards. */
 export function evidenceArt(id: ClueId): string {
   const art = drawings[id];
   if (!art) return '';
-  return `<svg viewBox="0 0 360 235" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="record-illustration"><rect width="360" height="235" fill="#122127"/><path d="M0 221 360 204M0 227 360 210" stroke="#23363b"/>${art}${['sketch', 'register', 'witness', 'diary'].includes(id) ? `<g opacity=".12" stroke="#514d39">${Array.from({ length: 32 }, (_, i) => `<path d="M${80 + ((i * 43) % 196)} ${48 + ((i * 31) % 140)}h${2 + (i % 6)}"/>`).join('')}</g>` : ''}<path d="M12 12h22m-22 0v22M348 223h-22m22 0v-22" stroke="#506a68" fill="none"/></svg>`;
+  return `<svg viewBox="0 0 360 235" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="record-illustration"><rect width="360" height="235" fill="#122127"/><path d="M0 221 360 204M0 227 360 210" stroke="#23363b"/>${art}${['sketch', 'register', 'witness', 'diary', 'manifest', 'consent'].includes(id) ? `<g opacity=".12" stroke="#514d39">${Array.from({ length: 32 }, (_, i) => `<path d="M${80 + ((i * 43) % 196)} ${48 + ((i * 31) % 140)}h${2 + (i % 6)}"/>`).join('')}</g>` : ''}<path d="M12 12h22m-22 0v22M348 223h-22m22 0v-22" stroke="#506a68" fill="none"/></svg>`;
 }

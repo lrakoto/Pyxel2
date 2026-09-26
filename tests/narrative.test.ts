@@ -74,18 +74,27 @@ test('new evidence, insights and resolutions cannot be forged ahead of their gat
   assert.equal(restored.resolution, null);
   assert.doesNotThrow(() => parseSave(JSON.stringify({ ...m.save, deductions: {} })));
 });
+/** Every case open, so any record can be collected: the Graves case, the first one, the shipment. */
+function everyCaseOpen() {
+  const m = completedFirstCase();
+  m.startFollowup();
+  for (const id of FOLLOWUP_CLUES) m.collect(id);
+  for (const d of DEDUCTIONS.filter((d) => FOLLOWUP_DEDUCTIONS.includes(d.id)))
+    m.connect(...d.pair);
+  m.resolveFollowup('protect');
+  m.startShipment();
+  return m;
+}
 test('every re-examination requires related evidence and survives a saved field note', () => {
   for (const insight of INSIGHTS) {
-    const m = completedFirstCase();
-    m.startFollowup();
+    const m = everyCaseOpen();
     m.save.clues = [];
     m.collect(insight.clue);
     assert.equal(insightFor(m, insight.clue), undefined);
     insight.requires.forEach((id) => m.collect(id));
     assert.equal(insightFor(m, insight.clue)?.id, insight.id);
     // Restore the already-earned first case so save validation preserves chapter two.
-    const full = completedFirstCase();
-    full.startFollowup();
+    const full = everyCaseOpen();
     full.collect(insight.clue);
     insight.requires.forEach((id) => full.collect(id));
     full.save.insights.push(insight.id, 'unknown');

@@ -92,6 +92,11 @@ export function drawInteriorForeground(
   if (area === 'street') return;
   c.save();
   const offset = cam * 1.075;
+  if (area === 'clinic') {
+    drawClinicForeground(c, offset, clear);
+    c.restore();
+    return;
+  }
   c.strokeStyle = '#0b1518';
   c.lineWidth = 5;
   for (const anchor of [180, 1010]) {
@@ -169,6 +174,68 @@ export function drawInteriorForeground(
     }
   }
   c.restore();
+}
+
+/** A folding privacy screen and a drip stand, clear of the clinic's evidence. */
+function drawClinicForeground(
+  c: CanvasRenderingContext2D,
+  offset: number,
+  clear?: { x: number; half: number },
+) {
+  const screen = 790 - offset;
+  c.globalAlpha = foregroundAlpha(screen, 96, clear);
+  c.fillStyle = '#06101299';
+  c.beginPath();
+  c.ellipse(screen + 47, 519, 63, 7, 0, 0, Math.PI * 2);
+  c.fill();
+  for (let panel = 0; panel < 3; panel++) {
+    const x = screen + panel * 32;
+    c.fillStyle = '#0d1618';
+    c.fillRect(x, 318, 30, 200);
+    c.fillStyle = panel % 2 ? '#213430' : '#293b33';
+    c.fillRect(x + 3, 324, 24, 170);
+    // Folded canvas, stitched seams and rubbed edges keep this plane as worn as the plate.
+    for (let fold = 0; fold < 4; fold++) {
+      c.fillStyle = fold % 2 ? '#40514665' : '#10252188';
+      c.fillRect(x + 4 + fold * 6, 326, 2 + (fold % 2), 166);
+    }
+    c.fillStyle = '#75827638';
+    for (let stitch = 0; stitch < 29; stitch++) c.fillRect(x + 5, 328 + stitch * 5, 1, 2);
+    c.fillStyle = '#101f1c66';
+    for (let wear = 0; wear < 28; wear++)
+      c.fillRect(x + 5 + ((wear * 13 + panel * 3) % 20), 337 + ((wear * 23) % 149), 2, 1);
+    c.fillStyle = '#4c605d';
+    c.fillRect(x, 318, 30, 2);
+    c.fillStyle = '#60777366';
+    c.fillRect(x, 321, 1, 183);
+    c.fillStyle = '#101a1c';
+    c.fillRect(x - 2, 514, 8, 6);
+    c.fillRect(x + 24, 514, 8, 6);
+  }
+  const stand = 1250 - offset;
+  c.globalAlpha = foregroundAlpha(stand - 16, 32, clear);
+  c.fillStyle = '#101a1c';
+  c.fillRect(stand, 250, 4, 280);
+  c.fillRect(stand - 16, 250, 36, 4);
+  c.fillStyle = '#6f9fa080';
+  c.fillRect(stand - 12, 256, 10, 24);
+  c.fillStyle = '#9eb8ad77';
+  c.fillRect(stand - 11, 259, 1, 16);
+  c.fillStyle = '#376467';
+  c.fillRect(stand - 10, 269, 6, 9);
+  c.strokeStyle = '#5b797c88';
+  c.lineWidth = 1;
+  c.beginPath();
+  c.moveTo(stand - 7, 280);
+  c.bezierCurveTo(stand - 17, 336, stand + 20, 354, stand + 9, 402);
+  c.stroke();
+  c.fillStyle = '#253b3e';
+  c.fillRect(stand, 286, 1, 233);
+  c.fillStyle = '#0b1619';
+  c.fillRect(stand - 14, 525, 32, 3);
+  c.fillRect(stand - 15, 528, 6, 4);
+  c.fillRect(stand + 12, 528, 6, 4);
+  c.globalAlpha = 1;
 }
 
 /** Mei occupies the serving window, with the counter masking her lower body. */

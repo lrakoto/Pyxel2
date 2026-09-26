@@ -7,7 +7,12 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const source = join(root, 'assets/environments');
 const destination = join(root, 'public/env');
 await mkdir(destination, { recursive: true });
-for (const file of (await readdir(source)).filter(f => f.endsWith('.png')).sort()) {
+// Optional names limit the pass, so one new plate doesn't re-encode the others:
+//   npm run optimize-art -- clinic.png
+const only = process.argv.slice(2);
+for (const file of (await readdir(source))
+  .filter(f => f.endsWith('.png') && (!only.length || only.includes(f)))
+  .sort()) {
   const input = join(source, file);
   const output = join(destination, file.replace(/\.png$/, '.webp'));
   await sharp(input).webp({ lossless: true, effort: 6 }).toFile(output);

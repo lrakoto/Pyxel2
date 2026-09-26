@@ -143,7 +143,12 @@ export class AudioEngine {
     this.interior = !street;
     this.rain?.gain.setTargetAtTime(street ? 0.24 : 0.07, t, 0.6);
     this.lowpass?.frequency.setTargetAtTime(street ? 1900 : 250, t, 0.6);
-    this.hum?.gain.setTargetAtTime(area === 'den' ? 0.08 : 0.04, t, 0.6);
+    // The Den's servers and the clinic's cold room both run a heavier hum than the studio.
+    this.hum?.gain.setTargetAtTime(
+      area === 'den' ? 0.08 : area === 'clinic' ? 0.065 : 0.04,
+      t,
+      0.6,
+    );
     // Indoors the city is still out there, just through a wall.
     this.city?.gain.setTargetAtTime(street ? 0.075 : 0.012, t, 0.8);
     this.rumble?.gain.setTargetAtTime(street ? 0.09 : 0.03, t, 0.8);

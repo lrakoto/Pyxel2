@@ -5,6 +5,8 @@ import {
   CORE_DEDUCTIONS,
   FOLLOWUP_DEDUCTIONS,
   FOLLOWUP_CLUES,
+  SHIPMENT_DEDUCTIONS,
+  SHIPMENT_CLUES,
   type AreaId,
   type ClueId,
   type DeductionId,
@@ -25,14 +27,34 @@ export interface SaveData {
   insights: string[];
   resumeHotspot: string | null;
   resolution: 'protect' | 'testify' | null;
+  /** The third case, “Follow the shipment”, is open and Gravity's transit card has its fare. */
+  shipment: boolean;
+  /** Gravity and Lyra named the buyer, which closes the third case. */
+  buyerNamed: boolean;
 }
 export const SAVE_KEY = 'everybody-nobody:fragments:v1';
-/** The district is a hub: interior-to-interior routes pass through the street. */
+/**
+ * The district is a hub: interior-to-interior routes pass through the street. Meridian Clinic is
+ * off the hub, a train ride away, so its only way out also leads back to the street.
+ */
 export function nextRouteHotspot(area: AreaId, destination: string): Hotspot | null {
   const end = AREAS.street.hotspots.find((h) => h.id === destination);
   if (!end || end.target === area) return null;
   if (area === 'street') return end;
   return AREAS[area].hotspots.find((h) => h.target === 'street') ?? null;
+}
+/** Where Gravity comes in: through the door she used, or off the night train by the vending machines. */
+export function arrivalX(to: AreaId, from: AreaId) {
+  if (to !== 'street') return AREAS[to].spawn;
+  if (from === 'studio') return 965;
+  if (from === 'den') return 1465;
+  return AREAS.street.spawn;
+}
+/** A theory can be worked only once the case it belongs to is open. */
+export function theoryOpen(save: SaveData, id: DeductionId) {
+  if (FOLLOWUP_DEDUCTIONS.includes(id)) return save.followup;
+  if (SHIPMENT_DEDUCTIONS.includes(id)) return save.shipment;
+  return true;
 }
 export function freshSave(): SaveData {
   return {
@@ -49,6 +71,8 @@ export function freshSave(): SaveData {
     insights: [],
     resumeHotspot: null,
     resolution: null,
+    shipment: false,
+    buyerNamed: false,
   };
 }
 export function parseSave(raw: string | null): SaveData {
@@ -78,6 +102,22 @@ export function parseSave(raw: string | null): SaveData {
       clues = clues.filter((id) => !FOLLOWUP_CLUES.includes(id));
       deductions = deductions.filter((id) => !FOLLOWUP_DEDUCTIONS.includes(id));
     }
+    const resolution =
+      followup &&
+      FOLLOWUP_DEDUCTIONS.every((id) => deductions.includes(id)) &&
+      (s.resolution === 'protect' || s.resolution === 'testify')
+        ? s.resolution
+        : null;
+    // Saves from before the third case have neither field; both default to closed.
+    const shipment = resolution !== null && s.shipment === true;
+    if (!shipment) {
+      clues = clues.filter((id) => !SHIPMENT_CLUES.includes(id));
+      deductions = deductions.filter((id) => !SHIPMENT_DEDUCTIONS.includes(id));
+    }
+    const buyerNamed =
+      shipment &&
+      SHIPMENT_DEDUCTIONS.every((id) => deductions.includes(id)) &&
+      s.buyerNamed === true;
     const insights = INSIGHTS.filter(
       (i) =>
         Array.isArray(s.insights) &&
@@ -85,13 +125,8 @@ export function parseSave(raw: string | null): SaveData {
         clues.includes(i.clue) &&
         i.requires.every((id) => clues.includes(id)),
     ).map((i) => i.id);
-    const resolution =
-      followup &&
-      FOLLOWUP_DEDUCTIONS.every((id) => deductions.includes(id)) &&
-      (s.resolution === 'protect' || s.resolution === 'testify')
-        ? s.resolution
-        : null;
-    const area = s.area === 'den' && !contact ? 'street' : s.area;
+    const area =
+      (s.area === 'den' && !contact) || (s.area === 'clinic' && !shipment) ? 'street' : s.area;
     return {
       version: 1,
       introSeen:
@@ -112,6 +147,8 @@ export function parseSave(raw: string | null): SaveData {
       followup,
       insights,
       resolution,
+      shipment,
+      buyerNamed,
       resumeHotspot:
         typeof s.resumeHotspot === 'string' &&
         AREAS[area].hotspots.some(
@@ -119,6 +156,7 @@ export function parseSave(raw: string | null): SaveData {
             h.id === s.resumeHotspot &&
             (h.kind === 'talk' || h.kind === 'clue') &&
             (h.requires !== 'followup' || followup) &&
+            (h.requires !== 'shipment' || shipment) &&
             (h.requires !== 'deduced' || CORE_DEDUCTIONS.every((id) => deductions.includes(id))),
         )
           ? s.resumeHotspot
@@ -148,10 +186,46 @@ export class CaseModel {
     this.save.resolution = choice;
     return true;
   }
+  get shipmentSolved() {
+    return (
+      this.save.shipment && SHIPMENT_DEDUCTIONS.every((id) => this.save.deductions.includes(id))
+    );
+  }
+  /** Opens “Follow the shipment”: the Meridian lead from Ada's case, and a fare on the card. */
+  startShipment() {
+    if (!this.save.resolution || this.save.shipment) return false;
+    this.save.shipment = true;
+    return true;
+  }
+  nameBuyer() {
+    if (!this.shipmentSolved || this.save.buyerNamed) return false;
+    this.save.buyerNamed = true;
+    return true;
+  }
+  /**
+   * Meridian on the district map. It appears once Ada's case points there, and is a ride away
+   * once the next case puts a fare on the transit card. There is no street door to walk to.
+   */
+  get meridian(): 'hidden' | 'no-fare' | 'ride' | 'here' {
+    if (this.save.area === 'clinic') return 'here';
+    if (this.save.shipment) return 'ride';
+    return this.save.resolution ? 'no-fare' : 'hidden';
+  }
   get awaitingAmbush() {
     return this.save.area === 'street' && this.save.companion && !this.save.escaped;
   }
   get objective() {
+    if (this.save.buyerNamed) return 'The Broker paid for Marlon. Find out who wears the name.';
+    if (this.shipmentSolved) return 'The records agree. Tell Lyra who paid for Marlon.';
+    if (this.save.shipment) {
+      const found = this.save.clues.filter((id) => SHIPMENT_CLUES.includes(id)).length;
+      if (found === SHIPMENT_CLUES.length)
+        return 'Connect the records. Where Marlon went, who runs intake B, who paid.';
+      if (this.save.area === 'clinic') return 'Search intake B. Find where the collection went.';
+      return found
+        ? 'Return to Meridian Clinic. Intake B has more to give up.'
+        : 'Take the night train to Meridian Clinic. Find intake B.';
+    }
     if (this.save.resolution) return 'Ada Vale is remembered. The trail leads to Meridian Clinic.';
     if (this.followupSolved)
       return 'Return to Lyra in the Den. Decide how to preserve Ada’s story.';
@@ -177,20 +251,25 @@ export class CaseModel {
     return 'Investigate Marlon Graves’ studio.';
   }
   get chapter() {
-    return this.save.resolution
-      ? 'A NAME KEPT SAFE'
-      : this.save.followup
-        ? 'THE FIRST ONE'
-        : this.save.escaped
-          ? 'THE FIRST ONE'
-          : this.save.contact
-            ? 'THE MEMORY KEEPER'
-            : this.deduced
-              ? 'SOMEONE IS WATCHING'
-              : 'THE LAST WORK';
+    return this.save.buyerNamed
+      ? 'THE BROKER’S RECEIPT'
+      : this.save.shipment
+        ? 'FOLLOW THE SHIPMENT'
+        : this.save.resolution
+          ? 'A NAME KEPT SAFE'
+          : this.save.followup
+            ? 'THE FIRST ONE'
+            : this.save.escaped
+              ? 'THE FIRST ONE'
+              : this.save.contact
+                ? 'THE MEMORY KEEPER'
+                : this.deduced
+                  ? 'SOMEONE IS WATCHING'
+                  : 'THE LAST WORK';
   }
   available(h: Hotspot) {
     if (h.requires === 'followup') return this.save.followup;
+    if (h.requires === 'shipment') return this.save.shipment;
     if (h.id === 'noodles' && this.save.followup) return false;
     if (h.id === 'lyra' && this.save.companion) return false;
     return !h.requires || (h.requires === 'deduced' ? this.deduced : true);
@@ -200,6 +279,7 @@ export class CaseModel {
   }
   collect(id: ClueId) {
     if (FOLLOWUP_CLUES.includes(id) && !this.save.followup) return false;
+    if (SHIPMENT_CLUES.includes(id) && !this.save.shipment) return false;
     if (this.save.clues.includes(id)) return false;
     this.save.clues.push(id);
     return true;
@@ -207,7 +287,7 @@ export class CaseModel {
   connect(a: ClueId, b: ClueId) {
     if (a === b || !this.save.clues.includes(a) || !this.save.clues.includes(b)) return null;
     const match = DEDUCTIONS.find((d) => d.pair.includes(a) && d.pair.includes(b));
-    if (match && FOLLOWUP_DEDUCTIONS.includes(match.id) && !this.save.followup) return null;
+    if (match && !theoryOpen(this.save, match.id)) return null;
     // A successful return means a newly established connection. Replaying an
     // old pair must not replay the discovery sound, save, or story reactions.
     if (!match || this.save.deductions.includes(match.id)) return null;
@@ -248,9 +328,7 @@ export class CaseModel {
         text: `Already recorded: ${recorded.title}. You can read this connection in the margin notes.`,
       };
     const open = DEDUCTIONS.filter(
-      (d) =>
-        !this.save.deductions.includes(d.id) &&
-        (this.save.followup || !FOLLOWUP_DEDUCTIONS.includes(d.id)),
+      (d) => !this.save.deductions.includes(d.id) && theoryOpen(this.save, d.id),
     );
     const solvedWith = (id: ClueId) =>
       DEDUCTIONS.some((d) => this.save.deductions.includes(d.id) && d.pair.includes(id));

@@ -215,6 +215,8 @@ The Broker sells things that should not be sellable: memories, talent, emotional
 
 He does not see himself as evil. He sees himself as a merchant. His philosophy: *"Nothing is sacred once someone is hungry enough to sell it."*
 
+In the game (case 07–033, *Follow the shipment*), Gravity first meets the name on a sale record. Meridian Clinic's intake B, a charity clinic that pays Sector 07's poor in meal credits for "therapeutic creativity archiving", is a Veil Syndicate processing site. Marlon's extracted mind was delivered there by courier V-17 as lot B-0419, reserved and paid for three days before he was killed. The buyer signs as THE BROKER, and his memo is his philosophy.
+
 The Broker's connection to Nobody: he may never use his real identity. He may be a rotating persona used by multiple people. Or "The Broker" may be an AI-generated mask worn by different criminals. So when Gravity tries to catch him, she realizes: the Broker is everybody in the system — and legally, he is nobody.
 
 ## Major threat: the neural virus

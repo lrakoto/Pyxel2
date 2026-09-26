@@ -20,4 +20,13 @@ export const RECORD_MOUNTS: Record<ClueId, { material: string; note: string; lab
   },
   witness: { material: 'receipt', note: 'Mei kept the carbon.', label: 'WITNESS EXHIBIT' },
   sketch: { material: 'paper', note: 'She kept the crooked wing.', label: 'RECOVERED DRAWING' },
+  manifest: { material: 'carbon', note: 'One collection. Hold for buyer.', label: 'LEDGER COPY' },
+  cartridge: {
+    material: 'photo',
+    note: 'Labelled by talent, not name.',
+    label: 'COLD ROOM PHOTOGRAPH',
+  },
+  consent: { material: 'paper', note: 'Two meals an afternoon.', label: 'SIGNED FORM' },
+  seal: { material: 'tracing', note: 'A folded veil on the tape.', label: 'SEAL RUBBING' },
+  sale: { material: 'carbon', note: 'Paid before it arrived.', label: 'TERMINAL TRANSCRIPT' },
 };

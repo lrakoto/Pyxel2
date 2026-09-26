@@ -17,7 +17,15 @@ export function caseRecap(save: SaveData): { summary: string; lead: string } {
   const recent = current.clues.at(-1);
   const deduction = [...DEDUCTIONS].reverse().find((item) => current.deductions.includes(item.id));
   let summary = 'Your field notes are still blank. The Graves case is waiting in Sector 07.';
-  if (current.resolution)
+  if (current.buyerNamed)
+    summary =
+      'You followed Marlon’s collection to Meridian Clinic’s intake B and named its buyer: the Broker.';
+  else if (model.shipmentSolved)
+    summary =
+      'Your records trace Marlon’s collection through intake B to the buyer who paid for it.';
+  else if (current.shipment)
+    summary = 'You are following the shipment from Marlon’s studio to Meridian Clinic’s intake B.';
+  else if (current.resolution)
     summary =
       current.resolution === 'protect'
         ? 'You kept Ada Vale’s identity in Lyra’s private archive. The evidence points to Meridian Clinic.'
@@ -39,7 +47,9 @@ export function caseRecap(save: SaveData): { summary: string; lead: string } {
   else if (deduction) summary = `Your notes connect the evidence: “${deduction.title}.”`;
   else if (current.introSeen)
     summary = 'You arrived in Sector 07 to investigate Marlon Graves’ death.';
-  if (recent && !current.resolution) summary += ` Your latest record is “${CLUES[recent].title}.”`;
+  // A closed case speaks for itself; an open one also names the latest record.
+  const open = !current.resolution || (current.shipment && !current.buyerNamed);
+  if (recent && open) summary += ` Your latest record is “${CLUES[recent].title}.”`;
   return { summary, lead: model.objective };
 }
 

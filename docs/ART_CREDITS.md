@@ -28,6 +28,12 @@ Side-scrolling cyberpunk noir pixel art game background, ultra-wide 3:1 landscap
 
 Use case: background-extraction. Edit target: the provided wide pixel art cyberpunk street background. Create a TRANSPARENT PNG foreground layer for a 2.5D parallax game. CRITICAL: preserve the exact wide composition, dimensions, pixel art, building positions, signs and colors of the input. Keep the nearest three street-level building groups (the large noodle shop building on the left, the lower GRAVES artist studio and its neighboring shutter at center, and the large MEMORY DEN building on the right), all of their attached foreground cables, pipes and signs, plus the continuous horizontal sidewalk and wet pavement. Remove ALL of the distant city skyline, atmospheric sky, elevated railway bridge, train, and their supporting structures that are visible in the open gap behind the foreground buildings, replacing those distant/background areas with GENUINE alpha transparency, not black, not a checkerboard illustration. Follow the existing roof silhouettes exactly. In particular, the large upper central gap between the tall left building and tall right building must be transparent down to the stepped roof of the low GRAVES studio. No new details, no relighting, no repositioning, no resizing buildings. Output only this foreground layer on a transparent background at the original wide 3:1 framing.
 
+### Meridian Clinic — finished plate (September 26)
+
+`assets/environments/clinic.png` was generated with the built-in image-generation tool, using the clinic's code-drawn layout blockout and the existing studio plate as composition and style references. The finished image replaces the blockout. No new third-party material was downloaded. The exact prompt and reference roles are retained in [the Meridian art prompt](meridian-art-prompt.md).
+
+`public/env/clinic.webp` is the lossless runtime derivative, verified pixel-for-pixel with the PNG by `npm run optimize-art -- clinic.png`. The room is mapped into 1500 × 540 world coordinates. Fixtures, evidence, glass, rain opening and Lyra's machine sockets are measured against the finished plate.
+
 ## Code-rendered elements
 
 The middle-distance buildings and rail deck, moving train, near-camera objects, rain, mist, glints, scarf, dynamic water reflection pass, combat projectiles, and light overlays are rendered in code. Most sound is generated locally with Web Audio; no recorded music is bundled.

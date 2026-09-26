@@ -178,6 +178,19 @@ export function hopState(
   return { phase: 'done', spark: null, shell: 1, machine: 0 };
 }
 
+/** One signal position drives the eye, character rim light and reflected floor glow. */
+export function lyraSignal(
+  hop: LyraHop | null,
+  time: number,
+  shell: OrbPoint,
+  reducedMotion: boolean,
+) {
+  const state = hop ? hopState(hop, time, shell, reducedMotion) : null;
+  if (!hop || !state || state.phase === 'done') return { hop: null, state: null, light: shell };
+  return { hop, state, light: state.spark ?? hop.to };
+}
+export type LyraSignal = ReturnType<typeof lyraSignal>;
+
 /** Machines she can occupy, measured off each plate. */
 export const ORB_SOCKETS: Record<AreaId, OrbPoint[]> = {
   street: [
@@ -195,9 +208,15 @@ export const ORB_SOCKETS: Record<AreaId, OrbPoint[]> = {
     { x: 823, y: 201 }, // memory column
     { x: 1196, y: 195 }, // monitor wall
   ],
+  // Measured off the finished Meridian plate, in 1500 × 540 world coordinates.
+  clinic: [
+    { x: 267, y: 286 }, // intake monitor
+    { x: 927, y: 412 }, // cold-storage controls beneath the glass
+    { x: 1360, y: 262 }, // outbound terminal
+  ],
 };
 /** Machine evidence she steps into while Gravity examines it. */
-export const MACHINE_CLUES = ['camera', 'device', 'transfer', 'chime'];
+export const MACHINE_CLUES = ['camera', 'device', 'transfer', 'chime', 'cartridge', 'sale'];
 
 const AMBIENT_WINDOW = 34;
 const AMBIENT_OFFSET = 20;

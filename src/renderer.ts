@@ -32,11 +32,12 @@ import {
   ORB_HOVER,
   ambientHop,
   companionAnchor,
-  hopState,
+  lyraSignal,
   lyraPresence,
   orbPose,
   type LyraHop,
   type LyraPresence,
+  type LyraSignal,
   type OrbPoint,
 } from './lyra-orb.ts';
 import { drawLyraBeam, drawLyraHop, drawLyraOrb } from './lyra-orb-draw.ts';
@@ -200,8 +201,12 @@ export class Renderer {
       ? { kind: 'none' }
       : lyraPresence(area, v.model.deduced, v.model.save.companion);
     const orb = this.placeOrb(presence, area, v, figure, world.ground);
+    const quiet = !v.speaker && !v.examining && !v.performance?.gravity;
+    let signal = orb ? lyraSignal(v.lyraHop ?? null, v.time, orb, v.reducedMotion) : null;
+    if (orb && !signal?.state && presence.kind === 'follow' && quiet && !v.reducedMotion)
+      signal = lyraSignal(ambientHop(area, v.time, v.player.x), v.time, orb, false);
     const lyraLight: SignLight | null = orb
-      ? { x: orb.x, y: orb.y, color: '#83c9ff', intensity: 1.3 }
+      ? { ...signal!.light, color: '#83c9ff', intensity: 1.3 }
       : null;
     const sceneLights = lyraLight ? [...world.lights, lyraLight] : world.lights;
     const actorLights =
@@ -280,6 +285,10 @@ export class Renderer {
     } else if (area === 'studio') {
       c.drawImage(this.light, 520 - cam, 30, 530, 430);
       c.drawImage(this.mist, 1050 - cam, 200, 350, 300);
+    } else if (area === 'clinic') {
+      // Cold air pools at the cabinet's feet; keep the glass and evidence clear.
+      c.globalAlpha = 0.055;
+      c.drawImage(this.mist, 818 - cam, 398, 265, 76);
     } else {
       c.globalAlpha = 0.15 + Math.sin(t * 0.8) * 0.025;
       c.drawImage(this.mist, 510 - cam, 180, 600, 350);
@@ -327,7 +336,7 @@ export class Renderer {
       this.crowd.draw(c, cam, t, world.ground);
     }
     // Her shell floats behind Gravity's shoulder, so it is drawn before her.
-    if (orb) this.drawOrb(c, orb, presence, area, cam, t, figure, v);
+    if (orb && signal) this.drawOrb(c, orb, area, cam, t, figure, v, signal);
     const p = v.player,
       tag = !p.grounded ? 'jump' : Math.abs(p.vx) > 8 ? 'walk' : 'idle';
     const motion = this.characterMotion.update(
@@ -1029,24 +1038,16 @@ export class Renderer {
   private drawOrb(
     c: CanvasRenderingContext2D,
     orb: OrbPoint,
-    presence: LyraPresence,
     area: AreaId,
     cam: number,
     t: number,
     figure: number,
     v: View,
+    signal: LyraSignal,
   ) {
     const performance = v.performance;
     const mode = performance?.lyra ?? (v.speaker === 'LYRA' ? 'speak' : 'idle');
-    // Story hops come from the game; a companion's idle habit fills the quiet between them.
-    let hop = v.lyraHop ?? null;
-    let state = hop ? hopState(hop, v.time, orb, v.reducedMotion) : null;
-    if (state?.phase === 'done') hop = state = null;
-    const quiet = !v.speaker && !v.examining && !performance?.gravity;
-    if (!hop && presence.kind === 'follow' && quiet && !v.reducedMotion) {
-      hop = ambientHop(area, v.time, v.player.x);
-      state = hop ? hopState(hop, v.time, orb, false) : null;
-    }
+    const { hop, state } = signal;
     const shell = state ? state.shell : 1;
     const look = mode === 'project' ? ARCHIVE_PROJECTION.x - orb.x : v.player.x - orb.x;
     const pose = orbPose(
@@ -1076,6 +1077,7 @@ export class Renderer {
         state.spark ? { x: state.spark.x - cam, y: state.spark.y } : null,
         figure,
         v.time,
+        v.reducedMotion,
       );
   }
   private weather(

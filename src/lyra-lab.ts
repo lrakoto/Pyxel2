@@ -112,7 +112,7 @@ Promise.all([plate('street'), plate('den'), loadLyraHumanoid()])
           time,
           reduced,
         );
-      if (hop && state) drawLyraHop(after, state, hop.to, state.spark, zoom / 2, time);
+      if (hop && state) drawLyraHop(after, state, hop.to, state.spark, zoom / 2, time, reduced);
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);

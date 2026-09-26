@@ -1,5 +1,5 @@
 import type { AreaWater } from './water.ts';
-export type AreaId = 'street' | 'studio' | 'den';
+export type AreaId = 'street' | 'studio' | 'den' | 'clinic';
 export type ClueId =
   | 'camera'
   | 'lock'
@@ -14,7 +14,12 @@ export type ClueId =
   | 'register'
   | 'transfer'
   | 'witness'
-  | 'sketch';
+  | 'sketch'
+  | 'manifest'
+  | 'cartridge'
+  | 'consent'
+  | 'seal'
+  | 'sale';
 export type DeductionId =
   | 'harvest'
   | 'voices'
@@ -22,10 +27,16 @@ export type DeductionId =
   | 'entry'
   | 'identity'
   | 'seizure'
-  | 'continuity';
+  | 'continuity'
+  | 'intake'
+  | 'front'
+  | 'buyer';
 export const CORE_DEDUCTIONS: DeductionId[] = ['harvest', 'voices', 'first'];
 export const FOLLOWUP_DEDUCTIONS: DeductionId[] = ['identity', 'seizure', 'continuity'];
 export const FOLLOWUP_CLUES: ClueId[] = ['chime', 'register', 'transfer', 'witness', 'sketch'];
+/** The third case, “Follow the shipment”: intake B at Meridian Clinic. */
+export const SHIPMENT_DEDUCTIONS: DeductionId[] = ['intake', 'front', 'buyer'];
+export const SHIPMENT_CLUES: ClueId[] = ['manifest', 'cartridge', 'consent', 'seal', 'sale'];
 export interface Clue {
   id: ClueId;
   title: string;
@@ -161,6 +172,51 @@ export const CLUES: Record<ClueId, Clue> = {
     observation:
       'A crooked wing. She didn’t erase it. She showed the child how to turn the mistake into a feather. The same line as the memory. Something real made it out.',
   },
+  manifest: {
+    id: 'manifest',
+    title: 'The night intake',
+    category: 'INTAKE LEDGER',
+    glyph: '▦',
+    body: 'Intake B’s ledger for the night Marlon died. Every entry that week is a donor session except one: “Collection · Sector 07 · courier V-17 · lot B-0419 · hold for buyer.”',
+    observation:
+      'Donor session, donor session, donor session. Then one line in a different hand: a collection from Sector 07, courier V-17, held for a buyer. No name. They logged him like freight.',
+  },
+  cartridge: {
+    id: 'cartridge',
+    title: 'Minds kept cold',
+    category: 'NEURAL CARGO',
+    glyph: '▣',
+    body: 'A refrigerated rack of sealed cartridges, each holding an iridescent polymer that shifts with the light. They are labelled by talent, not by name: HANDS, PATIENCE, COLOUR. Only the newest carries initials: M.G.',
+    observation:
+      'Hands. Patience. Colour. Labelled like cuts of meat. The newest one just says M.G. The film inside turns toward the light. I’ve seen it do that before.',
+  },
+  consent: {
+    id: 'consent',
+    title: 'Paid in meal credits',
+    category: 'SIGNED CONSENT',
+    glyph: '▭',
+    body: 'Consent forms on the donor recliners promise “therapeutic creativity archiving,” paid in meal credits. The same names return week after week. The fine print hands everything archived to a processing partner, marked with a small folded veil.',
+    observation:
+      'Two meals for an afternoon of someone’s imagination. The same names come back every week, and every week the signature forgets a little more of itself.',
+  },
+  seal: {
+    id: 'seal',
+    title: 'The folded veil',
+    category: 'PHYSICAL TRACE',
+    glyph: '▽',
+    body: 'The crates by the loading door are sealed with red tape pressed with a folded veil, not Meridian’s cross. No destination, no clinic registration: only a courier window at 03:00.',
+    observation:
+      'Not the clinic’s cross. A folded veil, pressed into red tape. Lyra went still when she saw it. The enforcers who came for the memory answered to this mark.',
+  },
+  sale: {
+    id: 'sale',
+    title: 'Sold before it arrived',
+    category: 'SALE RECORD',
+    glyph: '◫',
+    body: 'The outbound terminal’s sale log, opened by Lyra from inside the machine: lot B-0419, reserved three days before collection and paid in full. Buyer: THE BROKER. Memo: “Nothing is sacred once someone is hungry enough to sell it.”',
+    observation:
+      'Lot B-0419. Reserved three days before it was collected. Paid in full. The buyer signs with a title instead of a name, and leaves a memo that reads like a shrug.',
+  },
 };
 export interface Deduction {
   id: DeductionId;
@@ -240,7 +296,55 @@ export const DEDUCTIONS: Deduction[] = [
     conclusion:
       'The corrected wing exists in the memory and on a child’s paper drawing. Archive 001 preserves an event, not a synthetic replacement.',
   },
+  {
+    id: 'intake',
+    pair: ['residue', 'cartridge'],
+    title: 'Marlon arrived at intake B',
+    question: 'Where did Marlon’s mind go?',
+    hint: 'Something left Marlon at the studio. Find where it was kept.',
+    conclusion:
+      'The film beneath Marlon’s body and the polymer in the cartridge marked M.G. are the same carrier. What the receiver pulled out of him was sealed and kept cold at intake B.',
+  },
+  {
+    id: 'front',
+    pair: ['consent', 'seal'],
+    title: 'A clinic for the Veil',
+    question: 'Who really runs intake B?',
+    hint: 'Compare what the donors signed with what leaves by the loading door.',
+    conclusion:
+      'The forms promise therapy and sign everything over to a partner marked with a folded veil. The crates leave under the same seal. Meridian treats Sector 07’s poor; intake B processes them for the Veil Syndicate.',
+  },
+  {
+    id: 'buyer',
+    pair: ['manifest', 'sale'],
+    title: 'The Broker paid for Marlon',
+    question: 'Who paid for the collection?',
+    hint: 'Match the night’s delivery to the sale it was made for.',
+    conclusion:
+      'V-17’s collection from Sector 07 was logged as lot B-0419, and lot B-0419 was reserved and paid for three days before it was collected. Marlon was taken to order. The buyer signs as the Broker.',
+  },
 ];
+/** The notebook keeps one file per case. */
+export type CaseFileId = 'graves' | 'first-one' | 'shipment';
+export function theoryFile(id: DeductionId): CaseFileId {
+  if (FOLLOWUP_DEDUCTIONS.includes(id)) return 'first-one';
+  if (SHIPMENT_DEDUCTIONS.includes(id)) return 'shipment';
+  return 'graves';
+}
+/** A file shows its own records, and any earlier record that one of its theories reopens. */
+export function clueFile(id: ClueId): CaseFileId {
+  return FOLLOWUP_CLUES.includes(id)
+    ? 'first-one'
+    : SHIPMENT_CLUES.includes(id)
+      ? 'shipment'
+      : 'graves';
+}
+export function inCaseFile(file: CaseFileId, id: ClueId) {
+  return (
+    clueFile(id) === file ||
+    DEDUCTIONS.some((d) => theoryFile(d.id) === file && d.pair.includes(id))
+  );
+}
 export interface Hotspot {
   id: string;
   x: number;
@@ -250,7 +354,7 @@ export interface Hotspot {
   clue?: ClueId;
   target?: AreaId;
   text?: string;
-  requires?: 'deduced' | 'contact' | 'followup';
+  requires?: 'deduced' | 'contact' | 'followup' | 'shipment';
 }
 /**
  * A neon sign or practical light. These do not light the plate — that is
@@ -530,6 +634,109 @@ export const AREAS: Record<AreaId, Area> = {
         label: 'The unclaimed',
         kind: 'flavor',
         text: 'Names on paper labels. A teacher. A mechanic. Someone’s father. The city calls them redundant data. Lyra keeps them in alphabetical order.',
+      },
+    ],
+  },
+  /**
+   * Outside Sector 07: there is no street door, only the night train on the transit card.
+   * Positions measured against the finished Meridian plate in 1500 × 540 world coordinates.
+   */
+  clinic: {
+    id: 'clinic',
+    title: 'Meridian Clinic',
+    subtitle: 'INTAKE B · AFTER HOURS',
+    width: 1500,
+    // Just inside the night-service door, clear of the dock's near-plane curtain.
+    spawn: 180,
+    color: '#9cc9d4',
+    figureScale: 2.85,
+    ground: 438,
+    lights: [
+      { x: 330, y: 56, color: '#d6efff', intensity: 1.05, flicker: 0.2 }, // tube over intake
+      { x: 760, y: 56, color: '#cfe4ff', intensity: 1.15, flicker: 0.52 }, // failing tube, recliners
+      { x: 1176, y: 56, color: '#cfe4ff', intensity: 0.95, flicker: 0.12 }, // loading bay
+      { x: 410, y: 253, color: '#ffc17c', intensity: 0.7 }, // counter lamp
+      // Light behind glass, so it earns a flare; the terminal is a diffuse screen.
+      { x: 930, y: 236, color: '#7fdcff', intensity: 1.7, flicker: 0.12, flare: 0.22 }, // cold storage
+      { x: 1360, y: 262, color: '#ff5a48', intensity: 0.85, flicker: 0.45 }, // outbound terminal
+      { x: 80, y: 360, color: '#ffb066', intensity: 0.8 }, // sodium light under the service door
+    ],
+    water: {
+      // The night-service door is rolled a third of the way up: the rain is right there.
+      openings: [{ x: 30, y: 239, w: 109, h: 183 }],
+      // Condensation running down the cold-storage glass.
+      panes: [{ x: 869, y: 158, w: 121, h: 231 }],
+      leaks: [
+        { x: 196, from: 36, to: 462 },
+        { x: 1262, from: 40, to: 466 },
+      ],
+      puddles: [
+        { x: 110, y: 460, rx: 104, ry: 16 },
+        { x: 930, y: 474, rx: 128, ry: 20 },
+        { x: 1262, y: 466, rx: 112, ry: 18 },
+      ],
+    },
+    hotspots: [
+      {
+        id: 'clinic-exit',
+        x: 85,
+        y: 370,
+        label: 'Return to Sector 07',
+        kind: 'door',
+        target: 'street',
+      },
+      {
+        id: 'manifest',
+        x: 330,
+        y: 318,
+        label: 'Intake ledger',
+        kind: 'clue',
+        clue: 'manifest',
+        requires: 'shipment',
+      },
+      {
+        id: 'notice',
+        x: 320,
+        y: 267,
+        label: 'Health notice',
+        kind: 'flavor',
+        text: 'Free neural health checks. Sector 07 residents welcome. The paper has curled in the damp. Nobody takes it down, because it still works.',
+      },
+      {
+        id: 'consent',
+        x: 648,
+        y: 351,
+        label: 'Donor recliners',
+        kind: 'clue',
+        clue: 'consent',
+        requires: 'shipment',
+      },
+      {
+        id: 'cartridge',
+        x: 930,
+        y: 262,
+        label: 'Cold storage',
+        kind: 'clue',
+        clue: 'cartridge',
+        requires: 'shipment',
+      },
+      {
+        id: 'seal',
+        x: 1150,
+        y: 392,
+        label: 'Outbound crates',
+        kind: 'clue',
+        clue: 'seal',
+        requires: 'shipment',
+      },
+      {
+        id: 'sale',
+        x: 1360,
+        y: 262,
+        label: 'Outbound terminal',
+        kind: 'clue',
+        clue: 'sale',
+        requires: 'shipment',
       },
     ],
   },

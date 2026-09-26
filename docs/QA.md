@@ -490,3 +490,53 @@ Not verified: the Chrome window was hidden for the rest of the check. Chrome pau
 * The ambush returning.
 * The first-run start.
 * The panel contrast in the page itself (the ratios above are computed from the CSS values).
+
+## September 26 — Follow the shipment (Meridian Clinic)
+
+Automated checks:
+
+* `npm test`: **149 passed, 0 failed**. The 8 new tests in `tests/shipment.test.ts` cover:
+  * old saves loading with the case closed
+  * forged saves rejected: clinic area, records, deductions and the closing flag
+  * the transit card's map states
+  * three orders of connection, with reloads in between
+  * the residue reopening in file 03
+  * spoiler-safe hints and recap
+  * train routing and arrival points
+  * Lyra's clinic sockets and the illustrations
+
+  The re-examination test now opens every case, so it covers the two new clinic observations.
+* Strict TypeScript, `npm run format:check`, `npm run build` and `git diff --check` pass.
+* The placeholder plate's WebP decodes pixel-for-pixel equal to its PNG master.
+
+Browser, production build on an isolated origin (`127.0.0.1:4193`) with a temporary save in the clinic. The save was removed afterwards; no live progress was touched.
+
+* The clinic save resumes with the right location title, objective ("Search intake B…") and chapter (05 FOLLOW THE SHIPMENT). No console errors.
+* **Not verified:** anything visual. The Chrome window was hidden, so the canvas never repainted after load. Nobody has yet seen the following in the running game:
+  * the plate in play, and the near-plane screen and trolley
+  * Lyra's hops in the clinic
+  * the train ticket, and the map's fourth place on desktop and phones
+  * the closing panel
+
+## September 26 — finished Meridian and integration pass
+
+Built on the incoming third-case work and preserved the drone Lyra direction. Replaced the clinic blockout with a finished generated plate; aligned the shutter rain mask, glass, evidence and fixture lights; confined cold mist to the cabinet base; added worn canvas, seams, tubing and feet to near-plane equipment. Lyra's resolved signal now drives her room lighting and reflection as well as her machine effect. Reduced motion holds the machine glow steady. Notebook matches are scoped to the selected case, carried records identify their source file, and a newly opened notebook resets to its tabs.
+
+Automated verification:
+- `npm test`: **151 passed**, 0 failed. New regression checks cover signal-light travel/return/reduced motion and cross-case evidence reopening only in its destination file.
+- `npm run format:check`: passed.
+- `npm run build`: passed (TypeScript and Vite, game and both labs).
+- `git diff --check`: passed.
+- `npm run optimize-art -- clinic.png`: lossless PNG/WebP pixel equality passed; runtime plate reduced from approximately 2.48 MB to 1.85 MB.
+
+Browser verification, isolated origin `http://127.0.0.1:4197/`:
+- Fresh first-run investigation, intro, camera, seven studio records, three core deductions plus camera/lock optional deduction; Lyra encounter, archive 001, companion choice, non-combat service-alley ending.
+- Second case: Den audio/register, studio drawing/spool, Mei's scheduled-pickup testimony, all three deductions, sealed witness statement, completion and shipment handoff.
+- Third case: fare-loaded map route, night train arrival, all five clinic records, all three deductions including the reused studio residue, Name the buyer conversation and completion.
+- All four scenes observed in play. Grounding and foreground readability checked in studio, Den and clinic; new clinic plate inspected at entry, cabinet and terminal. Machine occupation checked with reduced motion on and off.
+- A real Download case action produced `gravity-case-file-01-2026-09-26.json` (949 bytes, 19 records, 10 deductions, buyerNamed true). Imported that same file through the native file chooser into empty folder 02; preview, commit and resumed game retained the completed case. Folder 01 remained intact. The automation download event timed out despite the browser successfully writing the file; existence, timestamp and contents were checked directly. The native chooser was slow to return.
+- Normal phone layouts checked at 390 × 844 and 844 × 390; narrow notebook, source-file cross-reference, visible case tabs and transit map reviewed. Temporary viewport override reset afterwards.
+- Fullscreen toggle and exit checked. Desktop immersive rendering passed visually. With an emulated phone viewport, the browser screenshot surface scaled unexpectedly although DOM bounds matched the viewport; do not treat that as a verified mobile-native fullscreen result.
+- A transient renderer error occurred during an intermediate hot reload between dependent edits; the completed renderer call supplies the signal and subsequent playthrough/build passed.
+
+Limits: no physical iPhone test; no touch-hold selection test on hardware; no new audio-by-ear assessment; combat deliberately skipped. No live Pages saves/settings were touched. This pass is a local checkpoint, not a Pages deployment.

@@ -9,8 +9,10 @@ export interface ActorPerformance {
 }
 
 export function investigationPose(h: Hotspot): InvestigationPose {
-  if (h.clue === 'residue') return 'crouch';
-  if (['device', 'transfer', 'fragment', 'chime'].includes(h.clue ?? '')) return 'terminal';
+  // Floor evidence: the studio's residue, and the seal taped low on the clinic's crates.
+  if (h.clue === 'residue' || h.clue === 'seal') return 'crouch';
+  if (['device', 'transfer', 'fragment', 'chime', 'cartridge', 'sale'].includes(h.clue ?? ''))
+    return 'terminal';
   return 'inspect';
 }
 

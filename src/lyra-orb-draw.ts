@@ -120,17 +120,31 @@ export function drawLyraHop(
   spark: OrbPoint | null,
   scale: number,
   time: number,
+  reducedMotion: boolean,
 ) {
   c.save();
   c.globalCompositeOperation = 'screen';
   if (state.machine > 0) {
-    const pulse = 0.85 + 0.15 * Math.sin(time * 12);
+    const pulse = reducedMotion ? 1 : 0.94 + 0.06 * Math.sin(time * 3);
     const glow = c.createRadialGradient(machine.x, machine.y, 0, machine.x, machine.y, 24 * scale);
     glow.addColorStop(0, cyan(0.5 * state.machine * pulse));
     glow.addColorStop(0.5, cyan(0.14 * state.machine * pulse));
     glow.addColorStop(1, cyan(0));
     c.fillStyle = glow;
     c.fillRect(machine.x - 24 * scale, machine.y - 24 * scale, 48 * scale, 48 * scale);
+    // The same single eye now lives in the machine, not in the empty shell.
+    // Small broken brackets read as a connection rather than a ghostly aura.
+    const unit = Math.max(1, Math.round(scale));
+    const x = Math.round(machine.x),
+      y = Math.round(machine.y);
+    c.fillStyle = cyan(0.7 * state.machine);
+    for (const direction of [-1, 1]) {
+      c.fillRect(x + direction * 5 * unit, y - 2 * unit, unit, 5 * unit);
+      c.fillRect(x + (direction < 0 ? -5 : 3) * unit, y - 3 * unit, 3 * unit, unit);
+      c.fillRect(x + (direction < 0 ? -5 : 3) * unit, y + 3 * unit, 3 * unit, unit);
+    }
+    c.fillStyle = `rgba(216,255,251,${0.85 * state.machine})`;
+    c.fillRect(x - unit, y - unit, unit * 2, unit * 2);
   }
   if (spark) {
     const glow = c.createRadialGradient(spark.x, spark.y, 0, spark.x, spark.y, 7 * scale);

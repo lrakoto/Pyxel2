@@ -33,10 +33,12 @@ import {
   AREAS,
   CLUES,
   DEDUCTIONS,
-  FOLLOWUP_CLUES,
-  FOLLOWUP_DEDUCTIONS,
   LYRA_ARCHIVE,
+  SHIPMENT_CLUES,
+  inCaseFile,
+  theoryFile,
   type AreaId,
+  type CaseFileId,
   type ClueId,
   type Hotspot,
 } from './content.ts';
@@ -46,6 +48,7 @@ import {
   clamp,
   stepBody,
   nextRouteHotspot,
+  arrivalX,
   type Body,
   type SaveData,
 } from './model.ts';
@@ -61,6 +64,8 @@ import {
   lyraIntroduction,
   lyraTopics,
   FOLLOWUP_OPENING,
+  SHIPMENT_OPENING,
+  SHIPMENT_CLOSING,
   type Line,
 } from './narrative.ts';
 
@@ -182,7 +187,7 @@ class Game {
   inspectedClue: ClueId | null = null;
   boardScroll = 0;
   selected: ClueId[] = [];
-  boardFile: 'graves' | 'first-one' = 'graves';
+  boardFile: CaseFileId = 'graves';
   examining = false;
   interactionSubject: Hotspot | null = null;
   staging: { hotspot: Hotspot; remaining: number } | null = null;
@@ -1029,7 +1034,12 @@ class Game {
         hotspot: a.hotspots.find((h) => h.id === element.dataset.hotspot)!,
       }),
     );
-    $('district-label').textContent = a.id === 'street' ? 'NEW ANGELES' : 'SECTOR 07 · INTERIOR';
+    $('district-label').textContent =
+      a.id === 'street'
+        ? 'NEW ANGELES'
+        : a.id === 'clinic'
+          ? 'MERIDIAN · INTERIOR'
+          : 'SECTOR 07 · INTERIOR';
     this.syncHotspots();
   }
   syncHotspots() {
@@ -1184,6 +1194,15 @@ class Game {
           if (clue.id === 'fragment') {
             this.toast('ARCHIVE 001 RECOVERED', 'Lyra is waiting beside the terminal.');
           } else if (
+            SHIPMENT_CLUES.includes(clue.id) &&
+            SHIPMENT_CLUES.every((id) => this.model.save.clues.includes(id)) &&
+            !this.model.shipmentSolved
+          ) {
+            this.toast(
+              'INTAKE B HAS GIVEN UP ITS RECORDS',
+              'Open the notebook [J] to connect the evidence.',
+            );
+          } else if (
             this.model.save.clues.filter((id) =>
               ['device', 'residue', 'painting', 'diary', 'writing', 'portrait'].includes(id),
             ).length === 6 &&
@@ -1322,12 +1341,21 @@ class Game {
     this.staging = null;
     this.lyraHop = null;
     this.clearInput();
-    $('transition').classList.add('active');
-    await new Promise((r) => setTimeout(r, this.reducedMotion ? 40 : 350));
     const from = this.model.save.area;
+    // Meridian is a train ride, not a doorway: the fade holds on the fare long enough to read.
+    const ride = from === 'clinic' || id === 'clinic';
+    const shade = $('transition');
+    shade.classList.toggle('ride', ride);
+    shade.innerHTML = ride
+      ? `<div class="transit-ticket"><span>FREMONT LINE · NIGHT SERVICE</span><strong>${AREAS[id === 'clinic' ? 'clinic' : 'street'].title}</strong><small>FARE PAID · NOT LOGGED</small></div>`
+      : '';
+    if (ride) this.audio.train(2.4);
+    shade.classList.add('active');
+    await new Promise((r) => setTimeout(r, this.reducedMotion ? 40 : 350));
+    if (ride) await new Promise((r) => setTimeout(r, 1100));
     this.model.save.resumeHotspot = null;
     this.model.save.area = id;
-    this.player.x = id === 'street' ? (from === 'studio' ? 965 : 1465) : this.currentArea.spawn;
+    this.player.x = arrivalX(id, from);
     this.player.y = this.currentArea.ground;
     this.player.vy = 0;
     this.player.grounded = true;
@@ -1370,6 +1398,9 @@ class Game {
   }
   caseMarginNote() {
     const save = this.model.save;
+    if (save.buyerNamed) return 'A signature is still a hand.';
+    if (this.model.shipmentSolved) return 'Say it out loud.';
+    if (save.shipment) return 'Follow the cargo, not the story.';
     if (save.resolution === 'protect') return 'Keep her safe. Keep the record.';
     if (save.resolution === 'testify') return 'Put the truth on record.';
     if (save.followup) return 'A person behind every fragment.';
@@ -1383,7 +1414,7 @@ class Game {
     $('clue-count').textContent = String(this.model.save.clues.length).padStart(2, '0');
     $('objective-text').textContent = this.model.objective;
     $('chapter-label').innerHTML =
-      `<i>${this.model.save.followup ? '04' : this.model.save.contact ? '03' : this.model.deduced ? '02' : '01'}</i> ${this.model.chapter}`;
+      `<i>${this.model.save.shipment ? '05' : this.model.save.followup ? '04' : this.model.save.contact ? '03' : this.model.deduced ? '02' : '01'}</i> ${this.model.chapter}`;
     $('companion').hidden = !this.model.save.companion || !!this.combat || !this.started;
     $('scene-hud').hidden = !!this.combat;
     $('combat-hud').hidden = !this.combat;
@@ -1423,25 +1454,40 @@ class Game {
   openBoard() {
     if (!this.started || this.cinematic) return;
     this.selected = [];
-    this.boardFile = this.model.save.followup ? 'first-one' : 'graves';
+    this.boardFile = this.model.save.shipment
+      ? 'shipment'
+      : this.model.save.followup
+        ? 'first-one'
+        : 'graves';
     this.renderBoard();
+    $('panel').scrollTop = 0;
   }
   renderBoard(message = 'Select two pieces of evidence. Find what connects them.') {
     const focusedClue = (document.activeElement as HTMLElement | null)?.dataset.clue;
     const scrollTop = $('panel').scrollTop;
     this.selected = this.selected.filter(
-      (id) => evidenceBoardState(this.model.save, id).selectable,
+      (id) => evidenceBoardState(this.model.save, id, this.boardFile).selectable,
     );
-    const second = this.boardFile === 'first-one';
-    const clues = this.model.save.clues.filter((id) =>
-      second ? id === 'fragment' || FOLLOWUP_CLUES.includes(id) : !FOLLOWUP_CLUES.includes(id),
-    );
-    const theories = DEDUCTIONS.filter((d) => second === FOLLOWUP_DEDUCTIONS.includes(d.id));
+    const file = this.boardFile;
+    const save = this.model.save;
+    const clues = save.clues.filter((id) => inCaseFile(file, id));
+    const theories = DEDUCTIONS.filter((d) => theoryFile(d.id) === file);
     const cards = clues
-      .map((id) => renderEvidenceCard(this.model.save, id, this.selected.includes(id)))
+      .map((id) => renderEvidenceCard(this.model.save, id, this.selected.includes(id), file))
       .join('');
     const required = theories.filter((d) => d.id !== 'entry');
-    const progress = `${required.filter((d) => this.model.save.deductions.includes(d.id)).length} OF ${required.length} CORE CONNECTIONS${second ? '' : ` · OPTIONAL ENTRY ${this.model.save.deductions.includes('entry') ? '✓' : 'OPEN'}`}`;
+    const progress = `${required.filter((d) => save.deductions.includes(d.id)).length} OF ${required.length} CORE CONNECTIONS${file === 'graves' ? ` · OPTIONAL ENTRY ${save.deductions.includes('entry') ? '✓' : 'OPEN'}` : ''}`;
+    const heading = {
+      graves: ['The Graves case', 'CASE FILE 07–031 · MARLON GRAVES'],
+      'first-one': ['The first one', 'CASE FILE 07–032 · ARCHIVE 001'],
+      shipment: ['Follow the shipment', 'CASE FILE 07–033 · MERIDIAN CLINIC'],
+    }[file];
+    const tabs = `<button data-action="file-graves" aria-pressed="${file === 'graves'}">01 · The Graves case</button>${save.followup ? `<button data-action="file-first" aria-pressed="${file === 'first-one'}">02 · The first one</button>` : save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}${save.shipment ? `<button data-action="file-shipment" aria-pressed="${file === 'shipment'}">03 · Follow the shipment</button>` : save.resolution ? `<button data-action="shipment">Open the next case →</button>` : ''}`;
+    // The last connection points at the closing conversation rather than leaving it to be found.
+    const closing =
+      file === 'shipment' && this.model.shipmentSolved && !save.buyerNamed
+        ? `<button class="text-button" data-action="name-buyer">Name the buyer with Lyra →</button>`
+        : '';
     const deductions = theories
       .map((d, i) => {
         const solved = this.model.save.deductions.includes(d.id);
@@ -1454,9 +1500,9 @@ class Game {
       })
       .join('');
     this.panel(
-      second ? 'The first one' : 'The Graves case',
-      second ? 'CASE FILE 07–032 · ARCHIVE 001' : 'CASE FILE 07–031 · MARLON GRAVES',
-      `<nav class="case-tabs" aria-label="Case files"><button data-action="file-graves" aria-pressed="${!second}">01 · The Graves case</button>${this.model.save.followup ? `<button data-action="file-first" aria-pressed="${second}">02 · The first one</button>` : this.model.save.escaped ? `<button data-action="followup">Open the next case →</button>` : ''}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${progress}</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, second)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>Gravity / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
+      heading[0],
+      heading[1],
+      `<nav class="case-tabs" aria-label="Case files">${tabs}</nav><div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${progress}</span></div><details class="case-hint"><summary>Need a lead?</summary><p>${boardHint(this.model, file)}</p></details><div class="notebook-inscription"><span><s>Close the file.</s> ${this.caseMarginNote()}</span><small>Gravity / private working copy</small></div><div class="board-layout"><div><div class="section-label">EXHIBITS & OBSERVATIONS <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">MARGIN NOTES / THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p>${closing}</div></aside></div>`,
       'board',
     );
     const notes = INSIGHTS.filter(
@@ -1476,7 +1522,7 @@ class Game {
     if (focusedClue) {
       document
         .querySelector<HTMLElement>(
-          evidenceBoardState(this.model.save, focusedClue as ClueId).selectable
+          evidenceBoardState(this.model.save, focusedClue as ClueId, this.boardFile).selectable
             ? `[data-clue="${focusedClue}"]`
             : `[data-inspect="${focusedClue}"]`,
         )
@@ -1525,10 +1571,16 @@ class Game {
       { x: 37, y: 42, label: 'Graves’ studio', id: 'studio-door', area: 'studio' },
       { x: 76, y: 53, label: 'Memory Den', id: 'den-door', area: 'den' },
     ];
+    // Meridian is off this map: the night train runs out along the rail line.
+    const meridian = this.model.meridian;
+    const clinic =
+      meridian === 'hidden'
+        ? ''
+        : `<button class="map-place map-transit ${meridian === 'here' ? 'current' : ''}" style="left:64%;top:26%" data-route="meridian"><i>04</i><strong>Meridian Clinic</strong><span>${meridian === 'here' ? 'CURRENT LOCATION' : meridian === 'ride' ? 'NIGHT TRAIN · FARE LOADED' : 'NO FARE ON YOUR CARD'}</span></button><span class="map-line">FREMONT LINE → MERIDIAN · 4 STOPS</span>`;
     this.panel(
       'Sector 07',
       'DISTRICT MAP · NEW ANGELES',
-      `<div class="map-canvas"><div class="map-grid"></div><div class="map-rail"></div><div class="map-road"><span>FREMONT AVENUE</span></div>${sites.map((site, i) => `<button class="map-place ${site.area === this.model.save.area ? 'current' : ''}" style="left:${site.x}%;top:${site.y}%" data-route="${site.id}"><i>${String(i + 1).padStart(2, '0')}</i><strong>${site.label}</strong><span>${site.area === this.model.save.area ? 'CURRENT LOCATION' : i === 2 && !this.model.save.contact ? 'CONTACT REQUIRED' : 'SET WALKING DESTINATION'}</span></button>`).join('')}<span class="map-north">N<br>↑</span><span class="map-caption">LOW DISTRICT<br>34°03′ N · 118°15′ W</span></div><div class="map-note"><span class="live-dot"></span><p>${this.model.objective}</p><span>Destinations guide Gravity through connected rooms.</span></div>`,
+      `<div class="map-canvas"><div class="map-grid"></div><div class="map-rail"></div><div class="map-road"><span>FREMONT AVENUE</span></div>${sites.map((site, i) => `<button class="map-place ${site.area === this.model.save.area ? 'current' : ''}" style="left:${site.x}%;top:${site.y}%" data-route="${site.id}"><i>${String(i + 1).padStart(2, '0')}</i><strong>${site.label}</strong><span>${site.area === this.model.save.area ? 'CURRENT LOCATION' : i === 2 && !this.model.save.contact ? 'CONTACT REQUIRED' : 'SET WALKING DESTINATION'}</span></button>`).join('')}${clinic}<span class="map-north">N<br>↑</span><span class="map-caption">LOW DISTRICT<br>34°03′ N · 118°15′ W</span></div><div class="map-note"><span class="live-dot"></span><p>${this.model.objective}</p><span>Destinations guide Gravity through connected rooms.</span></div>`,
       'map',
     );
   }
@@ -1573,7 +1625,7 @@ class Game {
     this.panel(
       'An open channel.',
       'LYRA · PRIVATE CONNECTION',
-      `<div class="topic-list"><p class="topic-intro">“I’m here, Gravity.”</p>${topics.map((t) => `<button data-topic="${t.id}"><strong>${t.title}</strong><span>${t.detail}</span>${icon('arrow')}</button>`).join('')}${this.model.save.escaped && !this.model.save.followup ? '<button data-action="followup"><strong>Open the next case</strong><span>Find the woman in archive 001</span>↗</button>' : ''}${this.model.followupSolved && !this.model.save.resolution && this.model.save.area === 'den' ? '<button data-action="resolution"><strong>Decide what happens to the archive</strong><span>Three conclusions, one person to protect</span>↗</button>' : ''}</div>`,
+      `<div class="topic-list"><p class="topic-intro">“I’m here, Gravity.”</p>${topics.map((t) => `<button data-topic="${t.id}"><strong>${t.title}</strong><span>${t.detail}</span>${icon('arrow')}</button>`).join('')}${this.model.save.escaped && !this.model.save.followup ? '<button data-action="followup"><strong>Open the next case</strong><span>Find the woman in archive 001</span>↗</button>' : ''}${this.model.followupSolved && !this.model.save.resolution && this.model.save.area === 'den' ? '<button data-action="resolution"><strong>Decide what happens to the archive</strong><span>Three conclusions, one person to protect</span>↗</button>' : ''}${this.model.save.resolution && !this.model.save.shipment ? '<button data-action="shipment"><strong>Open the next case</strong><span>Follow the shipment to Meridian Clinic</span>↗</button>' : ''}${this.model.shipmentSolved && !this.model.save.buyerNamed ? '<button data-action="name-buyer"><strong>Name the buyer</strong><span>Three connections, one signature</span>↗</button>' : ''}</div>`,
       'topics',
     );
   }
@@ -1678,10 +1730,50 @@ class Game {
         this.panel(
           'A name kept safe.',
           'THE FIRST ONE · CASE COMPLETE',
-          `<div class="ending"><span class="ending-number">ADA</span><p>One name recovered. One memory verified.</p><h3>Meridian Clinic.<br>Intake B.</h3><blockquote>${choice === 'protect' ? 'Her identity stays in Lyra’s private archive.' : 'A sealed statement preserves her name and the evidence.'}</blockquote><button class="primary" data-action="close">Return to the city ${icon('arrow')}</button><span class="small-note">End of this investigation. The Meridian lead is saved for the next chapter.</span></div>`,
+          `<div class="ending"><span class="ending-number">ADA</span><p>One name recovered. One memory verified.</p><h3>Meridian Clinic.<br>Intake B.</h3><blockquote>${choice === 'protect' ? 'Her identity stays in Lyra’s private archive.' : 'A sealed statement preserves her name and the evidence.'}</blockquote><button class="primary" data-action="shipment">Continue · Follow the shipment ${icon('arrow')}</button><button class="text-button" data-action="close">Return to the city</button><span class="small-note">The first one is saved. The Meridian lead is ready when you are.</span></div>`,
           'case-complete',
         ),
       'LYRA · A NAME RECOVERED',
+    );
+  }
+  startShipment() {
+    if (!this.model.startShipment()) return;
+    this.closePanel();
+    this.persist();
+    this.refreshArea();
+    this.sync();
+    this.audio.deduction();
+    this.say(SHIPMENT_OPENING, () =>
+      this.toast('TRANSIT CARD LOADED', 'Meridian Clinic is on your district map [M].'),
+    );
+  }
+  /** No street door leads to Meridian: the map puts Gravity on the night train. */
+  rideToMeridian() {
+    if (this.combat || this.cinematic || this.lines.length || this.transitioning) return;
+    const access = this.model.meridian;
+    if (access === 'here') this.toast('YOU’RE ALREADY HERE', this.currentArea.title);
+    else if (access === 'ride') void this.travel('clinic');
+    else
+      this.toast('NO FARE ON YOUR CARD', 'Open the next case from Lyra’s channel or the notebook.');
+  }
+  nameBuyer() {
+    if (!this.model.nameBuyer()) return;
+    this.closePanel();
+    this.persist();
+    this.sync();
+    this.refreshArea();
+    this.audio.deduction();
+    const records = SHIPMENT_CLUES.filter((id) => this.model.save.clues.includes(id)).length;
+    this.say(
+      SHIPMENT_CLOSING,
+      () =>
+        this.panel(
+          'Somebody paid.',
+          'FOLLOW THE SHIPMENT · CASE COMPLETE',
+          `<div class="ending"><span class="ending-number">SOLD</span><p>Collected in Sector 07. Kept cold at intake B. Paid for before it arrived.</p><h3>The buyer signs<br>as the Broker.</h3><div class="ending-stats"><span><b>${String(records).padStart(2, '0')}</b> RECORDS FROM INTAKE B</span><span><b>03</b> CONNECTIONS MADE</span><span><b>B-0419</b> LOT TRACED</span></div><blockquote>“Nobody signs for a sale like that. Somebody did.”</blockquote><button class="primary" data-action="close">Return to the city ${icon('arrow')}</button><span class="small-note">End of this investigation. The Broker is the next lead.</span></div>`,
+          'case-complete',
+        ),
+      'LYRA · THE BUYER',
     );
   }
   panelAction(e: MouseEvent) {
@@ -1720,7 +1812,7 @@ class Game {
     }
     if (el.dataset.clue) {
       const id = el.dataset.clue as ClueId;
-      if (!evidenceBoardState(this.model.save, id).selectable) return;
+      if (!evidenceBoardState(this.model.save, id, this.boardFile).selectable) return;
       if (this.selected.includes(id)) this.selected = this.selected.filter((c) => c !== id);
       else {
         if (this.selected.length === 2) this.selected.shift();
@@ -1733,6 +1825,10 @@ class Game {
       const id = el.dataset.route;
       this.closePanel();
       if (this.staging) this.cancelInteraction();
+      if (id === 'meridian') {
+        this.rideToMeridian();
+        return;
+      }
       const h = nextRouteHotspot(this.model.save.area, id);
       if (h) {
         this.goTo(h, id);
@@ -1745,12 +1841,24 @@ class Game {
         break;
       case 'file-graves':
       case 'file-first':
-        this.boardFile = el.dataset.action === 'file-first' ? 'first-one' : 'graves';
+      case 'file-shipment':
+        this.boardFile =
+          el.dataset.action === 'file-first'
+            ? 'first-one'
+            : el.dataset.action === 'file-shipment'
+              ? 'shipment'
+              : 'graves';
         this.selected = [];
         this.renderBoard();
         break;
       case 'followup':
         this.startFollowup();
+        break;
+      case 'shipment':
+        this.startShipment();
+        break;
+      case 'name-buyer':
+        this.nameBuyer();
         break;
       case 'resolution':
         this.closePanel();
@@ -1800,6 +1908,7 @@ class Game {
         if (this.selected.length !== 2) return;
         const wasDeduced = this.model.deduced;
         const wasFollowupSolved = this.model.followupSolved;
+        const wasShipmentSolved = this.model.shipmentSolved;
         const [a, b] = this.selected,
           d = this.model.connect(a, b);
         if (d) {
@@ -1813,6 +1922,8 @@ class Game {
             this.toast('THE CASE HAS A NEW LEAD', 'Someone is waiting outside the Memory Den.');
           if (!wasFollowupSolved && this.model.followupSolved)
             this.toast('THE RECORDS AGREE', 'Return to Lyra in the Den.');
+          if (!wasShipmentSolved && this.model.shipmentSolved)
+            this.toast('THE RECORDS AGREE', 'Name the buyer with Lyra.');
         } else {
           const miss = this.model.explain(a, b);
           if (miss.reason !== 'matched')
