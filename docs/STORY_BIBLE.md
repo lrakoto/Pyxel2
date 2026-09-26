@@ -154,9 +154,13 @@ She may be the missing bridge between: humanity and AI, individual and collectiv
 
 ## Key character: Lyra
 
-Lyra is a humanoid AI who becomes central to Gravity's investigation. She may be one of the first AI beings to recognize that human creativity is not just data output — it is tied to pain, limitation, mortality, love, memory, and contradiction.
+Lyra is an AI who lives in the city's machines and becomes central to Gravity's investigation. She may be one of the first AI beings to recognize that human creativity is not just data output — it is tied to pain, limitation, mortality, love, memory, and contradiction.
 
 Lyra believes AI and humans do not need to destroy each other. But she is also hiding something.
+
+### Form (decided, September 2026)
+
+Lyra is not a humanoid. She lives in the city's machines, and when she wants to be seen she travels in a **small floating drone shell with a single cyan eye**, in the spirit of 343 Guilty Spark. She can leave the shell: her light hops into a street camera, a sign, a monitor or a lock, and comes home. That is how she watched Gravity before they met, how she stays invisible to the Veil (there is nothing physical to follow), and how she can travel with Gravity everywhere. She is still she/her, with the navy and gunmetal palette and cyan accents of her earlier design. The humanoid model she used until September 2026 is retired from the game and kept only for comparison in the motion study.
 
 ### Canonical direction (locked, Aug 2026)
 
@@ -164,10 +168,10 @@ Lyra's arc across the series is now fixed: **Lyra has been watching Gravity befo
 
 Concretely:
 
-- **Pre-introduction.** Lyra has been observing Gravity's investigation (and possibly her prior cases / life) from inside the city's systems. Lyra chose to help Gravity for reasons the AI does not fully disclose at first. When they finally meet in the flesh (planned: the studio or a Memory Den encounter), it is a reveal for Gravity, not for Lyra.
-- **Companion arc.** Over the issues Lyra moves from *watching* → *contacting* → *traveling with* Gravity. The end-state is a persistent companion: an AI presence that rides alongside her (in her implants, on a device, in the city grid — exact diegetic form TBD), comments on the world, and is mechanically present across areas, not locked to one interior.
+- **Pre-introduction.** Lyra has been observing Gravity's investigation (and possibly her prior cases / life) from inside the city's systems. Lyra chose to help Gravity for reasons the AI does not fully disclose at first. When they finally meet face to face (on the street outside the Memory Den), it is a reveal for Gravity, not for Lyra.
+- **Companion arc.** Over the issues Lyra moves from *watching* → *contacting* → *traveling with* Gravity. The end-state is a persistent companion: an AI presence that rides alongside her (her drone shell, with the city's machines as her roads — see *Form* above), comments on the world, and is mechanically present across areas, not locked to one interior.
 - **Why this matters for design.** The four "possible versions" below are no longer either/or — they become *layers* of the same character revealed across the arc. The companion direction makes Version D (the Nobody witness / mirror) especially resonant: she has been watching the way the system watches, and chose to watch *differently*.
-- **What this does NOT commit to.** The exact trigger for her companion transition, the diegetic "where she lives" once traveling, and her combat/gameplay role are open. The story commitment is the relationship arc, not the mechanic.
+- **What this does NOT commit to.** The exact trigger for her companion transition, and her combat/gameplay role are open. The story commitment is the relationship arc, not the mechanic.
 
 ### Possible versions of Lyra (now read as facets of the locked arc, not alternatives)
 
@@ -258,7 +262,7 @@ Gravity finds a final artwork left behind by Marlon. At first, it looks like fra
 
 ### Lyra's entrance
 
-Gravity meets Lyra, a humanoid AI who warns her that Marlon's death is not isolated. Other creatives have gone missing. Some returned alive but hollow. Some became famous overnight with work that did not seem to belong to them. Some died producing masterpieces in voices that were not their own. Lyra tells Gravity that creativity is being harvested and sold through underground markets.
+Gravity meets Lyra, an AI who has been watching her from the city's machines. She warns Gravity that Marlon's death is not isolated. Other creatives have gone missing. Some returned alive but hollow. Some became famous overnight with work that did not seem to belong to them. Some died producing masterpieces in voices that were not their own. Lyra tells Gravity that creativity is being harvested and sold through underground markets.
 
 ### The Veil Syndicate
 
@@ -299,4 +303,4 @@ The story should keep circling these questions:
 
 ## Clean updated summary
 
-In New Angeles, 2077, Detective Gravity investigates the murder of Marlon Graves, an artist-cyborg found dead in Sector 7. The case leads her to an illegal creativity-harvesting device, a humanoid AI named Lyra, and a final artwork titled "Everybody/Nobody." As Gravity follows the evidence, she uncovers The Veil Syndicate, a hidden network trafficking in stolen imagination, augmented narcotics, weaponized AI, and neural viruses. But the deeper she goes, the less the crime belongs to one killer. The stolen fragments of countless minds have begun forming a collective intelligence known as Everybody, while the people emptied by the system become Nobody. Gravity must solve a murder, expose a citywide conspiracy, and decide whether the thing born from humanity's stolen soul is a monster, a victim, or the next form of life.
+In New Angeles, 2077, Detective Gravity investigates the murder of Marlon Graves, an artist-cyborg found dead in Sector 7. The case leads her to an illegal creativity-harvesting device, an AI named Lyra who lives in the city's machines, and a final artwork titled "Everybody/Nobody." As Gravity follows the evidence, she uncovers The Veil Syndicate, a hidden network trafficking in stolen imagination, augmented narcotics, weaponized AI, and neural viruses. But the deeper she goes, the less the crime belongs to one killer. The stolen fragments of countless minds have begun forming a collective intelligence known as Everybody, while the people emptied by the system become Nobody. Gravity must solve a murder, expose a citywide conspiracy, and decide whether the thing born from humanity's stolen soul is a monster, a victim, or the next form of life.

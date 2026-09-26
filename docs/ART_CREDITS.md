@@ -62,9 +62,17 @@ The source PNGs and the downloaded walk, run, and jump artwork remain unchanged.
 No music from the pack is used. Gravity’s name and narrative direction were chosen
 by the project owner. The former Cole design is a historical prototype.
 
-## Lyra — current humanoid character
+## Lyra — drone (current, September 25)
 
-Lyra’s game model and the comparison in `lyra-lab.html` use **MV Platformer Female (32x64)** by
+Lyra now appears in the game as a small floating drone shell with a single eye, drawn entirely in
+code. `src/lyra-orb.ts` defines the 17 × 17 pixel design as palette indices, together with her
+poses, hops between machines and placement. `src/lyra-orb-draw.ts` paints them for the game and
+for `lyra-lab.html`. The palette keeps her navy and gunmetal with cyan accents. No external art
+or third-party asset is used.
+
+## Lyra — previous humanoid model (lab only)
+
+The previous humanoid model, kept for comparison in `lyra-lab.html`, uses **MV Platformer Female (32x64)** by
 MoikMellah, released under CC0 1.0:
 https://opengameart.org/content/mv-platformer-female-32x64
 

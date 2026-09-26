@@ -166,7 +166,7 @@ export class CaseModel {
     if (this.save.companion) return 'Leave the Den. Keep the memory safe.';
     if (this.save.clues.includes('fragment')) return 'Speak to Lyra about the first memory.';
     if (this.save.contact) return 'Enter the Memory Den. Recover archive 001.';
-    if (this.deduced) return 'Find the woman outside the Memory Den.';
+    if (this.deduced) return 'Find the watcher outside the Memory Den.';
     if (
       this.save.clues.filter((id) =>
         ['device', 'residue', 'painting', 'diary', 'writing', 'portrait'].includes(id),

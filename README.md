@@ -68,7 +68,8 @@ This is a contained vertical slice: three areas, nine evidence records, three de
 | `src/audio.ts` | Web Audio ambience, procedural effects, and recorded water impacts |
 | `src/sprites.ts` | Imported atlas playback with procedural fallback |
 | `src/character-art.ts` | Adapted original character pixels, rendered to cached canvases |
-| `src/gravity-acting.ts`, `src/lyra-acting.ts` | Pixel pose derivatives and reaction timing shared by the game and character labs |
+| `src/gravity-acting.ts` | Gravity's pixel pose derivatives and reaction timing, shared by the game and character lab |
+| `src/lyra-orb.ts`, `src/lyra-orb-draw.ts` | Lyra's drone: pixel design, poses, machine hops and placement, shared by the game and Lyra's lab |
 | `assets/environments/` | Original-resolution PNG artwork masters |
 | `public/env/` | Lossless WebP delivery assets |
 | `assets/sprites/` | Drop `.aseprite` source files here |
@@ -148,3 +149,21 @@ To move a case between browsers or devices, open an occupied folder’s recap an
 Only the latest saved checkpoint travels with a download; earlier checkpoints and browser preferences stay local. Nothing is uploaded, and there is no cloud sync or account system. If storage is unavailable/full, the game reports session-only progress. A changed file in another tab pauses writes here to protect newer notes; reload that tab to use the current archive.
 
 Implementation: `src/save-archive.ts` owns migration/storage/recovery; `src/archive-transfer.ts` validates versioned JSON transfers; `src/archive-ui.ts` owns recaps, folder rendering, and import previews; `src/archive.css` styles the archive. Tests cover corruption, quota errors, stale tabs, slot isolation, reversible restoration, spoiler-safe recaps, transfer round trips, rejected files, and occupied-folder protection.
+
+## September 25 — Lyra's drone and playtest fixes
+
+**Lyra** is now an AI who lives in the city's machines. She appears as a small floating drone shell with one cyan eye, drawn in code. She keeps a post on the street once Gravity notices her, and at her terminal in the Den. After she joins, the shell travels at Gravity's shoulder in every area and docks at the terminal in the Den. She can leave the shell:
+* She opens the Den from inside its lock after their first conversation.
+* She steps into machine evidence (the street camera, the neural receiver, its spool, the memory column) while Gravity examines it.
+* As a companion she occasionally slips into a nearby sign or screen.
+
+The archive projection becomes a beam from her eye. Her first meeting gains two lines about how she watches. `lyra-lab.html` compares the drone with the retired humanoid model. Reduced motion keeps her still and skips the leaps.
+
+**Fixes from the partial playtest** (see [the QA record](docs/QA.md)):
+* Story-choice panels use paper ink and are readable again.
+* A dismissed ambush returns after a few seconds on the street.
+* A first visit starts the case immediately in folder 01.
+* Near-plane easels, cabinets and street poles thin out over Gravity and Lyra.
+* Arriving in the Den starts clear of the cabinet.
+* One surplus E press no longer reopens what was just closed.
+* Observations and Mei's lines carry their own labels.

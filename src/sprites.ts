@@ -1,12 +1,4 @@
 import {
-  loadLyraHumanoid,
-  LYRA_HUMAN_CROP,
-  lyraReactionFrame,
-  type LyraReaction,
-} from './lyra-candidate.ts';
-import { drawLyraSignal } from './lyra-projection.ts';
-import { LYRA_REFINED_FRAMES, lyraFrameIndex } from './lyra-art.ts';
-import {
   COLE_FRAMES,
   COLE_STORY_FRAMES,
   ENFORCER_FRAMES,
@@ -41,7 +33,6 @@ interface Frame {
 
 export class Sprites {
   private candidate: CandidateFrames | null = null;
-  private lyraCandidate: Awaited<ReturnType<typeof loadLyraHumanoid>> | null = null;
   get candidateActive() {
     return this.candidate !== null;
   }
@@ -62,11 +53,6 @@ export class Sprites {
   private shadows = new Map<string, HTMLCanvasElement>();
 
   async load() {
-    try {
-      this.lyraCandidate = await loadLyraHumanoid();
-    } catch {
-      console.warn('Lyra asset unavailable; using procedural fallback.');
-    }
     if (new URLSearchParams(location.search).get('character') !== 'cole') {
       try {
         this.candidate = await loadCandidate(
@@ -120,27 +106,6 @@ export class Sprites {
         cellH: crop.cellHeight,
       };
     }
-    if (id === 'lyra' && this.lyraCandidate) {
-      const clip: LyraReaction =
-        tag === 'walk' || tag === 'stride'
-          ? 'walk'
-          : tag === 'listen' || tag === 'speak' || tag === 'project'
-            ? tag
-            : 'idle';
-      const frames = this.lyraCandidate[clip];
-      const index = lyraReactionFrame(clip, time);
-      const crop = LYRA_HUMAN_CROP;
-      return {
-        key: `lyra-human:${clip}:${index}`,
-        src: frames[index],
-        sx: crop.x,
-        sy: crop.y,
-        sw: crop.width,
-        sh: crop.height,
-        pivotX: crop.pivotX,
-        cellH: crop.cellHeight,
-      };
-    }
     const sheet = this.manifest?.sheets[id];
     if (sheet && this.atlas) {
       const fallbackTag = tag === 'stride' || tag === 'sprint' ? 'walk' : 'idle';
@@ -176,16 +141,13 @@ export class Sprites {
     if (id === 'cole')
       frames =
         COLE_STORY_FRAMES[tag] ?? COLE_FRAMES[tag as keyof typeof COLE_FRAMES] ?? COLE_FRAMES.idle;
-    else if (id === 'lyra') frames = LYRA_REFINED_FRAMES[tag === 'listen' ? 'listen' : 'idle'];
     else if (id === 'enforcer') frames = ENFORCER_FRAMES.walk;
     else if (id === 'drone') frames = DRONE_FRAMES.hover;
     else frames = this.peds[id === 'ped_a' ? 0 : 1];
     const index =
-      id === 'lyra'
-        ? lyraFrameIndex(time, tag === 'listen')
-        : id === 'cole' && tag in COLE_STORY_FRAMES
-          ? storyFrameIndex(tag, time, frames.length)
-          : Math.floor(time * 9) % frames.length;
+      id === 'cole' && tag in COLE_STORY_FRAMES
+        ? storyFrameIndex(tag, time, frames.length)
+        : Math.floor(time * 9) % frames.length;
     const frame = frames[index];
     return {
       key: `${id}:${tag}#${index}`,
@@ -272,11 +234,6 @@ export class Sprites {
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.scale(facing, 1);
-    if (id === 'lyra' && this.lyraCandidate && tag === 'idle') {
-      // A quiet breath around the soles, matching the single-pose lab preview.
-      const breath = Math.sin(time * 1.7);
-      ctx.transform(1, 0, breath * 0.002, 1 + breath * 0.004, 0, 0);
-    }
     const frame = this.resolve(id, tag, time);
     const scale = height / frame.cellH;
     const dx = -frame.pivotX * scale;
@@ -303,7 +260,7 @@ export class Sprites {
       ctx.restore();
     }
     // Broad, low-energy light across cloth; combat keeps the established edge-only pass.
-    if (rim && ((id === 'cole' && tag in COLE_STORY_FRAMES) || id === 'lyra')) {
+    if (rim && id === 'cole' && tag in COLE_STORY_FRAMES) {
       const wash = this.clothLight;
       if (wash.width !== frame.sw || wash.height !== frame.sh) {
         wash.width = frame.sw;
@@ -332,17 +289,6 @@ export class Sprites {
       ctx.restore();
     }
     if (rim && rim.strength > 0.001) paintRim(ctx, this.masks(frame), rim, dx, dy, dw, dh);
-    if (id === 'lyra' && this.lyraCandidate)
-      drawLyraSignal(
-        ctx,
-        frame.src,
-        { x: frame.sx, y: frame.sy, width: frame.sw, height: frame.sh },
-        dx,
-        dy,
-        dw,
-        dh,
-        time,
-      );
     ctx.restore();
   }
 }

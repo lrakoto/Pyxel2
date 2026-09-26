@@ -70,6 +70,16 @@ export class FootWater {
   }
 }
 
+/**
+ * Near-plane props thin out over a figure standing behind them, as the street poles do, so an
+ * examination or an arrival never happens behind solid furniture. `clear` is in screen space.
+ */
+export function foregroundAlpha(left: number, width: number, clear?: { x: number; half: number }) {
+  if (!clear) return 1;
+  const gap = Math.abs(left + width / 2 - clear.x) - width / 2 - clear.half;
+  return 0.3 + 0.7 * Math.min(1, Math.max(0, gap) / 24);
+}
+
 /** Foreground objects are deliberately at the edges of evidence compositions. */
 export function drawInteriorForeground(
   c: CanvasRenderingContext2D,
@@ -77,6 +87,7 @@ export function drawInteriorForeground(
   cam: number,
   time: number,
   plate?: HTMLCanvasElement,
+  clear?: { x: number; half: number },
 ) {
   if (area === 'street') return;
   c.save();
@@ -95,6 +106,7 @@ export function drawInteriorForeground(
   if (area === 'studio') {
     for (const anchor of [480, 1390]) {
       const x = anchor - offset;
+      c.globalAlpha = foregroundAlpha(x, 96, clear);
       c.fillStyle = '#101818';
       c.beginPath();
       c.moveTo(x, 510);
@@ -137,6 +149,8 @@ export function drawInteriorForeground(
   } else {
     for (const anchor of [70, 1390]) {
       const x = anchor - offset;
+      const alpha = foregroundAlpha(x, 80, clear);
+      c.globalAlpha = alpha;
       c.fillStyle = '#0b171b';
       c.fillRect(x, 310, 80, 218);
       c.fillStyle = '#2b3b3e';
@@ -148,9 +162,9 @@ export function drawInteriorForeground(
         c.fillStyle = '#536354';
         c.fillRect(x + 14, y + 5, 24, 3);
         c.fillStyle = '#79b9a0';
-        c.globalAlpha = 0.5 + Math.sin(time * 0.7 + row) * 0.15;
+        c.globalAlpha = alpha * (0.5 + Math.sin(time * 0.7 + row) * 0.15);
         c.fillRect(x + 58, y + 8, 2, 2);
-        c.globalAlpha = 1;
+        c.globalAlpha = alpha;
       }
     }
   }

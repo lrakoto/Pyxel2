@@ -108,7 +108,7 @@ test('all six discovery orders lead to the same case objective', () => {
       m.connect(...d.pair);
     }
     assert.equal(m.deduced, true);
-    assert.equal(m.objective, 'Find the woman outside the Memory Den.');
+    assert.equal(m.objective, 'Find the watcher outside the Memory Den.');
   }
 });
 test('an unfinished street encounter resumes from its checkpoint but never inside or after completion', () => {

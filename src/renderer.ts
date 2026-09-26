@@ -28,7 +28,18 @@ import { buildSheen } from './sheen.ts';
 import { drawFlare } from './flare.ts';
 import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
 import { leakImpacts } from './water-events.ts';
-import { drawLyraEmitter } from './lyra-projection.ts';
+import {
+  ORB_HOVER,
+  ambientHop,
+  companionAnchor,
+  hopState,
+  lyraPresence,
+  orbPose,
+  type LyraHop,
+  type LyraPresence,
+  type OrbPoint,
+} from './lyra-orb.ts';
+import { drawLyraBeam, drawLyraHop, drawLyraOrb } from './lyra-orb-draw.ts';
 import type { ActorPerformance } from './interaction-staging.ts';
 import { FootWater, drawInteriorForeground, drawMei } from './visual-details.ts';
 import { CharacterMotion, footfallBetween } from './character-motion.ts';
@@ -70,9 +81,13 @@ interface View {
   discovery: { id: ClueId; x: number; y: number } | null;
   speaker: string | null;
   performance?: ActorPerformance;
+  /** A story hop: Lyra's light leaving her shell for a machine. */
+  lyraHop?: LyraHop | null;
   /** Wall-clock seconds since the last frame, for the scarf's cloth sim. */
   dt: number;
 }
+/** Where the archive projection lands in the Den: the memory column. */
+const ARCHIVE_PROJECTION = { x: 820, y: 250 };
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
   private distantReflection = document.createElement('canvas');
@@ -181,16 +196,13 @@ export class Renderer {
       for (const strength of this.traffic.step(v.dt, W)) this.cue?.('traffic', strength);
     const movingLights =
       area === 'street' && !v.combat && !v.reducedMotion ? this.traffic.headlights(cam) : [];
-    const lyraX =
-      area === 'den'
-        ? 1150
-        : area === 'street' && v.model.deduced && !v.model.save.companion
-          ? 1280
-          : null;
-    const lyraLight: SignLight | null =
-      !v.combat && lyraX !== null
-        ? { x: lyraX, y: world.ground - 36 * figure, color: '#83c9ff', intensity: 1.3 }
-        : null;
+    const presence: LyraPresence = v.combat
+      ? { kind: 'none' }
+      : lyraPresence(area, v.model.deduced, v.model.save.companion);
+    const orb = this.placeOrb(presence, area, v, figure, world.ground);
+    const lyraLight: SignLight | null = orb
+      ? { x: orb.x, y: orb.y, color: '#83c9ff', intensity: 1.3 }
+      : null;
     const sceneLights = lyraLight ? [...world.lights, lyraLight] : world.lights;
     const actorLights =
       !v.combat && area === 'street'
@@ -314,32 +326,8 @@ export class Renderer {
       if (!v.reducedMotion) this.crowd.step(v.dt);
       this.crowd.draw(c, cam, t, world.ground);
     }
-    if (v.model.deduced && !v.model.save.companion && area === 'street')
-      this.drawLyra(
-        c,
-        1280,
-        cam,
-        t,
-        figure,
-        438,
-        world.lights,
-        v.speaker === 'LYRA',
-        v.player.x < 1280 ? -1 : 1,
-        v.performance,
-      );
-    if (area === 'den')
-      this.drawLyra(
-        c,
-        1150,
-        cam,
-        t,
-        figure,
-        world.ground,
-        world.lights,
-        v.speaker === 'LYRA',
-        v.player.x < 1150 ? -1 : 1,
-        v.performance,
-      );
+    // Her shell floats behind Gravity's shoulder, so it is drawn before her.
+    if (orb) this.drawOrb(c, orb, presence, area, cam, t, figure, v);
     const p = v.player,
       tag = !p.grounded ? 'jump' : Math.abs(p.vx) > 8 ? 'walk' : 'idle';
     const motion = this.characterMotion.update(
@@ -529,9 +517,11 @@ export class Renderer {
       for (const pole of [40, 1360, 2210]) {
         const x = layerX(pole, cam, PARALLAX.foreground);
         c.save();
-        // Retain near-plane movement without hiding Cole behind a solid pole.
+        // Retain near-plane movement without hiding Gravity or Lyra behind a solid pole.
+        const clearOf = (screenX: number) => Math.min(1, Math.abs(x + 6 - screenX) / (42 * figure));
         if (!v.combat)
-          c.globalAlpha = 0.32 + 0.68 * Math.min(1, Math.abs(x + 6 - (p.x - cam)) / (42 * figure));
+          c.globalAlpha =
+            0.32 + 0.68 * Math.min(clearOf(p.x - cam), orb ? clearOf(orb.x - cam) : 1);
         c.fillRect(x, 0, 13, H);
         c.fillRect(x - 4, 122, 21, 9);
         c.fillRect(x + 11, 216, 18, 13);
@@ -561,7 +551,11 @@ export class Renderer {
     if (!v.combat) drawNearArchitecture(c, area, cam, t);
     if (!v.combat && area === 'street')
       this.nearWeather.draw(c, cam, t, actorLights, v.reducedMotion, ambientWind);
-    if (!v.combat) drawInteriorForeground(c, area, cam, t, this.plates.get(area));
+    if (!v.combat)
+      drawInteriorForeground(c, area, cam, t, this.plates.get(area), {
+        x: p.x - cam,
+        half: 16 * figure,
+      });
     this.discoveryLight +=
       ((v.discovery ? 1 : 0) - this.discoveryLight) *
       (v.reducedMotion ? 1 : 1 - Math.exp(-v.dt * 3));
@@ -1000,39 +994,89 @@ export class Renderer {
     c.fillRect(0, 442, c.canvas.width, 90);
     c.restore();
   }
-  private drawLyra(
+  /** The shell holds a post, or drifts after Gravity with a little lag as her companion. */
+  private orbAt: { x: number; y: number; area: AreaId | null } = { x: 0, y: 0, area: null };
+  private placeOrb(
+    presence: LyraPresence,
+    area: AreaId,
+    v: View,
+    figure: number,
+    ground: number,
+  ): OrbPoint | null {
+    if (presence.kind === 'none') {
+      this.orbAt.area = null;
+      return null;
+    }
+    let target: OrbPoint;
+    if (presence.kind === 'post') target = { x: presence.x, y: ground - ORB_HOVER * figure };
+    else {
+      const anchor = companionAnchor(v.player.x, v.player.facing, figure);
+      target = { x: anchor.x, y: ground - anchor.lift };
+    }
+    const o = this.orbAt;
+    // A new room, a restored checkpoint or a long jump places her; otherwise she follows.
+    if (o.area !== area || v.reducedMotion || Math.abs(target.x - o.x) > 360 * figure) {
+      o.x = target.x;
+      o.y = target.y;
+    } else {
+      const k = 1 - Math.exp(-v.dt * 3.5);
+      o.x += (target.x - o.x) * k;
+      o.y += (target.y - o.y) * k;
+    }
+    o.area = area;
+    return { x: o.x, y: o.y };
+  }
+  private drawOrb(
     c: CanvasRenderingContext2D,
-    worldX: number,
+    orb: OrbPoint,
+    presence: LyraPresence,
+    area: AreaId,
     cam: number,
     t: number,
     figure: number,
-    ground: number,
-    lights: SignLight[],
-    speaking = false,
-    facing = 1,
-    performance?: ActorPerformance,
+    v: View,
   ) {
-    const x = worldX - cam,
-      y = ground;
-    // Halo and sprite stay within this bound; skip off-camera projection work.
-    if (x < -80 * figure || x > c.canvas.width + 80 * figure) return;
-    drawLyraEmitter(c, x, y, 70 * figure, t);
-    const rim = rimAt(lights, worldX, y - 40 * figure, facing, t);
-    c.save();
-    c.globalAlpha = 1;
-    const reaction = performance?.lyra ?? (speaking ? 'speak' : 'idle');
-    this.sprites.draw(
-      c,
-      'lyra',
-      reaction,
-      reaction === 'idle' ? t : (performance?.lyraTime ?? t),
-      x,
-      y,
-      facing,
-      70 * figure,
-      rim,
+    const performance = v.performance;
+    const mode = performance?.lyra ?? (v.speaker === 'LYRA' ? 'speak' : 'idle');
+    // Story hops come from the game; a companion's idle habit fills the quiet between them.
+    let hop = v.lyraHop ?? null;
+    let state = hop ? hopState(hop, v.time, orb, v.reducedMotion) : null;
+    if (state?.phase === 'done') hop = state = null;
+    const quiet = !v.speaker && !v.examining && !performance?.gravity;
+    if (!hop && presence.kind === 'follow' && quiet && !v.reducedMotion) {
+      hop = ambientHop(area, v.time, v.player.x);
+      state = hop ? hopState(hop, v.time, orb, false) : null;
+    }
+    const shell = state ? state.shell : 1;
+    const look = mode === 'project' ? ARCHIVE_PROJECTION.x - orb.x : v.player.x - orb.x;
+    const pose = orbPose(
+      shell < 0.5 ? 'away' : mode,
+      t,
+      performance?.lyraTime ?? t,
+      look,
+      v.reducedMotion,
     );
-    c.restore();
+    const x = orb.x - cam;
+    if (x > -40 * figure && x < c.canvas.width + 40 * figure)
+      drawLyraOrb(c, x, orb.y, figure, pose, shell);
+    if (mode === 'project' && shell > 0.5 && area === 'den')
+      drawLyraBeam(
+        c,
+        { x: x + pose.gaze * figure, y: orb.y + pose.bob * figure },
+        { x: ARCHIVE_PROJECTION.x - cam, y: ARCHIVE_PROJECTION.y },
+        figure,
+        v.time,
+        v.reducedMotion,
+      );
+    if (hop && state)
+      drawLyraHop(
+        c,
+        state,
+        { x: hop.to.x - cam, y: hop.to.y },
+        state.spark ? { x: state.spark.x - cam, y: state.spark.y } : null,
+        figure,
+        v.time,
+      );
   }
   private weather(
     c: CanvasRenderingContext2D,

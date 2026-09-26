@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { FootWater } from '../src/visual-details.ts';
+import { FootWater, foregroundAlpha } from '../src/visual-details.ts';
+import { AREAS } from '../src/content.ts';
 import { evidenceArt } from '../src/evidence-art.ts';
 
 test('footfall ripples are distance-driven at different refresh rates', () => {
@@ -44,4 +45,20 @@ test('physical records and the archive share locally authored illustrations', ()
   assert.match(evidenceArt('register'), /Ada Vale/);
   assert.match(evidenceArt('witness'), /V-17/);
   assert.match(evidenceArt('camera'), /SIGNAL ABSENT/);
+});
+
+test('near-plane props thin out over Gravity and stay solid elsewhere', () => {
+  assert.equal(foregroundAlpha(100, 80), 1);
+  // Overlapping the figure: the prop becomes a veil, never a wall.
+  assert.equal(foregroundAlpha(100, 80, { x: 140, half: 45 }), 0.3);
+  // Well clear of her: fully solid, so walking past still reads as depth.
+  assert.equal(foregroundAlpha(100, 80, { x: 400, half: 45 }), 1);
+  const partial = foregroundAlpha(100, 80, { x: 237, half: 45 });
+  assert.ok(partial > 0.3 && partial < 1);
+});
+
+test('arriving in the Den starts clear of the stair-foot cabinet', () => {
+  const den = AREAS.den;
+  // At the left camera stop the cabinet spans 70–150; Gravity is 16 × figure either side.
+  assert.equal(foregroundAlpha(70, 80, { x: den.spawn, half: 16 * den.figureScale }), 1);
 });

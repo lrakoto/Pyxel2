@@ -67,7 +67,7 @@ All paths are in `src/` unless noted.
 | Cinematics     | `cinematic.ts`: a pure keyframe timeline. The intro script is `INTRO`                                                                                                                                                                                                                     |
 | Rendering      | `renderer.ts` (compositor; reports scene events through its `cue` callback) · `layers.ts` (parallax 0.10 / 0.34 / 1.00 / 1.18) · `lighting.ts`, `rim-mask.ts`, `sheen.ts`, `flare.ts` · `atmosphere.ts`, `spatial.ts`, `water.ts`, `near-weather.ts`, `interior-finish.ts`, `world-polish.ts`, `visual-details.ts`, `story-details.ts`, `traffic.ts`, `pedestrians.ts` |
 | Shared timing  | `wind.ts`, `water-events.ts`: deterministic functions of game time, used by both visuals and audio                                                                                                                                                                                        |
-| Characters     | Gravity: `character-candidate.ts`, `gravity-palette.ts`, `gravity-acting.ts` · Lyra: `lyra-candidate.ts`, `lyra-acting.ts`, `lyra-projection.ts`, `lyra-art.ts` · Shared: `character-motion.ts` (footfalls), `interaction-staging.ts` (approach, face, gesture), `scarf.ts` (verlet cloth), `sprites.ts` (atlas with fallback), `character-art.ts` (legacy procedural frames, enemies, pedestrians) |
+| Characters     | Gravity: `character-candidate.ts`, `gravity-palette.ts`, `gravity-acting.ts` · Lyra: `lyra-orb.ts` (pure: drone pixels, poses, hops, placement), `lyra-orb-draw.ts` · previous humanoid, kept for the lab: `lyra-candidate.ts`, `lyra-acting.ts`, `lyra-projection.ts` · Shared: `character-motion.ts` (footfalls), `interaction-staging.ts` (approach, face, gesture), `scarf.ts` (verlet cloth), `sprites.ts` (atlas with fallback), `character-art.ts` (legacy procedural frames, enemies, pedestrians) |
 | Audio          | `audio.ts`: `AudioEngine`, one persistent ambience graph plus one-shots                                                                                                                                                                                                                   |
 | Combat         | `combat.ts`                                                                                                                                                                                                                                                                               |
 | Labs           | `character-lab.html` / `.ts`, `lyra-lab.html` / `.ts` share pose timing and effects with the game. Keep them in step                                                                                                                                                                      |
@@ -116,9 +116,12 @@ These were settled through review with the user. Keep them unless the user chang
   2.4 s and leaves out the deep crouch. The downloaded walk, sprint and jump art is preserved.
 - **Sprint speed:** 290 px/s on the street and in combat. The 330 px/s boost applies **only**
   in the studio and the Den.
-- **Lyra:** MoikMellah's humanoid model with the approved navy/gunmetal cyber palette, cyan
-  visor and circuit accents, and a _small_ cyan aura. Her arc is locked: she has been watching
-  Gravity before they meet, and she becomes a traveling companion (see the story bible).
+- **Lyra:** an AI who lives in the city's machines. She travels in a small floating drone shell
+  with one cyan eye (Guilty Spark–like, drawn in code, navy/gunmetal with cyan accents), and she
+  can leave it: her light hops into cameras, signs, screens and locks, then returns. Before she
+  joins Gravity she keeps a post (the street outside the Den, her terminal inside it). As a
+  companion she follows Gravity's shoulder everywhere, docking at her terminal in the Den. Her
+  arc is locked: she was watching Gravity before they met (see the story bible).
 - **Screens:** in-world conversations use the CRT screen. The notebook (J) stays paper, in the
   olive case jacket.
 - **Type:** interface text uses the bundled DejaVu Sans Mono.

@@ -415,7 +415,7 @@ body {
   color: #44534c;
 }
 .panel .text-button {
-  color: #405b61;
+  color: #2f4a50;
 }
 .record-reader {
   background: transparent;
@@ -605,6 +605,16 @@ body {
 .panel .ending-stats,
 .panel .ending blockquote {
   color: #344e49;
+}
+/* Story choices kept their dark-panel inks after the panel became paper. */
+.panel .story-choice p {
+  color: #344e49;
+}
+.panel .story-choice small {
+  color: #3d4f45;
+}
+.panel .eyebrow.danger {
+  color: #7a3226;
 }
 .panel .deduction small {
   color: #75664e;

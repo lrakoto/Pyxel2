@@ -53,6 +53,7 @@ import { Renderer, H } from './renderer.ts';
 import { AudioEngine } from './audio.ts';
 import { Combat } from './combat.ts';
 import { Cinematic, INTRO } from './cinematic.ts';
+import { MACHINE_CLUES, lyraPresence, type LyraHop } from './lyra-orb.ts';
 import {
   INSIGHTS,
   boardHint,
@@ -185,6 +186,12 @@ class Game {
   examining = false;
   interactionSubject: Hotspot | null = null;
   staging: { hotspot: Hotspot; remaining: number } | null = null;
+  /** Seconds of street play before a dismissed ambush returns. The enforcers are still coming. */
+  ambushDelay: number | null = null;
+  /** When the last conversation closed, so one surplus E press doesn't reopen the same subject. */
+  dialogueClosedAt = 0;
+  /** Lyra's light out of her shell and into a machine, while the story needs her there. */
+  lyraHop: LyraHop | null = null;
   interactionTime = 0;
   lineTime = 0;
   discovery: { id: ClueId; x: number; y: number } | null = null;
@@ -450,6 +457,9 @@ class Game {
       'close',
       () => {
         if (this.modal) return;
+        // Dismissing the ambush postpones it; nothing else on the street offers the choice.
+        if (this.panelMode === 'ambush' && this.model.awaitingAmbush && !this.combat)
+          this.ambushDelay = 3;
         this.importProposal = null;
         this.importRequest++;
         this.panelMode = '';
@@ -627,9 +637,18 @@ class Game {
       this.begin();
       return;
     }
-    const slot = archive.list().find((slot) => slot.id === archive!.activeId);
+    const slots = archive.list();
+    const slot = slots.find((slot) => slot.id === archive!.activeId);
     if (slot?.save) this.openResume(slot.id);
-    else this.openArchive();
+    else if (slots.every((slot) => !slot.save && !slot.corrupt)) {
+      // A first visit goes straight into the case. The archive matters once there is a second one.
+      try {
+        archive.create(1, 'Case file 01');
+        this.resumeCase(1);
+      } catch {
+        this.openArchive();
+      }
+    } else this.openArchive();
   }
   archiveError(
     detail = 'The case could not be filed. Storage may be full or unavailable. Your current session is still open; no other case was replaced.',
@@ -703,6 +722,8 @@ class Game {
     };
     this.combat = null;
     this.combatStory = false;
+    this.ambushDelay = null;
+    this.lyraHop = null;
     this.cinematic = null;
     this.cineWalk = null;
     this.lines = [];
@@ -1052,6 +1073,7 @@ class Game {
       this.advance();
       return;
     }
+    if (performance.now() - this.dialogueClosedAt < 400) return;
     if (this.nearest && !this.combat && !this.modal) this.interact(this.nearest);
   }
   interact(h: Hotspot) {
@@ -1072,6 +1094,14 @@ class Game {
       this.clearInput();
       this.player.facing = Math.sign(h.x - this.player.x) || this.player.facing;
       this.interactionSubject = h;
+      // Machine evidence: Lyra steps into it while Gravity reads it, if she's here.
+      if (
+        h.clue &&
+        MACHINE_CLUES.includes(h.clue) &&
+        lyraPresence(this.model.save.area, this.model.deduced, this.model.save.companion).kind !==
+          'none'
+      )
+        this.lyraHop = { to: { x: h.x, y: h.y }, start: this.time, end: null };
       this.interactionTime = this.lineTime = 0;
       this.model.save.resumeHotspot = h.id;
       this.persist();
@@ -1085,7 +1115,12 @@ class Game {
     }
     this.resolveInteraction(h);
   }
+  /** Sends Lyra home from a machine she was holding open for an examination. */
+  releaseHop() {
+    if (this.lyraHop && this.lyraHop.end === null) this.lyraHop.end = this.time;
+  }
   cancelInteraction() {
+    this.releaseHop();
     this.staging = null;
     this.interactionSubject = null;
     this.model.save.resumeHotspot = null;
@@ -1105,14 +1140,18 @@ class Game {
     if (Math.abs(h.x - this.player.x) > 1) this.player.facing = Math.sign(h.x - this.player.x);
     this.clearInput();
     if (!this.model.unlocked(h)) {
-      this.say([
-        {
-          speaker: 'GRAVITY',
-          text: this.model.deduced
-            ? 'Still locked. The woman outside has been watching me. Time to ask what she knows.'
-            : 'Locked from inside. Whoever runs this place isn’t taking walk-ins. Marlon’s studio is my way into this.',
-        },
-      ]);
+      this.say(
+        [
+          {
+            speaker: 'GRAVITY',
+            text: this.model.deduced
+              ? 'Still locked. Something out here has been watching me. Time to ask what it knows.'
+              : 'Locked from inside. Whoever runs this place isn’t taking walk-ins. Marlon’s studio is my way into this.',
+          },
+        ],
+        null,
+        'DETECTIVE’S OBSERVATION',
+      );
       return;
     }
     if (h.kind === 'door') {
@@ -1174,6 +1213,14 @@ class Game {
       if (h.id === 'lyra' && !this.model.save.contact)
         this.say(lyraIntroduction(this.model), () => {
           this.model.save.contact = true;
+          // She opens the Den from inside its lock, then comes back to her shell.
+          const door = this.currentArea.hotspots.find((spot) => spot.id === 'den-door');
+          if (door)
+            this.lyraHop = {
+              to: { x: door.x, y: door.y },
+              start: this.time,
+              end: this.time + 1.4,
+            };
           this.persist();
           this.sync();
           this.refreshArea();
@@ -1196,7 +1243,7 @@ class Game {
         ]);
       else if (!this.model.save.companion) this.say(LYRA_ARCHIVE, () => this.openCompanionChoice());
       else this.companionTalk();
-    } else this.say([{ speaker: 'GRAVITY', text: h.text! }]);
+    } else this.say([{ speaker: 'GRAVITY', text: h.text! }], null, 'DETECTIVE’S OBSERVATION');
   }
   say(
     lines: { speaker: string; text: string }[],
@@ -1249,6 +1296,8 @@ class Game {
   }
   closeDialogue() {
     const done = this.dialogueDone;
+    this.dialogueClosedAt = performance.now();
+    this.releaseHop();
     this.model.save.resumeHotspot = null;
     this.persist();
     this.lines = [];
@@ -1271,6 +1320,7 @@ class Game {
     this.transitioning = true;
     this.interactionSubject = null;
     this.staging = null;
+    this.lyraHop = null;
     this.clearInput();
     $('transition').classList.add('active');
     await new Promise((r) => setTimeout(r, this.reducedMotion ? 40 : 350));
@@ -1529,12 +1579,16 @@ class Game {
   }
   openMei() {
     if (this.model.save.clues.includes('witness')) {
-      this.say([
-        {
-          speaker: 'MEI',
-          text: 'You have the receipt. V-17, intake B. Don’t let them turn another person into a delivery number.',
-        },
-      ]);
+      this.say(
+        [
+          {
+            speaker: 'MEI',
+            text: 'You have the receipt. V-17, intake B. Don’t let them turn another person into a delivery number.',
+          },
+        ],
+        null,
+        'MEI · NOODLE BAR WINDOW',
+      );
       return;
     }
     const prepared = this.model.save.deductions.includes('entry');
@@ -1728,6 +1782,7 @@ class Game {
               '<div class="story-choice"><p>“I can tell you about the driver. I have to know you’ll listen.”</p><button class="primary" data-action="mei-pickup">Explain the memory and listen</button><button class="text-button" data-action="close">Give her some space</button></div>',
               'mei-trust',
             ),
+          'MEI · NIGHT SHIFT',
         );
         break;
 
@@ -1878,6 +1933,7 @@ class Game {
           player: this.player,
           camera: this.camera,
           time: this.time,
+          lyraHop: this.lyraHop,
           scan: this.scan,
           reducedMotion: this.reducedMotion,
           combat: this.combat,
@@ -1928,6 +1984,16 @@ class Game {
       return;
     }
     if (this.combat?.down || this.combat?.complete) return;
+    if (this.ambushDelay !== null && !this.combat) {
+      this.ambushDelay -= dt;
+      if (this.ambushDelay <= 0) {
+        this.ambushDelay = null;
+        if (this.model.awaitingAmbush) {
+          this.openAmbush();
+          return;
+        }
+      }
+    }
     let axis =
       (this.keys.has('KeyD') || this.keys.has('ArrowRight') || this.keys.has('touch-right')
         ? 1

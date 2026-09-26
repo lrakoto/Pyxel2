@@ -424,3 +424,69 @@ Case archive now exports a versioned JSON containing a single latest checkpoint.
 Validation: **131 tests pass**, including connected character silhouettes, preserved soles and scarf sockets, interaction approach/reaction selection, reduced motion, portable-save round trips, malformed and oversized imports, occupied-folder protection, quota failures and stale-tab races. Formatting, TypeScript/Pages build and diff checks pass.
 
 Browser checks on the local preview covered invalid-file rejection, valid import preview and confirmation in an empty folder, continued play from that imported checkpoint, studio crouch/terminal examinations, map travel to the Den, Lyra conversation and archive projection, interrupted-conversation recovery, closing a staged topic panel then activating another hotspot, reduced-motion re-examination, and the 390×844 portrait CRT layout. Inspected the actual composited character contact sheets and shared character-lab playback. No captured browser warnings/errors. The in-app browser did not report a download event for the Download case click, so native file delivery remains unverified there; serialization and import round trips passed automated checks. Tests used a separate local QA folder and did not modify public player progress. This was a focused pass, not a complete chapter or physical iPhone playthrough.
+
+## September 25 — partial chapter playthrough (paused)
+
+Production build of `e2ddad1`, served on an isolated local origin (`127.0.0.1:4191`) with fresh storage and the soundscape at 10%. Played by driving the real interface in Chrome at 1440×647: mouse clicks on markers and panels, and E / J / M / Esc on the keyboard. To save time, some marker clicks and case-board selections were dispatched through the page. Stopped at the ambush choice at the user's request. No live player progress was touched.
+
+Verified in the browser:
+
+* First run: case archive → new folder → intro. The 35.5 s intro plays through (dispatch, crane, walk-in, chapter card), hands over with the area card and toast, and saves `introSeen`.
+* Evidence and field notes:
+  * The street camera and all seven studio records.
+  * The lock's field note, which appears because the camera record is already held.
+  * The "room has given up its secrets" toast after the sixth core record.
+* Case board:
+  * Same-kind and cold misses give their graded messages.
+  * All three core connections and the optional camera/lock connection work.
+  * Matched cards show red checks.
+  * The objective, chapter label and notebook count update at each step.
+* Map routing from the studio to the Den door through the street. The locked-door line points to the woman outside.
+* Lyra's introduction uses the prepared-entry variant, and contact opens the Den.
+* Archive 001 recovery. Reloading during Lyra's archive conversation brings up the resume recap ("Speak to Lyra about the first memory", 9 records / 4 connections), and Continue restarts that conversation from its first line.
+* Accepting Lyra as companion shows the channel HUD, and leaving the Den opens the ambush.
+
+Found:
+
+1. **Story choices are nearly unreadable.** `.story-choice p` (#d6ddc7) and `.story-choice small` (#9eb194) in `src/style.css` were set for the old dark panel. On the paper panel they measure 1.29:1 and 1.27:1. Seen on Lyra's companion choice and the ambush. The Ada resolution, Mei's trust prompt and the combat-down panel use the same class.
+2. **Dismissing the ambush strands the objective.** Esc or × closes the panel, but the objective still asks Gravity to face the enforcers or take the escape route. Nothing on the street offers either, and B only starts practice combat. The choice returns only after entering and leaving another area, or after a reload.
+3. **First run takes three steps to start.** In a fresh browser, Begin investigation opens the empty case archive and a folder-naming form before the intro plays.
+4. **Staging hides the characters.**
+   * Examining the unfinished portrait puts Gravity directly behind the foreground easel, which hides her below the chest.
+   * The Den spawn puts her behind the tall foreground cabinet.
+   * Lyra's street position lines up with the foreground pole when the camera is at its right edge. That is the framing the map route produces, so she is almost hidden when Gravity arrives.
+5. **Minor:**
+   * One extra E after closing an examination re-examines the same object immediately.
+   * Flavor observations are labelled "PRIVATE CHANNEL".
+   * The "I need a moment" link measures 4.04:1.
+
+Not covered:
+
+* Combat waves and the downed/retry flow.
+* The escape route and the chapter ending.
+* The whole second case: Mei, the sketch, the spool, the chime, the register, three deductions and Ada's resolution.
+* Reduced motion and phone layouts.
+* Archive download/import and earlier checkpoints.
+* Browser console output.
+
+## September 25 — playtest fixes and Lyra's drone
+
+Fixed the partial playthrough's findings:
+
+* **Story-choice contrast.** Paper-ink overrides for `.story-choice` text and the danger eyebrow; panel text buttons are slightly darker. Computed against the panel paper (#cfc09a): quote 5.0:1, detail 4.9:1, danger label 5.0:1, text buttons 5.3:1.
+* **Ambush dismissal.** Closing the ambush without choosing brings it back after 3 s of street play. Opening a panel or conversation pauses the countdown, and combat or leaving the street cancels it.
+* **First run.** With an empty archive, Begin investigation creates folder 01 and starts the intro.
+* **Occluding props.** Interior near-plane props use the street poles' distance fade (`foregroundAlpha`), and the poles now fade for Lyra too. The Den spawn moved to x 230, clear of the cabinet.
+* **Minor.** A 400 ms guard after a conversation closes. "DETECTIVE’S OBSERVATION" for flavor and locked-door lines, and Mei's own labels for her lines.
+
+Lyra is now a code-drawn drone (see the README section of the same date). The humanoid is removed from the game's sprite loading. `lyra-art.ts` was only used there and is deleted.
+
+Validation: **141 tests pass**, including 8 new drone tests and 2 foreground-fade tests. Strict TypeScript, formatting and the production build pass. In the browser, `lyra-lab.html` loaded and its first frame showed the drone correctly.
+
+Not verified: the Chrome window was hidden for the rest of the check. Chrome pauses rendering and defers image decoding for hidden pages, so the game never finished loading. The following still need a look:
+
+* The drone in the game: posts, following, docking, the Den-door hop, hops during examinations, and ambient hops.
+* The archive beam.
+* The ambush returning.
+* The first-run start.
+* The panel contrast in the page itself (the ratios above are computed from the CSS values).

@@ -348,8 +348,8 @@ export const AREAS: Record<AreaId, Area> = {
       {
         id: 'lyra',
         x: 1280,
-        y: 365,
-        label: 'The woman in the rain',
+        y: 378,
+        label: 'The watcher in the rain',
         kind: 'talk',
         requires: 'deduced',
       },
@@ -459,7 +459,8 @@ export const AREAS: Record<AreaId, Area> = {
     title: 'The Memory Den',
     subtitle: 'LYRA’S ARCHIVE · BELOW THE GRID',
     width: 1500,
-    spawn: 140,
+    // Clear of the near-plane cabinet at the stair foot, so arrival isn't behind furniture.
+    spawn: 230,
     color: '#85d6d0',
     figureScale: 2.85,
     ground: 438,
@@ -503,7 +504,7 @@ export const AREAS: Record<AreaId, Area> = {
         kind: 'clue',
         clue: 'fragment',
       },
-      { id: 'lyra-den', x: 1150, y: 365, label: 'Lyra', kind: 'talk' },
+      { id: 'lyra-den', x: 1150, y: 300, label: 'Lyra', kind: 'talk' },
       {
         id: 'chime',
         x: 850,
@@ -533,16 +534,6 @@ export const AREAS: Record<AreaId, Area> = {
     ],
   },
 };
-export const LYRA_INTRO = [
-  { speaker: 'LYRA', text: 'You noticed the oil on the lock. Most detectives stop at the body.' },
-  { speaker: 'GRAVITY', text: 'You’ve been watching me.' },
-  { speaker: 'LYRA', text: 'I’ve been watching everyone walk past. You went inside.' },
-  { speaker: 'GRAVITY', text: 'Marlon painted a woman. Number zero-zero-one. You know her?' },
-  {
-    speaker: 'LYRA',
-    text: 'I know what they left of her. Come into the Den. There are things the rain shouldn’t hear.',
-  },
-];
 export const LYRA_ARCHIVE = [
   {
     speaker: 'LYRA',

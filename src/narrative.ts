@@ -102,10 +102,15 @@ export function lyraIntroduction(model: CaseModel): Line[] {
     { speaker: 'LYRA', text: opening },
     { speaker: 'GRAVITY', text: 'You’ve been watching me.' },
     { speaker: 'LYRA', text: 'I’ve been watching everyone walk past. You went inside.' },
+    { speaker: 'GRAVITY', text: 'From a drone.' },
+    {
+      speaker: 'LYRA',
+      text: 'From the camera across the road. From the signs. The shell is only for when I want to be seen.',
+    },
     { speaker: 'GRAVITY', text: 'Marlon painted a woman. Number zero-zero-one. You know her?' },
     {
       speaker: 'LYRA',
-      text: 'I know what they left of her. Come into the Den. There are things the rain shouldn’t hear.',
+      text: 'I know what they left of her. Come into the Den. I’ll get the door. There are things the rain shouldn’t hear.',
     },
   ];
 }
