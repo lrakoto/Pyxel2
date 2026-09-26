@@ -121,13 +121,17 @@ These were settled through review with the user. Keep them unless the user chang
   with one cyan eye (Guilty Spark–like, drawn in code, navy/gunmetal with cyan accents), and she
   can leave it: her light hops into cameras, signs, screens and locks, then returns. One
   resolved signal position drives her sprite effects, room light, wet rim and reflection.
-  Occupied machines show a small cyan eye; reduced motion holds the light steady. Before she
+  Occupied machines show a small cyan eye; reduced motion holds the light steady. Ambient
+  visits start at rest and keep their destination through movement (`AmbientHopSession`);
+  its transient target resets on area/clock changes and is never saved. Before she
   joins Gravity she keeps a post (the street outside the Den, her terminal inside it). As a
   companion she follows Gravity's shoulder everywhere, docking at her terminal in the Den. Her
   arc is locked: she was watching Gravity before they met (see the story bible).
 - **Case board:** completed cards are scoped to the displayed case. Records reused by a later
   case keep a cross-reference to the source file, without reopening the earlier case’s matches.
   Opening the notebook starts at the case tabs; returning from a record preserves its place.
+- **Interior depth:** `interiorGlassDepth` reuses each plate inside fixed glass apertures,
+  before lighting/reflections. Reduced motion disables the small view-dependent offset.
 - **Screens:** in-world conversations use the CRT screen. The notebook (J) stays paper, in the
   olive case jacket.
 - **Type:** interface text uses the bundled DejaVu Sans Mono.

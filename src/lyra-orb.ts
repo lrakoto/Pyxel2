@@ -235,6 +235,37 @@ export function ambientHop(area: AreaId, time: number, playerX: number): LyraHop
   return { to: pick, start, end: start + HOP_TRAVEL + AMBIENT_STAY };
 }
 
+/** Lock a machine for the duration of a visit; movement must not retarget a live signal. */
+export class AmbientHopSession {
+  private area: AreaId | null = null;
+  private time = -Infinity;
+  private window = -1;
+  private active: LyraHop | null = null;
+
+  sample(area: AreaId, time: number, playerX: number, enabled: boolean, stationary: boolean) {
+    if (area !== this.area || time < this.time) {
+      this.active = null;
+      this.window = -1;
+    }
+    this.area = area;
+    this.time = time;
+    if (!enabled) this.active = null;
+    if (this.active && time >= this.active.end! + HOP_TRAVEL) this.active = null;
+    const window = Math.floor(time / AMBIENT_WINDOW);
+    const start = window * AMBIENT_WINDOW + AMBIENT_OFFSET;
+    if (time >= start && this.window !== window) {
+      this.window = window;
+      // Starting mid-arc after a restore, interruption or arriving in a room reads as a teleport.
+      if (enabled && stationary && time - start < 0.25) {
+        const candidate = ambientHop(area, time, playerX);
+        if (candidate)
+          this.active = { to: candidate.to, start: time, end: time + HOP_TRAVEL + AMBIENT_STAY };
+      }
+    }
+    return this.active;
+  }
+}
+
 export type LyraPresence = { kind: 'none' } | { kind: 'post'; x: number } | { kind: 'follow' };
 /**
  * Where her shell is. Before she joins Gravity she keeps a post: the street once she's been

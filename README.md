@@ -186,3 +186,12 @@ Lyra's room light, reflected pool and light on Gravity follow her signal when sh
 The notebook now treats matches within each case separately. Carried evidence has a source-file cross-reference, so the studio residue stays checked in the Graves case while remaining usable for Meridian. Opening the notebook resets to its case tabs; reading a record still preserves the board's place.
 
 Verified a fresh investigation through all three cases using the UI, with all 19 records and 10 deductions, the non-combat escape and night train. A real downloaded case was imported into empty folder 02 and resumed with the completed investigation intact. Browser checks include portrait/landscape layouts and reduced motion; physical iPhone behavior and the audio mix still need device review. See [QA](docs/QA.md) for exact checks and limits.
+
+
+## September 26 · glass depth and companion continuity
+
+The studio windows, the Den's archive glass and Meridian's cold cabinet now have a restrained recessed layer. Their contents shift behind fixed frames as the camera moves; edge shadows keep the aperture attached to the wall. Reduced motion removes that relative shift. Existing plates provide the pixels, with no new asset downloads.
+
+The studio's near easels gained chipped paint and contact shadows. The Den's near racks gained worn labels, vents, small fasteners, base shadows and loose cables. These details preserve the existing fade over Gravity.
+
+Lyra starts ambient machine visits only while Gravity is stationary. Once begun, a visit keeps its machine even if Gravity walks away, finishes its return once, and cannot resume halfway through after a dialogue, area change or clock reset. Story examinations take priority. The page's case label now follows the active investigation instead of always showing the Graves case number.

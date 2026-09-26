@@ -1,4 +1,4 @@
-import { interiorFinish } from './interior-finish.ts';
+import { interiorFinish, interiorGlassDepth } from './interior-finish.ts';
 import { NearWeather } from './near-weather.ts';
 import { evidenceLight, edgeLight, roomVeil, dampAsphalt } from './world-polish.ts';
 import {
@@ -30,7 +30,7 @@ import { drawOpenings, drawPanes, drawLeaks, drawPuddles } from './water.ts';
 import { leakImpacts } from './water-events.ts';
 import {
   ORB_HOVER,
-  ambientHop,
+  AmbientHopSession,
   companionAnchor,
   lyraSignal,
   lyraPresence,
@@ -97,6 +97,7 @@ export class Renderer {
   private sprites = new Sprites();
   private characterMotion = new CharacterMotion();
   private footWater = new FootWater();
+  private ambientVisit = new AmbientHopSession();
   private nearWeather = new NearWeather();
   private discoveryLight = 0;
   private skyline: HTMLCanvasElement | null = null;
@@ -203,8 +204,14 @@ export class Renderer {
     const orb = this.placeOrb(presence, area, v, figure, world.ground);
     const quiet = !v.speaker && !v.examining && !v.performance?.gravity;
     let signal = orb ? lyraSignal(v.lyraHop ?? null, v.time, orb, v.reducedMotion) : null;
-    if (orb && !signal?.state && presence.kind === 'follow' && quiet && !v.reducedMotion)
-      signal = lyraSignal(ambientHop(area, v.time, v.player.x), v.time, orb, false);
+    const visit = this.ambientVisit.sample(
+      area,
+      v.time,
+      v.player.x,
+      !!orb && !signal?.state && presence.kind === 'follow' && quiet && !v.reducedMotion,
+      Math.abs(v.player.vx) < 1,
+    );
+    if (orb && visit) signal = lyraSignal(visit, v.time, orb, false);
     const lyraLight: SignLight | null = orb
       ? { ...signal!.light, color: '#83c9ff', intensity: 1.3 }
       : null;
@@ -235,7 +242,10 @@ export class Renderer {
       if (!v.combat) drawRelief(c, this.frontage, cam);
     } else {
       const plate = this.plates.get(area);
-      if (plate) c.drawImage(plate, -cam, 0);
+      if (plate) {
+        c.drawImage(plate, -cam, 0);
+        interiorGlassDepth(c, area, plate, cam, v.reducedMotion);
+      }
     }
     // The baked edge sheen breathes rather than being recomputed; it is the
     // plate's answer to the rim glow the characters get.

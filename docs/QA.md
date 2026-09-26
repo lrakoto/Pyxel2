@@ -540,3 +540,13 @@ Browser verification, isolated origin `http://127.0.0.1:4197/`:
 - A transient renderer error occurred during an intermediate hot reload between dependent edits; the completed renderer call supplies the signal and subsequent playthrough/build passed.
 
 Limits: no physical iPhone test; no touch-hold selection test on hardware; no new audio-by-ear assessment; combat deliberately skipped. No live Pages saves/settings were touched. This pass is a local checkpoint, not a Pages deployment.
+
+## September 26 — interior depth and companion continuity
+
+Changes: recessed contents inside fixed studio windows, Den archive glazing and clinic glass; subtle frame-edge shadows; paint chips/contact shadows on studio easels; worn labels, vents, fasteners, bases and cables on the Den's foreground racks. All use existing authored plate pixels or code; no new assets. The active-case masthead follows the current save. Ambient Lyra visits lock their target until returning, start only at rest, and do not restart midway through a scheduled window after interruption or room/clock changes.
+
+Automated: **153 tests passed**, including new ambient-visit tests for movement during a visit, paused redraws, one return per window, missed starts, interruptions, area changes and clock resets. `npm run format:check`, `npm run build` and `git diff --check` passed. Reduced motion disables the new glass offset and ambient visit scheduling.
+
+Browser: used the existing isolated test save at `127.0.0.1:4197`, folder 02. Resumed the completed case; followed the map route from clinic via the street into the studio, then from studio via street into the Den. Reviewed studio window/easel alignment at entry and moved to the portrait; inspected Den glazing/racks at entry and at the archive. Reduced-motion Den view checked; active masthead correctly reads case 07–033 while revisiting older locations. No live saves touched.
+
+Limits: the moving-target ambient regression is verified by automated state tests, not a frame-by-frame browser capture. No new full case playthrough or hardware phone/audio review in this pass. The prior full three-case playthrough remains the integration baseline. Local checkpoint only; not published to Pages.

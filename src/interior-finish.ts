@@ -1,4 +1,51 @@
 import { AREAS, type AreaId } from './content.ts';
+import { reliefOffset } from './spatial.ts';
+
+/** Fixed frames enclose slightly recessed contents; actors and evidence remain on their plane. */
+export function interiorGlassDepth(
+  c: CanvasRenderingContext2D,
+  area: AreaId,
+  plate: HTMLCanvasElement,
+  cam: number,
+  reducedMotion: boolean,
+) {
+  if (area === 'street') return;
+  for (const pane of AREAS[area].water?.panes ?? []) {
+    const x = pane.x - cam;
+    if (x + pane.w < 0 || x > c.canvas.width) continue;
+    const shift = reducedMotion
+      ? 0
+      : reliefOffset(pane.x + pane.w / 2, cam, c.canvas.width, -0.012);
+    c.save();
+    c.beginPath();
+    c.rect(x + 3, pane.y + 3, pane.w - 6, pane.h - 6);
+    c.clip();
+    c.fillStyle = '#091619';
+    c.fillRect(x, pane.y, pane.w, pane.h);
+    // Overscan supplies real edge pixels as the contents move behind the fixed aperture.
+    c.drawImage(
+      plate,
+      pane.x - 14,
+      pane.y,
+      pane.w + 28,
+      pane.h,
+      x - 14 + shift,
+      pane.y,
+      pane.w + 28,
+      pane.h,
+    );
+    const shade = c.createLinearGradient(x, 0, x + pane.w, 0);
+    shade.addColorStop(0, '#030b0d70');
+    shade.addColorStop(0.1, '#030b0d00');
+    shade.addColorStop(0.88, '#030b0d00');
+    shade.addColorStop(1, '#030b0d65');
+    c.fillStyle = shade;
+    c.fillRect(x, pane.y, pane.w, pane.h);
+    c.fillStyle = '#030b0d55';
+    c.fillRect(x, pane.y + 3, pane.w, 3);
+    c.restore();
+  }
+}
 
 /** Glass edge moisture and fixture-local light; drawn behind the characters. */
 export function interiorFinish(

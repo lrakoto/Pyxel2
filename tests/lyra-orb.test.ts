@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   HOP_TRAVEL,
+  AmbientHopSession,
   ORB_SIZE,
   ORB_SOCKETS,
   ambientHop,
@@ -15,6 +16,38 @@ import {
 
 const at = (pixels: number[], x: number, y: number) => pixels[y * ORB_SIZE + x];
 const c = (ORB_SIZE - 1) / 2;
+
+test('ambient visits retain their machine when Gravity moves and finish once', () => {
+  const visit = new AmbientHopSession();
+  assert.equal(visit.sample('street', 19, 600, true, true), null);
+  const started = visit.sample('street', 20, 600, true, true);
+  assert.ok(started);
+  assert.equal(visit.sample('street', 21, 1600, true, false), started);
+  assert.equal(visit.sample('street', 21, 1600, true, false), started, 'paused redraw');
+  assert.equal(visit.sample('street', 24, 1600, true, true), null);
+  assert.equal(
+    visit.sample('street', 24.1, 1600, true, true),
+    null,
+    'no repeat in the same window',
+  );
+});
+
+test('ambient visits do not begin mid-hop, while moving, or after an interruption', () => {
+  const visit = new AmbientHopSession();
+  assert.equal(visit.sample('street', 21, 600, true, true), null, 'late room arrival');
+  assert.equal(visit.sample('street', 54, 600, true, false), null, 'moving at scheduled start');
+  assert.equal(visit.sample('street', 54.1, 600, true, true), null);
+  assert.ok(visit.sample('street', 88, 600, true, true));
+  assert.equal(visit.sample('street', 88.1, 600, false, true), null, 'dialogue or reduced motion');
+  assert.equal(
+    visit.sample('street', 88.2, 600, true, true),
+    null,
+    'no restart after interruption',
+  );
+  assert.equal(visit.sample('clinic', 89, 930, true, true), null, 'area reset');
+  assert.equal(visit.sample('street', 0, 600, true, true), null, 'clock reset');
+  assert.ok(visit.sample('street', 20, 600, true, true));
+});
 
 test('the shell is a round, outlined casing with one eye', () => {
   const open = orbPixels(0, 'open');

@@ -150,6 +150,19 @@ export function drawInteriorForeground(
       c.fillRect(x + 8, 341, 78, 2);
       c.fillStyle = '#151d1c';
       c.fillRect(x, 443, 96, 7);
+      // Old paint on the ledge and worn timber, with contact beneath both feet.
+      c.fillStyle = '#050d1090';
+      for (const foot of [4, 80]) {
+        c.beginPath();
+        c.ellipse(x + foot, 516, 16, 3, 0, 0, Math.PI * 2);
+        c.fill();
+      }
+      for (let chip = 0; chip < 18; chip++) {
+        c.fillStyle = ['#756345', '#6b8272', '#81564d'][chip % 3];
+        c.fillRect(x + 5 + ((chip * 19) % 87), 444 + (chip % 3), 1 + (chip % 3), 1);
+      }
+      c.fillStyle = '#8b795744';
+      c.fillRect(x + 10, 344, 65, 1);
     }
   } else {
     for (const anchor of [70, 1390]) {
@@ -160,17 +173,34 @@ export function drawInteriorForeground(
       c.fillRect(x, 310, 80, 218);
       c.fillStyle = '#2b3b3e';
       c.fillRect(x, 310, 3, 218);
+      c.fillStyle = '#52626755';
+      c.fillRect(x + 3, 310, 72, 1);
+      c.fillStyle = '#050d1090';
+      c.fillRect(x - 4, 527, 88, 5);
       for (let row = 0; row < 5; row++) {
         const y = 329 + row * 34;
         c.fillStyle = '#17282c';
         c.fillRect(x + 9, y, 61, 25);
         c.fillStyle = '#536354';
         c.fillRect(x + 14, y + 5, 24, 3);
+        c.fillStyle = '#a8a58a66';
+        c.fillRect(x + 15, y + 5, 9 + row * 2, 1);
+        c.fillStyle = '#081418';
+        for (let vent = 0; vent < 6; vent++) c.fillRect(x + 14 + vent * 5, y + 15, 3, 1);
+        c.fillStyle = '#61747266';
+        c.fillRect(x + 10, y + 1, 1, 1);
+        c.fillRect(x + 67, y + 22, 1, 1);
         c.fillStyle = '#79b9a0';
         c.globalAlpha = alpha * (0.5 + Math.sin(time * 0.7 + row) * 0.15);
         c.fillRect(x + 58, y + 8, 2, 2);
         c.globalAlpha = alpha;
       }
+      c.strokeStyle = '#030b0e';
+      c.lineWidth = 2;
+      c.beginPath();
+      c.moveTo(x + 72, 480);
+      c.bezierCurveTo(x + 90, 490, x + 72, 515, x + 96, 530);
+      c.stroke();
     }
   }
   c.restore();

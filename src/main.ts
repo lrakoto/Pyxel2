@@ -107,7 +107,7 @@ document.getElementById('app')!.innerHTML = `
  <main class="shell" id="shell">
   <header class="topbar">
    <a class="monogram" href="#" id="brand" aria-label="Pause Gravity">G<span>/</span></a>
-   <div class="edition"><span>DETECTIVE GRAVITY · FIELD NOTES</span><strong>CASE 07–031 <i>/</i> FRAGMENTS</strong></div>
+   <div class="edition"><span>DETECTIVE GRAVITY · FIELD NOTES</span><strong id="active-case-title">CASE 07–031 <i>/</i> FRAGMENTS</strong></div>
    <nav aria-label="Game controls">
     <button class="nav-button" id="board-btn" aria-label="Investigation notebook">${icon('case')}<span>Notebook</span><kbd>J</kbd><b id="clue-count">00</b></button>
     <button class="icon-button" id="map-btn" aria-label="District map" title="District map [M]">${icon('map')}</button>
@@ -1411,6 +1411,11 @@ class Game {
     return 'Follow the evidence.';
   }
   sync() {
+    $('active-case-title').innerHTML = this.model.save.shipment
+      ? 'CASE 07–033 <i>/</i> THE SHIPMENT'
+      : this.model.save.followup
+        ? 'CASE 07–032 <i>/</i> THE FIRST ONE'
+        : 'CASE 07–031 <i>/</i> FRAGMENTS';
     $('clue-count').textContent = String(this.model.save.clues.length).padStart(2, '0');
     $('objective-text').textContent = this.model.objective;
     $('chapter-label').innerHTML =
