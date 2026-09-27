@@ -8,6 +8,7 @@ export interface StoryDetails {
   examined: ExaminedRecord[];
   archiveRecovered: boolean;
   memoryPreserved: boolean;
+  clinicRecords: ClueId[];
 }
 
 /** No visual state is retained between frames or case files. Restoring notes also restores the room. */
@@ -17,6 +18,10 @@ export function storyDetails(save: SaveData): StoryDetails {
     examined:
       save.area === 'studio' ? EXAMINED_RECORDS.filter((id) => save.clues.includes(id)) : [],
     archiveRecovered,
+    clinicRecords:
+      save.area === 'clinic' && save.shipment
+        ? (['manifest', 'cartridge', 'sale'] as ClueId[]).filter((id) => save.clues.includes(id))
+        : [],
     memoryPreserved:
       archiveRecovered &&
       save.followup &&
@@ -56,12 +61,34 @@ export function drawStoryDetails(
   reducedMotion: boolean,
 ) {
   const details = storyDetails(model.save);
-  if (!details.examined.length && !details.archiveRecovered) return;
+  if (!details.examined.length && !details.archiveRecovered && !details.clinicRecords.length)
+    return;
   c.save();
   c.translate(-Math.round(cam), 0);
   for (const id of details.examined) {
     const tab = RECORD_TABS[id];
     evidenceTab(c, tab.x, tab.y, tab.width);
+  }
+  if (details.clinicRecords.includes('manifest')) evidenceTab(c, 348, 330, 9);
+  if (details.clinicRecords.includes('cartridge')) {
+    // A copied lot number on the cabinet lip, anchored to the glass rack.
+    c.fillStyle = '#253b3b';
+    c.fillRect(918, 359, 31, 8);
+    c.fillStyle = '#b0bda3';
+    c.font = '6px monospace';
+    c.fillText('M.G.', 922, 365);
+  }
+  if (details.clinicRecords.includes('sale')) {
+    // Lyra leaves a readable copy on the terminal, rather than a looping error screen.
+    c.fillStyle = '#0a1e20';
+    c.fillRect(1328, 246, 64, 35);
+    c.fillStyle = '#76a99b';
+    c.font = '6px monospace';
+    c.fillText('B-0419 / COPIED', 1331, 254);
+    c.fillStyle = '#3c655f';
+    for (let i = 0; i < 4; i++) c.fillRect(1331, 260 + i * 4, 28 + (i % 3) * 9, 1);
+    c.fillStyle = '#b4b994';
+    c.fillRect(1385, 275, 3, 2);
   }
   if (details.archiveRecovered) {
     // The existing archive pedestal gains a settled bank of status lamps. Their

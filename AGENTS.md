@@ -136,6 +136,13 @@ These were settled through review with the user. Keep them unless the user chang
   imported boot padding is removed in all exploration scenes, not combat.
 - **Interior depth:** `interiorGlassDepth` reuses each plate inside fixed glass apertures,
   before lighting/reflections. Reduced motion disables the small view-dependent offset.
+- **Interaction polish:** `field-layout.ts` places captions beside nearby actors; marker DOM
+  updates are cached by position/state. Focus mode still reveals labels. `PoseRecovery` in
+  `gravity-acting.ts` reverses authored action frames for 0.3 s, cancelled by movement/reduced
+  motion and reset on room entry. Paintings use `study`, shared with the character lab.
+  Broad lighting includes these action tags, while combat retains its existing lighting.
+  Clinic progress details in `story-details.ts` derive from held records, never cached.
+  Local-only `?profile=1` / `&marker-cache=0` provides a frame CPU/marker-write comparison.
 - **Screens:** in-world conversations use the CRT screen. The notebook (J) stays paper, in the
   olive case jacket.
 - **Type:** interface text uses the bundled DejaVu Sans Mono.

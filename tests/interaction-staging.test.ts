@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { AREAS } from '../src/content.ts';
 import {
   actorPerformance,
+  investigationPose,
   interactionLead,
   interactionPosition,
   interactionReach,
@@ -48,4 +49,14 @@ test('reduced motion skips the staging delay and selects a settled inspection po
   assert.ok(interactionLead(painting, false) > 0);
   assert.equal(interactionLead(painting, true), 0);
   assert.equal(actorPerformance(painting, true, 'GRAVITY', false, 0, 0, true).gravityTime, 99);
+});
+
+test('paintings have a considered study while devices and floor traces retain their own gesture', () => {
+  for (const [id, pose] of [
+    ['painting', 'study'],
+    ['portrait', 'study'],
+    ['residue', 'crouch'],
+    ['device', 'terminal'],
+  ])
+    assert.equal(investigationPose(AREAS.studio.hotspots.find((h) => h.id === id)!), pose);
 });

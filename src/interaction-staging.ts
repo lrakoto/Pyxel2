@@ -1,6 +1,6 @@
 import type { Area, Hotspot } from './content.ts';
 
-export type InvestigationPose = 'inspect' | 'crouch' | 'terminal';
+export type InvestigationPose = 'inspect' | 'study' | 'crouch' | 'terminal';
 export interface ActorPerformance {
   gravity: InvestigationPose | 'speak' | 'listen' | null;
   gravityTime: number;
@@ -9,6 +9,7 @@ export interface ActorPerformance {
 }
 
 export function investigationPose(h: Hotspot): InvestigationPose {
+  if (h.clue === 'painting' || h.clue === 'portrait') return 'study';
   // Floor evidence: the studio's residue, and the seal taped low on the clinic's crates.
   if (h.clue === 'residue' || h.clue === 'seal') return 'crouch';
   if (['device', 'transfer', 'fragment', 'chime', 'cartridge', 'sale'].includes(h.clue ?? ''))

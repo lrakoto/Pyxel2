@@ -17,11 +17,12 @@ function recoveredCase() {
 }
 
 test('new cases have no earned room changes in any location', () => {
-  for (const area of ['street', 'studio', 'den'] as const) {
+  for (const area of ['street', 'studio', 'den', 'clinic'] as const) {
     assert.deepEqual(storyDetails({ ...freshSave(), area }), {
       examined: [],
       archiveRecovered: false,
       memoryPreserved: false,
+      clinicRecords: [],
     });
   }
 });
@@ -66,4 +67,13 @@ test('the preserved bird appears only after the resolved followup and survives e
   assert.equal(storyDetails(model.save).memoryPreserved, true);
   assert.equal(storyDetails(parseSave(unresolved)).memoryPreserved, false);
   assert.equal(storyDetails(freshSave()).memoryPreserved, false);
+});
+
+test('clinic changes follow held evidence and clear with an earlier file or another area', () => {
+  const save = { ...freshSave(), area: 'clinic' as const, shipment: true };
+  save.clues.push('manifest', 'sale');
+  assert.deepEqual(storyDetails(save).clinicRecords, ['manifest', 'sale']);
+  assert.deepEqual(storyDetails({ ...save, area: 'studio' }).clinicRecords, []);
+  assert.deepEqual(storyDetails({ ...save, shipment: false }).clinicRecords, []);
+  assert.deepEqual(storyDetails({ ...save, clues: [] }).clinicRecords, []);
 });

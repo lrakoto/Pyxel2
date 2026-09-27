@@ -1,5 +1,6 @@
 /* Field annotations share the notebook's olive stock and pencil rules. */
 .hotspot-label {
+  pointer-events: none;
   background: #22271fee;
   color: #ddd5b9;
   border-color: #9b987452;
@@ -130,4 +131,38 @@
 }
 .stage:not(.in-combat) #touch-act {
   margin-left: 0;
+}
+
+/* Keep a generous target on the object, but set its caption beside the figure. */
+.hotspot[data-label-side='left'] .hotspot-label,
+.hotspot[data-label-side='right'] .hotspot-label {
+  position: absolute;
+  top: 50%;
+  margin: 0;
+  transform: translateY(-50%);
+  max-width: min(190px, 37vw);
+}
+.hotspot[data-label-side='right'] .hotspot-label {
+  left: calc(50% + 24px);
+}
+.hotspot[data-label-side='left'] .hotspot-label {
+  right: calc(50% + 24px);
+}
+.stage:not(.scanning)
+  .hotspot:not(.near):not(.destination-selected):not(:hover):not(:focus-visible)
+  .hotspot-label {
+  opacity: 0;
+}
+.scanning .hotspot:not(.collected) .hotspot-label {
+  opacity: 0.85;
+}
+.hotspot:focus-visible {
+  outline: 1px dashed #dfd2a2;
+  outline-offset: 2px;
+}
+@media (max-width: 600px) {
+  .hotspot[data-label-side] .hotspot-label {
+    font-size: 9px;
+    max-width: 34vw;
+  }
 }

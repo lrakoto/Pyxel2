@@ -217,3 +217,21 @@ background timers. Walking routes retain their final destination through every d
 Gravity faces into the arriving space with a reset movement pose; click-to-examine stops at
 its exact approach point. Her authored boot baseline now meets the street floor as well as
 interior floors. Combat and sprint speeds are unchanged.
+
+
+## September 26 — readable actions and rooms that remember
+
+Nearby evidence captions sit beside Gravity, while distant captions recede until focus mode,
+hover or keyboard focus. Paintings use a distinct considered-study pose; investigation and
+dialogue gestures retrace their authored frames over a short return to rest. Movement takes
+over immediately, and reduced motion skips the return. The same action frames receive the
+room's broad light tint, preventing a lighting change when examining something.
+
+Meridian keeps small earned details: a tab on the intake ledger, a copied M.G. label at cold
+storage and a retained copy on the outbound terminal. These derive from the active case and
+clear when an earlier checkpoint is restored.
+
+Marker layout skips unchanged DOM updates. For local profiling, `?profile=1` shows sampled
+frame CPU time and marker writes; add `&marker-cache=0` for the uncached comparison. This
+instrumentation is development-only, local, and measures JavaScript submission time rather
+than GPU work. It does not collect or transmit telemetry.

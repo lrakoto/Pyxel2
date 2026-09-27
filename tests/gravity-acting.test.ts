@@ -6,6 +6,7 @@ import { applyGravityPalette } from '../src/gravity-palette.ts';
 import { candidateIndex, resolveGravityPose } from '../src/character-candidate.ts';
 import {
   GRAVITY_ACTIONS,
+  PoseRecovery,
   gravityIdleIndex,
   makeGravityActingFrames,
 } from '../src/gravity-acting.ts';
@@ -120,4 +121,25 @@ test('acting settles once, with connected limbs, preserved soles and anatomical 
   }
   assert.deepEqual(idle, before, 'source frames were not mutated');
   assert.equal(Object.keys(acting).length, Object.keys(GRAVITY_ACTIONS).length);
+});
+
+test('action recovery retraces held poses, pauses cleanly and yields immediately to movement', () => {
+  const recovery = new PoseRecovery();
+  recovery.sample('crouch', 9, 0.016, false, false);
+  const start = recovery.sample(null, 0, 0, false, false)!;
+  assert.ok(Math.abs(start.time - GRAVITY_ACTIONS.crouch.duration) < 1e-9);
+  assert.equal(recovery.sample(null, 0, 0.15, false, false)!.time, start.time / 2);
+  assert.equal(recovery.sample(null, 0, 0.15, false, false)!.time, 0);
+  assert.equal(recovery.sample(null, 0, 0.01, false, false), null);
+  for (const [moving, reduced] of [
+    [true, false],
+    [false, true],
+  ]) {
+    recovery.sample('study', 1, 0, false, false);
+    assert.equal(recovery.sample(null, 0, 0.016, moving, reduced), null);
+    assert.equal(recovery.sample(null, 0, 0.016, false, false), null);
+  }
+  recovery.sample('terminal', 1, 0, false, false);
+  recovery.reset();
+  assert.equal(recovery.sample(null, 0, 0.016, false, false), null);
 });

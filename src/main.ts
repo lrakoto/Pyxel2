@@ -8,6 +8,8 @@ import './cinematic.css';
 import './archive.css';
 import './case-board.css';
 import './examination-crt.css';
+import { labelPlacement } from './field-layout.ts';
+import { RenderProbe } from './render-probe.ts';
 import { AreaTransition } from './area-transition.ts';
 import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
@@ -181,6 +183,15 @@ class Game {
   pending: Hotspot | null = null;
   queuedRoute: string | null = null;
   nearest: Hotspot | null = null;
+  private markerWrites = 0;
+  private markerCache = new WeakMap<HTMLElement, string>();
+  private probe =
+    import.meta.env.DEV && new URLSearchParams(location.search).has('profile')
+      ? new RenderProbe()
+      : null;
+  private cacheMarkers = !(
+    import.meta.env.DEV && new URLSearchParams(location.search).get('marker-cache') === '0'
+  );
   private hotspotNodes: { element: HTMLElement; hotspot: Hotspot }[] = [];
   lines: { speaker: string; text: string }[] = [];
   lineIndex = 0;
@@ -1070,12 +1081,28 @@ class Game {
   syncHotspots() {
     for (const { element: b, hotspot: h } of this.hotspotNodes) {
       const x = ((h.x - this.camera) / this.viewW) * 100;
-      b.style.left = x + '%';
+      const placement = labelPlacement(
+        h.x,
+        h.y,
+        this.player.x,
+        this.currentArea.ground,
+        this.currentArea.figureScale,
+        this.camera,
+        this.viewW,
+      );
+      const near = h === this.nearest,
+        selected = h === this.pending;
+      const state = `${x.toFixed(2)}:${near}:${selected}:${placement}`;
+      if (this.cacheMarkers && this.markerCache.get(b) === state) continue;
+      this.markerCache.set(b, state);
+      b.style.left = x.toFixed(2) + '%';
       b.hidden = x < 2 || x > 98;
-      b.classList.toggle('near', h === this.nearest);
-      b.classList.toggle('destination-selected', h === this.pending);
+      b.classList.toggle('near', near);
+      b.classList.toggle('destination-selected', selected);
       b.classList.toggle('edge-left', x < 22);
       b.classList.toggle('edge-right', x > 78);
+      b.dataset.labelSide = placement;
+      this.markerWrites += 7;
     }
   }
   goTo(h: Hotspot, route: string | null = null) {
@@ -2065,6 +2092,8 @@ class Game {
     else this.toast(evaded ? 'PRACTICE ENDED' : 'SECTOR CLEAR', 'Back to the investigation.');
   }
   frame(now: number) {
+    const frameStart = this.probe ? performance.now() : 0;
+    this.markerWrites = 0;
     const elapsed = this.previous ? Math.min((now - this.previous) / 1000, 0.1) : 0;
     this.previous = now;
     if (!document.hidden) {
@@ -2150,6 +2179,7 @@ class Game {
         this.persist();
       }
     }
+    this.probe?.sample(performance.now() - frameStart, this.markerWrites, now);
     this.raf = requestAnimationFrame((t) => this.frame(t));
   }
   update(dt: number) {
@@ -2320,6 +2350,7 @@ class Game {
     }
   }
   dispose() {
+    this.probe?.dispose();
     this.importProposal = null;
     this.importRequest++;
     this.resizeObserver.disconnect();

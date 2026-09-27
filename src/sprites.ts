@@ -1,3 +1,4 @@
+import { GRAVITY_ACTIONS } from './gravity-acting.ts';
 import {
   COLE_FRAMES,
   COLE_STORY_FRAMES,
@@ -260,7 +261,7 @@ export class Sprites {
       ctx.restore();
     }
     // Broad, low-energy light across cloth; combat keeps the established edge-only pass.
-    if (rim && id === 'cole' && tag in COLE_STORY_FRAMES) {
+    if (rim && id === 'cole' && (tag in COLE_STORY_FRAMES || Object.hasOwn(GRAVITY_ACTIONS, tag))) {
       const wash = this.clothLight;
       if (wash.width !== frame.sw || wash.height !== frame.sh) {
         wash.width = frame.sw;

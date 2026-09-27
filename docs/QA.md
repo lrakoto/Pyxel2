@@ -604,3 +604,39 @@ reloaded the preview after the build. No physical phone, audio-by-ear, combat, o
 retest. Hidden-time behavior is covered by the timeline test plus the existing visibility
 check in the frame loop, not a browser background/resume recording. No live saves touched.
 Local checkpoint only; not published to Pages.
+
+## September 26 — readable actions and rooms that remember
+
+Changes: nearby evidence captions move beside Gravity, inactive captions stay quiet outside
+focus mode, and unchanged marker DOM updates are skipped. Paintings use a dedicated study
+pose; investigation actions retrace their authored poses over 0.3 seconds when dismissed.
+Movement, combat and reduced motion cancel recovery. Action poses now receive the same broad
+cloth lighting as exploration. Earned clinic records leave a manifest tab, cartridge label
+and copied terminal log; these details derive from current save state. A development-only
+profiler supports comparison with marker caching disabled.
+
+Automated: **163 tests passed**, including caption placement, pose recovery/cancellation,
+study-pose selection, sprite connectivity/sole alignment and earned clinic details.
+TypeScript/Vite build, formatting and `git diff --check` passed. Source sprite images,
+save version/IDs, combat and movement speeds are unchanged.
+
+Browser: isolated folder 01 at `127.0.0.1:4197`. Re-examined cold storage, the studio painting
+and iridescent residue; reviewed the terminal, study and crouch poses, floor contact,
+directional cloth lighting and release to rest. The cold-storage caption sits beside the
+figure. Viewed the cartridge label and copied terminal detail. Routed clinic → street →
+studio → street through actual controls. At 390 × 844, focus mode and touch controls remained
+available; the stage had equal client/scroll width (360 px), and the nearby caption stayed
+inside its bounds. Restored the normal viewport. Public Pages saves/settings were untouched.
+
+Measurement: a stationary clinic comparison reported 2,940 marker property/class update
+calls per approximately one-second window with caching disabled and zero with caching on.
+Sampled frame CPU medians were 0.6–0.8 ms in that comparison, within variation; no broad
+frame-rate gain is claimed. A walking street sample reported median 1.2 ms, p95 1.8 ms at
+60 sampled frames. The profiler measures JavaScript frame work/submission, not GPU completion,
+and counts update calls rather than observed browser mutations. It is opt-in locally and
+has no telemetry.
+
+Limits: no physical iPhone, new landscape, audio-by-ear, combat or full-story playthrough.
+Reduced-motion cancellation and save-derived clinic rollback are covered by automated tests,
+not a new browser recording. Browser pointer activation was unreliable; keyboard activation
+of actual controls completed the checks. Local checkpoint only; not published to Pages.

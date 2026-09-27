@@ -1,3 +1,4 @@
+import { PoseRecovery } from './gravity-acting.ts';
 import { interiorFinish, interiorGlassDepth } from './interior-finish.ts';
 import { NearWeather } from './near-weather.ts';
 import { evidenceLight, edgeLight, roomVeil, dampAsphalt } from './world-polish.ts';
@@ -95,6 +96,7 @@ export class Renderer {
   private plates = new Map<AreaId, HTMLCanvasElement>();
   private sheens = new Map<AreaId, HTMLCanvasElement>();
   private sprites = new Sprites();
+  private poseRecovery = new PoseRecovery();
   private characterMotion = new CharacterMotion();
   private footWater = new FootWater();
   private ambientVisit = new AmbientHopSession();
@@ -226,6 +228,7 @@ export class Renderer {
       this.lastArea = area;
       this.scarf.reset();
       this.characterMotion.reset(v.player.facing);
+      this.poseRecovery.reset();
       this.footClock = 0;
       this.footTag = '';
       this.footWater.reset();
@@ -363,6 +366,18 @@ export class Renderer {
     if (!v.combat && v.performance?.gravity) {
       motion.tag = v.performance.gravity;
       motion.time = v.performance.gravityTime;
+      motion.lean = 0;
+    }
+    const recovery = this.poseRecovery.sample(
+      v.performance?.gravity ?? null,
+      v.performance?.gravityTime ?? 0,
+      v.dt,
+      Math.abs(p.vx) > 8 || !!v.combat,
+      v.reducedMotion,
+    );
+    if (recovery) {
+      motion.tag = recovery.tag;
+      motion.time = recovery.time;
       motion.lean = 0;
     }
     // Footsteps follow the feet: a tap each time the drawn stride lands.

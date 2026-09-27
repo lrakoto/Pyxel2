@@ -1,5 +1,6 @@
 /** Pixel-authored investigation poses built from Gravity's unchanged source body. */
 export const GRAVITY_ACTIONS = {
+  study: { count: 3, duration: 0.9, label: 'Painting / considered study' },
   inspect: { count: 3, duration: 0.72, label: 'Inspect / standing reach' },
   crouch: { count: 3, duration: 0.9, label: 'Floor evidence / crouch' },
   terminal: { count: 3, duration: 0.68, label: 'Terminal / reach' },
@@ -142,10 +143,41 @@ export function makeGravityActingFrames(
     return { data, neck: { x: 35, y: 37 } };
   };
   return {
+    study: [rest(), standing([45, 34], [45, 29]), standing([44, 32], [40, 28])],
     inspect: [rest(), standing([44, 31], [47, 28]), standing([45, 31], [51, 28], true)],
     crouch: [rest(), { data: idle[0].slice(), neck: { x: 35, y: 31 } }, crouch()],
     terminal: [rest(), standing([44, 33], [48, 35]), standing([44, 35], [51, 36], true)],
     listen: [rest(), standing([44, 31], [44, 27]), standing([43, 30], [41, 25])],
     speak: [rest(), standing([44, 33], [47, 33]), standing([44, 34], [49, 31], true)],
   };
+}
+
+/** Retrace authored poses on release; locomotion and reduced motion take priority. */
+export class PoseRecovery {
+  private action: GravityAction | null = null;
+  private heldTime = 0;
+  private remaining = 0;
+  reset() {
+    this.action = null;
+    this.remaining = 0;
+  }
+  sample(tag: string | null, time: number, dt: number, moving: boolean, reduced: boolean) {
+    if (moving || reduced) {
+      this.reset();
+      return null;
+    }
+    if (tag && Object.hasOwn(GRAVITY_ACTIONS, tag)) {
+      this.action = tag as GravityAction;
+      this.heldTime = Math.min(time, GRAVITY_ACTIONS[this.action].duration);
+      this.remaining = 0.3;
+      return null;
+    }
+    if (tag) {
+      this.reset();
+      return null;
+    }
+    if (!this.action || this.remaining <= 0) return null;
+    this.remaining = Math.max(0, this.remaining - Math.max(0, dt));
+    return { tag: this.action, time: (this.heldTime * this.remaining) / 0.3 };
+  }
 }
