@@ -130,6 +130,10 @@ These were settled through review with the user. Keep them unless the user chang
 - **Case board:** completed cards are scoped to the displayed case. Records reused by a later
   case keep a cross-reference to the source file, without reopening the earlier case’s matches.
   Opening the notebook starts at the case tabs; returning from a record preserves its place.
+- **Travel:** `area-transition.ts` owns a pure fade/cover/reveal timeline, advanced only while
+  the document is visible. Swap under full cover, release input after reveal, preserve the
+  final route across each leg. Gravity resets movement/footfall state on room changes; the
+  imported boot padding is removed in all exploration scenes, not combat.
 - **Interior depth:** `interiorGlassDepth` reuses each plate inside fixed glass apertures,
   before lighting/reflections. Reduced motion disables the small view-dependent offset.
 - **Screens:** in-world conversations use the CRT screen. The notebook (J) stays paper, in the

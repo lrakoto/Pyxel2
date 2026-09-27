@@ -6,6 +6,15 @@ export class CharacterMotion {
   private clock = 0;
   private previousSpeed = 0;
   private settle = 0;
+  /** A doorway is a new planted stance, not a continuation of the previous stride. */
+  reset(facing: number) {
+    this.facing = facing;
+    this.turn = 0;
+    this.previousTag = '';
+    this.clock = 0;
+    this.previousSpeed = 0;
+    this.settle = 0;
+  }
   update(
     dt: number,
     facing: number,

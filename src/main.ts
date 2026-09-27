@@ -8,6 +8,7 @@ import './cinematic.css';
 import './archive.css';
 import './case-board.css';
 import './examination-crt.css';
+import { AreaTransition } from './area-transition.ts';
 import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint } from './checkpoint.ts';
@@ -186,6 +187,12 @@ class Game {
   reveal = 0;
   dialogueDone: (() => void) | null = null;
   transitioning = false;
+  travelSequence: {
+    timeline: AreaTransition;
+    id: AreaId;
+    from: AreaId;
+    route: string | null;
+  } | null = null;
   panelMode = '';
   inspectedClue: ClueId | null = null;
   boardScroll = 0;
@@ -414,7 +421,14 @@ class Game {
         'pointerdown',
         (e) => {
           e.preventDefault();
-          if (this.modal || !this.started || this.staging || this.lines.length) return;
+          if (
+            this.modal ||
+            !this.started ||
+            this.staging ||
+            this.lines.length ||
+            this.transitioning
+          )
+            return;
           button.setPointerCapture(e.pointerId);
           const action = button.dataset.hold!;
           this.touchPointers.set(e.pointerId, action);
@@ -1345,7 +1359,7 @@ class Game {
     this.refreshArea();
     done?.();
   }
-  async travel(id: AreaId, route: string | null = null) {
+  travel(id: AreaId, route: string | null = null) {
     if (this.transitioning) return;
     this.transitioning = true;
     this.interactionSubject = null;
@@ -1361,28 +1375,51 @@ class Game {
       ? `<div class="transit-ticket"><span>FREMONT LINE · NIGHT SERVICE</span><strong>${AREAS[id === 'clinic' ? 'clinic' : 'street'].title}</strong><small>FARE PAID · NOT LOGGED</small></div>`
       : '';
     if (ride) this.audio.train(2.4);
+    shade.style.opacity = '0';
     shade.classList.add('active');
-    await new Promise((r) => setTimeout(r, this.reducedMotion ? 40 : 350));
-    if (ride) await new Promise((r) => setTimeout(r, 1100));
-    this.model.save.resumeHotspot = null;
-    this.model.save.area = id;
-    this.player.x = arrivalX(id, from);
-    this.player.y = this.currentArea.ground;
-    this.player.vy = 0;
-    this.player.grounded = true;
-    this.nearest = null;
-    this.camera = clamp(this.player.x - this.viewW * 0.48, 0, this.currentArea.width - this.viewW);
-    this.audio.area(id);
-    this.refreshArea();
-    this.sync();
-    this.persist();
+    this.travelSequence = {
+      timeline: new AreaTransition(ride, this.reducedMotion),
+      id,
+      from,
+      route,
+    };
+    this.tickUI();
+  }
+  stepTravel(dt: number) {
+    const travel = this.travelSequence;
+    if (!travel) return;
+    const { id, from, route } = travel;
+    const state = travel.timeline.step(dt);
+    $('transition').style.opacity = String(state.opacity);
+    if (state.swap) {
+      this.model.save.resumeHotspot = null;
+      this.model.save.area = id;
+      this.player.x = arrivalX(id, from);
+      this.player.facing = this.player.x < this.currentArea.width / 2 ? 1 : -1;
+      this.player.y = this.currentArea.ground;
+      this.player.vy = 0;
+      this.player.grounded = true;
+      this.nearest = null;
+      this.camera = clamp(
+        this.player.x - this.viewW * 0.48,
+        0,
+        this.currentArea.width - this.viewW,
+      );
+      this.audio.area(id);
+      this.refreshArea();
+      this.sync();
+      this.persist();
+    }
+    if (!state.done) return;
     $('transition').classList.remove('active');
+    this.travelSequence = null;
     this.transitioning = false;
+    this.clearInput();
     this.areaCard();
     if (this.model.awaitingAmbush) this.openAmbush();
     else if (route) {
       const next = nextRouteHotspot(id, route);
-      if (next) this.goTo(next);
+      if (next) this.goTo(next, route);
     }
   }
   areaCard() {
@@ -1458,6 +1495,7 @@ class Game {
     this.toastTimer = window.setTimeout(() => $('toast').classList.remove('show'), 4500);
   }
   panel(title: string, eyebrow: string, body: string, mode: string) {
+    if (this.transitioning) return;
     this.clearInput();
     this.panelMode = mode;
     $('panel').dataset.mode = mode;
@@ -2030,6 +2068,7 @@ class Game {
     const elapsed = this.previous ? Math.min((now - this.previous) / 1000, 0.1) : 0;
     this.previous = now;
     if (!document.hidden) {
+      this.stepTravel(elapsed);
       const active = this.started && !this.modal && !this.transitioning;
       if (!this.modal) this.time += elapsed;
       if (active && (this.staging || this.lines.length)) {
@@ -2145,6 +2184,7 @@ class Game {
       const d = this.target - this.player.x;
       if (Math.abs(d) < Math.max(4, Math.abs(this.player.vx) * dt + 1)) {
         const h = this.pending;
+        this.player.x = this.target;
         this.target = null;
         this.pending = null;
         this.player.vx = 0;

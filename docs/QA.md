@@ -574,3 +574,33 @@ Limits: portrait phone emulation verified, not physical hardware. The landscape 
 surface scaled incorrectly after changing viewport, so landscape rendering is not claimed.
 The browser session/server ended during a tool interruption after these checks; a normal-size
 preview was reopened. No new combat/audio/full-story retest. Local checkpoint only.
+
+## September 26 — arrivals, approach timing and grounding
+
+Changes: visible-frame-driven area transitions with a covered swap and a fully revealed arrival
+before input resumes; reduced-motion cuts retain the readable train ticket. No background
+transition timers survive a hot reload or hidden tab. Final map destinations persist through
+every leg. Touch input and notebook/settings panels are guarded during travel. Gravity faces
+into the arrival space and resets movement, turn, settle and footfall state; approaches stop
+at the exact requested position. The existing sole-padding correction now also applies to
+street exploration, shared by sprite, scarf, lighting and cast shadow. Combat is unchanged.
+
+Automated: **159 tests passed**. New tests exercise door/train sequencing at 120/30/10 Hz,
+reduced motion, invalid/paused time, delayed frames, and exactly one covered swap/completion;
+room-entry animation reset; authored idle/walk sole alignment now includes street scale.
+TypeScript/Vite build, formatting and `git diff --check` passed.
+
+Browser: isolated test folder 01 at `127.0.0.1:4197`. Reviewed clinic stance, routed clinic →
+street → studio, approached and re-examined the painting, then routed studio → street → Den.
+Observed the same “Walking to Memory Den” status after exiting the studio. Reviewed floor
+contact in all four scenes and the studio's settled inspection pose. Enabled reduced motion,
+took the train back to the clinic, and activated Notebook during the covered journey: the
+panel stayed closed. After the transition completed, settings opened normally. Restored
+normal motion and left the preview at clinic entry. Screenshot: `/private/tmp/pyxel-arrival-pass.png`.
+
+Limits: browser pointer activation was unreliable in this session; keyboard activation of
+actual controls was used to complete the playtest. A Vite websocket warning was recorded;
+reloaded the preview after the build. No physical phone, audio-by-ear, combat, or full-story
+retest. Hidden-time behavior is covered by the timeline test plus the existing visibility
+check in the frame loop, not a browser background/resume recording. No live saves touched.
+Local checkpoint only; not published to Pages.

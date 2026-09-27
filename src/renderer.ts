@@ -188,10 +188,10 @@ export class Renderer {
       cam = Math.round(v.camera),
       figure = world.figureScale,
       t = v.reducedMotion ? 0 : v.time;
-    // Interior close-ups expose the imported sprite's three-pixel pivot padding.
+    // Remove the imported sprite's pivot padding on every exploration floor.
     // Player.y remains the physical sole/floor position; only the art's anchor
     // changes, shared by the figure, scarf, light sampling, and cast shadows.
-    const floorOffset = area !== 'street' && !v.combat ? this.sprites.floorOffset(73 * figure) : 0;
+    const floorOffset = !v.combat ? this.sprites.floorOffset(73 * figure) : 0;
     const actorY = v.player.y + floorOffset;
     const ambientWind = area === 'street' ? streetWind(t, v.reducedMotion) : 0;
     if (area === 'street' && !v.reducedMotion)
@@ -225,6 +225,9 @@ export class Renderer {
     if (this.lastArea !== area) {
       this.lastArea = area;
       this.scarf.reset();
+      this.characterMotion.reset(v.player.facing);
+      this.footClock = 0;
+      this.footTag = '';
       this.footWater.reset();
       this.discoveryLight = 0;
     }

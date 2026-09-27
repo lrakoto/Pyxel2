@@ -207,3 +207,13 @@ made, including on narrow phone screens.
 
 Verified with 155 automated tests, TypeScript/Vite build, formatting, and an isolated browser
 playthrough of routes and notebook interactions. This checkpoint has not been published.
+
+
+## September 26 — steadier arrivals and floor contact
+
+Doorways and train journeys now finish revealing the destination before returning control.
+Transitions use the game’s visible-frame clock, including reduced-motion cuts, rather than
+background timers. Walking routes retain their final destination through every doorway.
+Gravity faces into the arriving space with a reset movement pose; click-to-examine stops at
+its exact approach point. Her authored boot baseline now meets the street floor as well as
+interior floors. Combat and sprint speeds are unchanged.

@@ -712,7 +712,6 @@ button {
   z-index: 20;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.35s;
 }
 .transition.active {
   opacity: 1;

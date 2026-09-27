@@ -47,3 +47,14 @@ test('walking after an idle or turn uses the restarted animation clock', () => {
   assert.equal(footfallBetween('sprint', 0.4, 0.41, 'stride'), false);
   assert.equal(footfallBetween('stride', 8.2, 0, 'breathe'), false);
 });
+
+test('room entry resets momentum, turn and footfall phase to a planted stance', () => {
+  const motion = new CharacterMotion();
+  motion.update(0.3, -1, -290, false, false, false);
+  motion.reset(1);
+  const arrival = motion.update(0, 1, 0, false, false, false);
+  assert.deepEqual(arrival, { lean: 0, tag: 'breathe', time: 0 });
+  const walk = motion.update(0.016, 1, 145, false, false, false);
+  assert.equal(walk.tag, 'stride');
+  assert.equal(footfallBetween(walk.tag, 0, walk.time), true);
+});
