@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { applyGravityPalette } from '../src/gravity-palette.ts';
-import { candidateIndex, resolveGravityPose } from '../src/character-candidate.ts';
+import { CANDIDATE_CROP, candidateIndex, resolveGravityPose } from '../src/character-candidate.ts';
+import { AREAS } from '../src/content.ts';
+import { interactionPosition } from '../src/interaction-staging.ts';
 import {
   GRAVITY_ACTIONS,
   PoseRecovery,
@@ -142,4 +144,38 @@ test('action recovery retraces held poses, pauses cleanly and yields immediately
   recovery.sample('terminal', 1, 0, false, false);
   recovery.reset();
   assert.equal(recovery.sample(null, 0, 0.016, false, false), null);
+});
+
+test('raised console contact preserves the standing body and reaches the keys from either side', () => {
+  const acting = makeGravityActingFrames(idle, 71, 67);
+  for (const pose of acting['terminal-high']) {
+    for (let y = 0; y < 67; y++)
+      for (let x = 0; x < 71; x++) {
+        if (x >= 38 && x <= 55 && y >= 24 && y <= 37) continue;
+        const at = (y * 71 + x) * 4;
+        assert.deepEqual(pose.data.slice(at, at + 4), idle[1].slice(at, at + 4));
+      }
+  }
+  const area = AREAS.clinic;
+  const console = area.hotspots.find((h) => h.id === 'sale')!;
+  const pose = acting['terminal-high'][2].data;
+  const scale = (73 * area.figureScale) / CANDIDATE_CROP.cellHeight;
+  // The plate's key strip is below the screen, around y295, not at the clue marker y262.
+  for (const facing of [-1, 1]) {
+    const stand = interactionPosition(console, area, console.x - facing * 180, facing);
+    let touchesKeys = false;
+    for (let y = 0; y < 67; y++)
+      for (let x = 50; x < 71; x++) {
+        const at = (y * 71 + x) * 4;
+        if (pose[at] !== 255 || pose[at + 1] !== 177 || pose[at + 2] !== 100) continue;
+        const handX = stand + facing * (x - CANDIDATE_CROP.pivotX) * scale;
+        const handY = area.ground + (y - 67) * scale;
+        if (handX >= 1344 && handX <= 1376 && handY >= 285 && handY <= 304) touchesKeys = true;
+      }
+    assert.ok(touchesKeys, `held fingertips meet the key strip facing ${facing}`);
+  }
+  const recovery = new PoseRecovery();
+  recovery.sample('terminal-high', 5, 0, false, false);
+  assert.equal(recovery.sample(null, 0, 0.15, false, false)?.tag, 'terminal-high');
+  assert.equal(recovery.sample(null, 0, 0.01, true, false), null);
 });

@@ -4,6 +4,7 @@ export const GRAVITY_ACTIONS = {
   inspect: { count: 3, duration: 0.72, label: 'Inspect / standing reach' },
   crouch: { count: 3, duration: 0.9, label: 'Floor evidence / crouch' },
   terminal: { count: 3, duration: 0.68, label: 'Terminal / reach' },
+  'terminal-high': { count: 3, duration: 0.68, label: 'Terminal / raised controls' },
   listen: { count: 3, duration: 0.8, label: 'Listen / hand to earpiece' },
   speak: { count: 3, duration: 0.78, label: 'Speak / open-hand gesture' },
 } as const;
@@ -147,6 +148,8 @@ export function makeGravityActingFrames(
     inspect: [rest(), standing([44, 31], [47, 28]), standing([45, 31], [51, 28], true)],
     crouch: [rest(), { data: idle[0].slice(), neck: { x: 35, y: 31 } }, crouch()],
     terminal: [rest(), standing([44, 33], [48, 35]), standing([44, 35], [51, 36], true)],
+    // Wall-mounted controls: lift the forearm without moving the torso or planted soles.
+    'terminal-high': [rest(), standing([44, 32], [48, 30]), standing([45, 31], [51, 27], true)],
     listen: [rest(), standing([44, 31], [44, 27]), standing([43, 30], [41, 25])],
     speak: [rest(), standing([44, 33], [47, 33]), standing([44, 34], [49, 31], true)],
   };

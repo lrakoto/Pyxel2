@@ -295,3 +295,11 @@ Meridian's cabinet now lights the room with a softer cyan spill. Removing the ce
 keeps the cartridge rows and their colors visible through the glass, while preserving the
 floor reflection and Lyra's light. Street lighting was reviewed and retained. This completes
 the first lighting review; physical investigation poses are next in the [hourly plan](docs/HOURLY_PASSES.md).
+
+### September 28 — A physical reach for the clinic console
+
+Gravity now raises her hand to the outbound terminal's wall-mounted controls, instead of
+reaching below them. Her feet, torso and scarf attachment remain fixed. The low reach stays
+on bench-height devices. Both variants use the existing settle/recovery timing and appear
+in the character lab; reduced motion holds the finished pose. See [QA](docs/QA.md) for
+before/after views and the compact-screen visibility limitation.

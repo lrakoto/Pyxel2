@@ -1,6 +1,6 @@
 import type { Area, Hotspot } from './content.ts';
 
-export type InvestigationPose = 'inspect' | 'study' | 'crouch' | 'terminal';
+export type InvestigationPose = 'inspect' | 'study' | 'crouch' | 'terminal' | 'terminal-high';
 export interface ActorPerformance {
   gravity: InvestigationPose | 'speak' | 'listen' | null;
   gravityTime: number;
@@ -12,7 +12,9 @@ export function investigationPose(h: Hotspot): InvestigationPose {
   if (h.clue === 'painting' || h.clue === 'portrait') return 'study';
   // Floor evidence: the studio's residue, and the seal taped low on the clinic's crates.
   if (h.clue === 'residue' || h.clue === 'seal') return 'crouch';
-  if (['device', 'transfer', 'fragment', 'chime', 'cartridge', 'sale'].includes(h.clue ?? ''))
+  // Meridian's outbound console has wall-height keys; other machines use the low reach.
+  if (h.clue === 'sale') return 'terminal-high';
+  if (['device', 'transfer', 'fragment', 'chime', 'cartridge'].includes(h.clue ?? ''))
     return 'terminal';
   return 'inspect';
 }

@@ -903,3 +903,49 @@ HUD overlap and Lyra's clue-coordinate examination target remain known follow-up
 occupancy/return screenshots do not verify every transit frame. Only isolated test progress
 changed; public saves/settings untouched. Nothing pushed or published. P2 bounded review is
 complete; P3 physical action/contact audit is next.
+
+## September 28 — P3 raised wall-console reach
+
+The clinic outbound terminal now selects `terminal-high`: a three-frame arm derivative in
+`gravity-acting.ts`, with routing in `interaction-staging.ts`. It lifts the hand to the wall
+console's lower key strip while preserving the body and soles. Existing low terminal reach,
+0.68 s settle, 0.55 s staging lead, recovery and reduced-motion semantics stay intact. Shared
+loading automatically includes it in the character lab, rim/shadow/reflection and scarf paths.
+No source art, speed, combat, camera, save or narrative changes.
+
+Required checks: **177 tests passed**, formatting, strict TypeScript/production build and
+diff check. Two new tests verify physical fingertip contact from both approach directions,
+unchanged body outside the arm, action selection/reduced motion and recovery cancellation.
+Existing all-pose alpha connectivity, boots, neck socket and locomotion/combat-timing checks
+also cover the new action. Game JS 233.54 kB / 78.08 kB gzip; no frame-rate claim.
+
+Isolated browser `127.0.0.1:4197`, folder 01, 19 records / 8 deductions:
+- Normal console before/after from the left shares the room-edge camera clamp and held body
+  position. Right-side approach mirrors the gesture onto the same key strip. Reduced motion
+  selects the finished pose; closing the CRT releases it through the existing recovery.
+- Character lab: new variant selected; held and middle frames inspected in both palette
+  panels, with left/right presentation sampled. No source-image mutation.
+- Reviewed retained clinic cabinet reach/crate crouch, studio painting/residue/receiver,
+  Den archive and street camera/Mei interactions through ordinary travel. This is a
+  representative action review, not a full hotspot or story replay.
+- Portrait and landscape reduced-motion previews (requested 390 × 844 / 844 × 390) retain
+  reading and Close controls but hide most of the actor behind the CRT/evidence cards.
+  Do not interpret these images as proof of visible phone hand contact. Desktop reduced
+  motion plus sprite geometry tests cover the pose itself.
+- Normal motion/default viewport restored, temporary lab closed, no browser console errors.
+  Public origin/save/preferences were untouched. Only the local test folder was used.
+
+[Console before](qa/2026-09-28-p3-contact/terminal-before.png) /
+[after](qa/2026-09-28-p3-contact/terminal-after.png) /
+[right approach](qa/2026-09-28-p3-contact/terminal-right-approach.png) /
+[desktop reduced](qa/2026-09-28-p3-contact/terminal-desktop-reduced.png).
+[Lab held](qa/2026-09-28-p3-contact/lab-raised.png) /
+[left middle frame](qa/2026-09-28-p3-contact/lab-middle-left.png).
+[Portrait](qa/2026-09-28-p3-contact/terminal-portrait-reduced.png) /
+[landscape](qa/2026-09-28-p3-contact/terminal-landscape-reduced.png).
+The [hourly log](HOURLY_PASSES.md) links the retained studio, Den and street review images.
+
+Limits: no physical touch/phone, audio listening, fresh/full-story, combat, measured
+performance or frame-by-frame recovery footage. Compact dialogue obscuration and Lyra's
+clue-coordinate machine target remain known follow-ups. No push/publication. Next: P4
+selective foreground depth; keep the important action/evidence clear.

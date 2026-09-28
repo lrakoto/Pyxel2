@@ -60,3 +60,15 @@ test('paintings have a considered study while devices and floor traces retain th
   ])
     assert.equal(investigationPose(AREAS.studio.hotspots.find((h) => h.id === id)!), pose);
 });
+
+test('the wall console uses a raised hold in ordinary and reduced motion without delaying input', () => {
+  const console = AREAS.clinic.hotspots.find((h) => h.id === 'sale')!;
+  const cabinet = AREAS.clinic.hotspots.find((h) => h.id === 'cartridge')!;
+  for (const reduced of [false, true]) {
+    const pose = actorPerformance(console, true, 'GRAVITY', false, 4, 0, reduced);
+    assert.equal(pose.gravity, 'terminal-high');
+    assert.ok(pose.gravityTime >= 4);
+    assert.equal(investigationPose(cabinet), 'terminal');
+    assert.equal(interactionLead(console, reduced), interactionLead(cabinet, reduced));
+  }
+});

@@ -8,8 +8,8 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P2 clinic light balance and street review; 175 passing tests.
-P1 and the first P2 review are complete across the four areas. P3 physical action contact is next.
+Latest completed product pass: P3 raised console contact; 177 passing tests.
+P1–P3 bounded reviews are complete. P4 selective foreground depth is next.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining camera/material/acting proposals are still queued.
 
@@ -70,7 +70,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   same spot. A grayscale comparison can inform judgment, but isn't a substitute for viewing.
 - Check reduced motion: no new stutters, flash or synchronized global pulse.
 
-### P3 — Physical action contact · TODO
+### P3 — Physical action contact · COMPLETE
 
 - Inspect terminal, study and crouch poses in all four areas. Pick the worst actual mismatch.
   Add authored target information or a small reusable pose variant, rather than stretching
@@ -143,8 +143,10 @@ hardware behavior, and whether anything was published (currently: nothing).
   Studio complete — localized warm bounce, restrained flares, corrected receiver light,
   mist below the bench. Clinic complete — diffuse cabinet light preserves cartridge rows.
   Street reviewed and retained; no global lighting rewrite. Verification limits remain below.
-- P3: next — inspect physical contact in existing study, terminal and crouch actions.
-- P4–P8: queued.
+- P3: complete — reviewed representative actions across the four areas; raised the clinic
+  console reach to its key strip. Body, soles, scarf socket and timing remain fixed.
+- P4: next — one selective foreground aperture/edge, preserving actor and evidence visibility.
+- P5–P8: queued.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
 
@@ -403,3 +405,61 @@ this bounded scene-lighting review is done, not that every lighting/material iss
 Local checkpoint only; no push/publication. Next: P3. Audit physical study/terminal/crouch
 contact across the four areas, beginning with the clinic's cabinet/control height and studio
 receiver workbench. Keep the already-recorded Lyra fixture-target mismatch for P6.
+
+### Pass 6 — September 28, 3:38 PM Pacific · Meet the wall console's controls
+
+P3's first contact review is complete. Sampled clinic cold storage, outbound terminal and
+crate-seal crouch; studio painting study, residue crouch and receiver bench reach; Den archive
+reach; street camera inspection and Mei listening. The clearest mismatch was the clinic's
+outbound console: the low reach held Gravity's hand below the wall-mounted key strip.
+
+Added one `terminal-high` derivative to the existing pixel-pose system and selected it only
+for the `sale` examination. The forearm rises through an intermediate frame, then holds near
+the console's lower controls (approximately world y295). The torso, head, boots, floor pivot
+and scarf socket remain fixed; no affine stretch or new sprite asset. It retains the low
+terminal action's 0.68 s settle, existing 0.55 s staging lead and 0.3 s recovery. Reduced motion
+uses the finished pose immediately. The shared character lab exposes “Terminal / raised
+controls”; palette adaptation, light/rim, shadows and reflection still use the shared frames.
+Other machines retain their low reach. No speed, input, camera, combat, save, story or Lyra
+changes. No new dependency/source art, no rejected implementation.
+
+Validation: **177 tests passed** (two new tests), format, strict TypeScript/production build
+and diff checks passed. Geometry coverage includes the new frames' connectivity, sole pixels,
+scarf sockets, unchanged body outside the arm, fingertips intersecting the console key region
+from either side, reduced-motion selection and movement cancellation of recovery. Existing
+movement/combat frame timing and all save tests still pass. Game JS 233.54 kB / 78.08 kB gzip;
+this is not a performance measurement.
+
+Browser: isolated `127.0.0.1:4197`, folder 01, 19 records / 8 deductions. Captured the console
+before/after from the left in normal motion at the same room-edge camera clamp; inspected the
+mirrored right approach and steady reduced-motion hold. The same held pose and middle frame
+were inspected in the lab, including the source palette and left-facing silhouette. Revisited
+the representative interactions above via normal map/door routes; retained their existing
+poses. The studio low reach meets the bench edge; study stays contemplative, crouches keep
+their boots connected, and Den/street gestures remain observations rather than forced touches
+on high glass/cameras. No console errors. Normal motion/default viewport restored; temporary
+lab closed. Only the isolated test file/settings were used, with public saves untouched.
+
+Evidence: [console before](qa/2026-09-28-p3-contact/terminal-before.png) /
+[after](qa/2026-09-28-p3-contact/terminal-after.png),
+[right approach](qa/2026-09-28-p3-contact/terminal-right-approach.png),
+[desktop reduced motion](qa/2026-09-28-p3-contact/terminal-desktop-reduced.png),
+[portrait reduced](qa/2026-09-28-p3-contact/terminal-portrait-reduced.png) /
+[landscape reduced](qa/2026-09-28-p3-contact/terminal-landscape-reduced.png),
+[lab held pose](qa/2026-09-28-p3-contact/lab-raised.png) /
+[middle frame, left](qa/2026-09-28-p3-contact/lab-middle-left.png),
+[studio study](qa/2026-09-28-p3-contact/studio-study-review.png) /
+[crouch](qa/2026-09-28-p3-contact/studio-crouch-review.png) /
+[receiver](qa/2026-09-28-p3-contact/studio-receiver-review.png),
+[Den archive](qa/2026-09-28-p3-contact/den-archive-review.png),
+[street listening](qa/2026-09-28-p3-contact/street-listen-review.png) /
+[inspection](qa/2026-09-28-p3-contact/street-inspect-review.png).
+
+Limits: sampled actions, not every hotspot or every transit/recovery frame. Phone previews
+(requested 390 × 844 and 844 × 390) expose a pre-existing limitation: the CRT and evidence
+card obscure most of Gravity while dialogue is open. They verify reading/dismissal layout,
+not visible hand contact; the desktop reduced-motion image and geometry tests establish that.
+No physical iPhone/touch, audio listening, fresh/full-story, combat or performance pass.
+Lyra's below-bench examination target remains the separate P6 issue. Local checkpoint only;
+no push/publication. Next: P4 selective foreground depth—inspect an existing aperture/edge
+before adding detail, checking both travel directions and narrow-screen actor visibility.

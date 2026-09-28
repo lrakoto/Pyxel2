@@ -159,6 +159,9 @@ These were settled through review with the user. Keep them unless the user chang
   `gravity-acting.ts` reverses authored action frames for 0.3 s, cancelled by movement/reduced
   motion and reset on room entry. Paintings use `study`, shared with the character lab.
   Broad lighting includes these action tags, while combat retains its existing lighting.
+  The clinic's outbound terminal uses `terminal-high`, a raised forearm variant aligned with
+  its wall-mounted controls. Other machines keep the low reach. Both share the 0.68 s settle,
+  planted body, scarf socket and recovery; the character lab exposes both variants.
   Clinic progress details in `story-details.ts` derive from held records, never cached.
   Local-only `?profile=1` / `&marker-cache=0` provides a frame CPU/marker-write comparison.
 - **Screens:** in-world conversations use the CRT screen. The notebook (J) stays paper, in the
