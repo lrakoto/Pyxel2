@@ -144,7 +144,10 @@ These were settled through review with the user. Keep them unless the user chang
   Clinic progress details in `story-details.ts` derive from held records, never cached.
   Local-only `?profile=1` / `&marker-cache=0` provides a frame CPU/marker-write comparison.
 - **Screens:** in-world conversations use the CRT screen. The notebook (J) stays paper, in the
-  olive case jacket.
+  olive case jacket. `dialogue-reader.ts` owns transient reveal/review position; Previous never
+  triggers story completion. Reveal line / Continue / Close reflect the actual action. Native
+  controls own Enter/Space, while E remains the game shortcut. Phone reading keys are at least
+  44 px tall. Reading history is not saved and resets for each new conversation.
 - **Type:** interface text uses the bundled DejaVu Sans Mono.
 
 ## Verification and the QA record

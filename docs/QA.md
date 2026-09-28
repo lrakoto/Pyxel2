@@ -640,3 +640,30 @@ Limits: no physical iPhone, new landscape, audio-by-ear, combat or full-story pl
 Reduced-motion cancellation and save-derived clinic rollback are covered by automated tests,
 not a new browser recording. Browser pointer activation was unreliable; keyboard activation
 of actual controls completed the checks. Local checkpoint only; not published to Pages.
+
+## September 28 — CRT reading and keyboard controls
+
+Changes: Previous-line review, preserved reveal positions, accurate Reveal line / Continue /
+Close labels, a steady reception indicator, and 44 px reading keys on narrow/touch layouts.
+`DialogueReader` is pure and transient; completion remains in the existing close handler.
+Native controls retain Enter/Space activation without also triggering the game shortcut;
+repeated native activation is suppressed. Save schema, narrative content, art and combat
+simulation are unchanged.
+
+Automated: **167 tests passed**, including reveal-before-advance/close, backward review,
+partial forward-position restoration, paused/negative time, reduced motion, reset between
+conversations and native-control activation. Production build, formatting and diff checks pass.
+
+Browser: isolated folder 01 at `127.0.0.1:4197`. Resumed the saved painting examination and
+closed it with one Enter. Opened Lyra's painting topic, advanced exactly one line with Enter,
+returned to the fully revealed first line with Previous, and advanced exactly one line with
+Space. The second line remained open, proving no duplicate native/game activation. Opened
+Pause by keyboard during dialogue without advancing it; enabled reduced motion, resumed,
+and checked review state. Returned settings to normal motion afterwards.
+
+Phone layout: 390 × 844 portrait showed both reading keys inside the CRT, each 44 px tall.
+The long first line fit without vertical overflow (dialogue clientHeight and scrollHeight
+both 233 px). Reviewed the same line and controls at 844 × 390 landscape, then reset the
+viewport. These are browser viewport checks, not a physical iPhone test. No live Pages save
+or settings were touched. No new full-story, combat or audio-by-ear playtest. Local checkpoint;
+not published to Pages.

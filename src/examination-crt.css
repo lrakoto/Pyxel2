@@ -367,7 +367,7 @@
   }
 }
 
-@media (pointer: coarse) {
+@media (pointer: coarse), (max-width: 600px) {
   #stage #dialogue .dialogue-bottom button {
     min-height: 44px;
   }
@@ -391,4 +391,47 @@
 
 .reduced-motion #stage #dialogue .dialogue-bottom button {
   transition: none;
+}
+
+/* Small transport keys belong to the monitor, keeping reading controls together. */
+#stage #dialogue .dialogue-bottom {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+#stage #dialogue .dialogue-controls {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+#stage #dialogue #advance-btn {
+  min-width: 125px;
+  justify-content: space-between;
+}
+#stage #dialogue #previous-line-btn {
+  color: var(--crt-muted);
+}
+#stage #dialogue button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+#stage #dialogue .dialogue-top::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #65846b;
+}
+#stage #dialogue.receiving .dialogue-top::after {
+  background: #cae7b9;
+  box-shadow: 0 0 5px #b7e7a67a;
+}
+@media (max-width: 600px) {
+  #stage #dialogue .dialogue-bottom > span {
+    flex-basis: 100%;
+  }
+  #stage #dialogue .dialogue-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
 }

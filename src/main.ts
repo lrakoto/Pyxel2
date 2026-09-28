@@ -8,6 +8,7 @@ import './cinematic.css';
 import './archive.css';
 import './case-board.css';
 import './examination-crt.css';
+import { DialogueReader, nativeActivation } from './dialogue-reader.ts';
 import { labelPlacement } from './field-layout.ts';
 import { RenderProbe } from './render-probe.ts';
 import { AreaTransition } from './area-transition.ts';
@@ -135,7 +136,7 @@ document.getElementById('app')!.innerHTML = `
     <div id="area-card" class="area-card" aria-live="polite"></div>
     <div id="combat-hud" class="combat-hud" hidden><div><span class="eyebrow">GRAVITY · VITALS</span><strong id="hp-text">100</strong><div class="hp-track"><i id="hp-fill"></i></div></div><div><span class="eyebrow">HOSTILE CONTACT</span><strong id="wave-text">WAVE 01 / 02</strong><button id="withdraw-btn">Disengage <kbd>Q</kbd></button></div></div>
     <div id="companion" class="companion" hidden><button id="companion-btn"><span class="waveform">▂▆▃▇▂</span><span>LYRA <small>CHANNEL OPEN</small></span></button></div>
-    <aside id="evidence-closeup" class="evidence-closeup" hidden aria-label="Evidence illustration"></aside><div id="dialogue" class="dialogue" hidden aria-label="Conversation"><div class="portrait-mark" id="portrait-mark">G<span>/</span></div><div class="dialogue-copy"><div class="dialogue-top"><span id="speaker" class="eyebrow">GRAVITY</span><span id="line-count" class="eyebrow"></span></div><p id="dialogue-text" aria-hidden="true"></p><p id="dialogue-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p><div class="dialogue-bottom"><span id="dialogue-context">DETECTIVE’S OBSERVATION</span><button id="advance-btn">Continue <kbd>E</kbd>${icon('arrow')}</button></div></div></div>
+    <aside id="evidence-closeup" class="evidence-closeup" hidden aria-label="Evidence illustration"></aside><div id="dialogue" class="dialogue" hidden aria-label="Conversation"><div class="portrait-mark" id="portrait-mark">G<span>/</span></div><div class="dialogue-copy"><div class="dialogue-top"><span id="speaker" class="eyebrow">GRAVITY</span><span id="line-count" class="eyebrow"></span></div><p id="dialogue-text" aria-hidden="true"></p><p id="dialogue-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p><div class="dialogue-bottom"><span id="dialogue-context">DETECTIVE’S OBSERVATION</span><div class="dialogue-controls"><button id="previous-line-btn" aria-label="Previous dialogue line" disabled>← Previous</button><button id="advance-btn"><span id="advance-label">Continue</span> <kbd>E</kbd>${icon('arrow')}</button></div></div></div></div>
     <div id="transition" class="transition" aria-hidden="true"></div>
     <section id="cinematic" class="cinematic" hidden aria-label="Opening scene"><div class="cine-bar top"></div><div class="cine-bar bottom"></div><div class="cine-fade" id="cine-fade"></div><div class="cine-caption" id="cine-caption" aria-live="polite"><span class="eyebrow" id="cine-kicker"></span><p id="cine-text"></p></div><button class="cine-skip" id="cine-skip">Skip <kbd>Esc</kbd></button></section>
     <section id="title-screen" class="title-screen" aria-label="Start game"><div class="title-content"><div class="eyebrow title-kicker"><span>AN INTERACTIVE NOIR</span><i></i> NEW ANGELES, 2077</div><h1 class="game-title"><span class="wordmark">GRAVITY<span class="title-period">.</span></span></h1><div class="issue-label"><span>ISSUE 01</span><i></i><strong>Fragments</strong></div><p class="opening">One dead artist. A thousand stolen minds.<br>Someone has to remember.</p><button class="primary" id="begin-btn" disabled><span id="begin-text">Entering New Angeles</span>${icon('arrow')}</button><button class="text-button" id="archive-btn">Open case archive</button><div class="title-footnote">${icon('headphones')} HEADPHONES RECOMMENDED <span>·</span> SAVED ON THIS DEVICE</div></div><div class="title-coordinates"><span>SECTOR</span><strong>07</strong><span>34°03′ N<br>118°15′ W</span></div></section>
@@ -194,8 +195,7 @@ class Game {
   );
   private hotspotNodes: { element: HTMLElement; hotspot: Hotspot }[] = [];
   lines: { speaker: string; text: string }[] = [];
-  lineIndex = 0;
-  reveal = 0;
+  private reader = new DialogueReader();
   dialogueDone: (() => void) | null = null;
   transitioning = false;
   travelSequence: {
@@ -371,6 +371,13 @@ class Game {
     $('interact-btn').addEventListener('click', () => this.examineNearest(), s);
     $('touch-act').addEventListener('click', () => this.examineNearest(), s);
     $('advance-btn').addEventListener('click', () => this.advance(), s);
+    $('previous-line-btn').addEventListener(
+      'click',
+      () => {
+        if (this.reader.previous()) this.showLine();
+      },
+      s,
+    );
     $('withdraw-btn').addEventListener('click', () => this.finishCombat(true), s);
     $('companion-btn').addEventListener('click', () => this.companionTalk(), s);
     $('hotspots').addEventListener(
@@ -588,6 +595,13 @@ class Game {
     if (action === 'fire') this.firing = false;
   }
   keydown(e: KeyboardEvent) {
+    const control = (e.target as HTMLElement).closest(
+      'button,a,input,select,textarea,summary,[role="button"],[role="link"],[role="checkbox"],[role="switch"]',
+    );
+    if (control && nativeActivation(e.code, control.tagName, control.getAttribute('role'))) {
+      if (e.repeat) e.preventDefault();
+      return;
+    }
     if (this.cinematic && !this.modal) {
       if (['Escape', 'Enter'].includes(e.code) && !e.repeat) this.finishIntro();
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault();
@@ -768,8 +782,7 @@ class Game {
     this.cinematic = null;
     this.cineWalk = null;
     this.lines = [];
-    this.lineIndex = 0;
-    this.reveal = 0;
+    this.reader.open([]);
     this.dialogueDone = null;
     this.nearest = null;
     this.discovery = null;
@@ -1327,8 +1340,10 @@ class Game {
     $('evidence-closeup').hidden = true;
     $('stage').classList.remove('examining-clue');
     this.lines = lines;
-    this.lineIndex = 0;
-    this.reveal = 0;
+    this.reader.open(
+      lines.map((line) => line.text),
+      this.reducedMotion,
+    );
     this.dialogueDone = done;
     $('dialogue').hidden = false;
     $('stage').classList.add('in-dialogue');
@@ -1339,31 +1354,32 @@ class Game {
   }
   showLine() {
     this.lineTime = 0;
-    const line = this.lines[this.lineIndex];
+    const line = this.lines[this.reader.index];
     $('speaker').textContent = line.speaker;
     $('dialogue-announcement').textContent = `${line.speaker}: ${line.text}`;
     $('portrait-mark').innerHTML = line.speaker === 'LYRA' ? 'L<span>◌</span>' : 'G<span>/</span>';
     if (line.speaker === 'MEI') $('portrait-mark').innerHTML = 'M<span>·</span>';
     $('dialogue').classList.toggle('lyra', line.speaker === 'LYRA');
     $('line-count').textContent =
-      `${String(this.lineIndex + 1).padStart(2, '0')} / ${String(this.lines.length).padStart(2, '0')}`;
-    $('dialogue-text').textContent = this.reducedMotion ? line.text : '';
-    this.reveal = this.reducedMotion ? line.text.length : 0;
-    $('advance-btn').innerHTML =
-      `${this.lineIndex === this.lines.length - 1 ? 'Close' : 'Continue'} <kbd>E</kbd>${icon('arrow')}`;
+      `${String(this.reader.index + 1).padStart(2, '0')} / ${String(this.lines.length).padStart(2, '0')}`;
+    $('dialogue-text').textContent = line.text.slice(0, Math.floor(this.reader.revealed));
+    this.syncDialogueControls();
+  }
+  syncDialogueControls() {
+    const label = this.reader.label;
+    if ($('advance-label').textContent !== label) $('advance-label').textContent = label;
+    $<HTMLButtonElement>('previous-line-btn').disabled = this.reader.index === 0;
+    $('dialogue').classList.toggle('receiving', !this.reader.complete);
   }
   advance() {
     if (!this.lines.length) return;
-    const text = this.lines[this.lineIndex].text;
-    if (this.reveal < text.length) {
-      this.reveal = text.length;
-      $('dialogue-text').textContent = text;
-      return;
+    const action = this.reader.advance();
+    if (action === 'close') this.closeDialogue();
+    else if (action === 'line') this.showLine();
+    else if (action === 'reveal') {
+      $('dialogue-text').textContent = this.lines[this.reader.index].text;
+      this.syncDialogueControls();
     }
-    if (this.lineIndex < this.lines.length - 1) {
-      this.lineIndex++;
-      this.showLine();
-    } else this.closeDialogue();
   }
   closeDialogue() {
     const done = this.dialogueDone;
@@ -2109,10 +2125,12 @@ class Game {
         }
       }
       if (active && this.lines.length) {
-        this.reveal += elapsed * 48;
-        const text = this.lines[this.lineIndex].text;
-        const next = text.slice(0, Math.floor(this.reveal));
+        const wasComplete = this.reader.complete;
+        this.reader.tick(elapsed, this.reducedMotion);
+        const text = this.lines[this.reader.index].text;
+        const next = text.slice(0, Math.floor(this.reader.revealed));
         if ($('dialogue-text').textContent !== next) $('dialogue-text').textContent = next;
+        if (wasComplete !== this.reader.complete) this.syncDialogueControls();
       }
       this.accumulator =
         active && !this.lines.length && !this.staging ? this.accumulator + elapsed : 0;
@@ -2151,13 +2169,13 @@ class Game {
           title: !this.started || !!this.cinematic,
           examining: this.examining,
           discovery: this.discovery,
-          speaker: this.lines[this.lineIndex]?.speaker ?? null,
+          speaker: this.lines[this.reader.index]?.speaker ?? null,
           performance:
             !this.combat && !this.cinematic
               ? actorPerformance(
                   this.interactionSubject,
                   !!this.staging || this.examining,
-                  this.lines[this.lineIndex]?.speaker ?? null,
+                  this.lines[this.reader.index]?.speaker ?? null,
                   this.interactionSubject?.id.startsWith('lyra') === true ||
                     this.lines.some((line) => line.speaker === 'LYRA'),
                   this.interactionTime,

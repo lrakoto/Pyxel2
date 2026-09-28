@@ -235,3 +235,15 @@ Marker layout skips unchanged DOM updates. For local profiling, `?profile=1` sho
 frame CPU time and marker writes; add `&marker-cache=0` for the uncached comparison. This
 instrumentation is development-only, local, and measures JavaScript submission time rather
 than GPU work. It does not collect or transmit telemetry.
+
+### September 28 — CRT reading controls
+
+Conversations now have a Previous key for rereading earlier lines. Reviewed text stays revealed,
+and returning forward preserves the reading position. The main key says Reveal line while text
+is arriving, then Continue or Close when the line is complete. A steady monitor indicator reflects
+that state without adding flashing or motion. Reading history is temporary to the current
+conversation; existing save files and story outcomes are unchanged.
+
+Enter and Space now belong to the focused interface control, preventing a button activation from
+also advancing dialogue through the game's keyboard handler. The E shortcut remains available.
+Phone reading keys have 44 px minimum tap height and stay together within the CRT layout.
