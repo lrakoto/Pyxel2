@@ -135,10 +135,12 @@ These were settled through review with the user. Keep them unless the user chang
   final route across each leg. Gravity resets movement/footfall state on room changes; the
   imported boot padding is removed in all exploration scenes, not combat.
 - **Exploration framing:** `exploration-camera.ts` adds bounded, stateless composition around
-  the studio painting and receiver. The bias tapers with distance and narrows with the viewport;
+  Mei’s window and the street entrances, the studio painting/receiver, the Den’s paper archive
+  and memory column, and the clinic intake desk/cold storage. The bias tapers with distance
+  and narrows with the viewport;
   reduced motion and combat use the original framing. Dialogue and intro keep their own focus.
   Constructor, save restore, resize and covered room swaps resolve the current area directly.
-  Street, Den and clinic composition is still unauthored.
+  Landmark positions follow physical fixtures, never hidden clues or save progress.
 - **Interior depth:** `interiorGlassDepth` reuses each plate inside fixed glass apertures,
   before lighting/reflections. Reduced motion disables the small view-dependent offset.
 - **Interaction polish:** `field-layout.ts` places captions beside nearby actors; marker DOM

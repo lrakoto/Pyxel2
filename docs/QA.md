@@ -726,3 +726,51 @@ covered numerically, not with a captured frame sequence. Renderer retains its ex
 rounding; no new transform is introduced for markers, reflections or picking. Live Pages
 saves/settings were untouched. P1 remains partial: street/Den/clinic authored zones are next.
 Local checkpoint only; no push or publication.
+
+
+## September 28 — P1 district composition completion
+
+Extended the existing camera helper to street landmarks (Mei’s window, Graves entrance,
+Memory Den entrance), the Den’s paper archive/memory column, and clinic intake/cold storage.
+The studio configuration, interpolation, draw/picking transforms, dialogue/intro priority and
+combat opt-out are unchanged. Composition follows visible architecture and does not expose
+clue/save state. No assets, dependencies, speeds, narrative or saved fields changed.
+
+Automated: **175 tests passed**. Camera continuity now sweeps every area in quarter-pixel
+steps at 300/390/460/620/960/1280 internal widths. Clue approach positions remain visible from
+either direction; talk partners remain on-screen at the 300-pixel minimum. All seven new
+landmarks attract toward the subject, bounds hold, reduced-motion targets equal the legacy
+formula, quiet stretches retain tracking, and the studio’s desktop/portrait targets remain
+unchanged. Format, strict TypeScript/production build and diff checks passed. Targeted camera
+tests reran successfully after adding the actual browser portrait width of 460.
+
+Browser: isolated `127.0.0.1:4197`, folder 01. Resumed the same saved street position after
+reload; Graves-door marker moved from 57.34% to 53.56%. Repeated archive and cold-storage
+approaches from the same side: their desktop markers moved 53.94% → 51.32% and 53.94% →
+51.50%, matching the intended targets. Both examinations opened and closed through existing
+CRT dialogue. Inspected all three scenes at 390 × 844, with actor and subject in view. Den
+portrait archive placement was 55.87%; enabling reduced motion restored the original 60.39%.
+Also inspected Den at 844 × 390 landscape. Restored normal motion and the default viewport.
+Used the street studio doorway in portrait, then the map route studio → street → Den and
+train from Den to clinic. A desktop floor click toward intake completed and cleared its
+destination; the ledger’s marker remained registered to the counter. Examined that ledger
+from the right and inspected its portrait composition. No console errors observed.
+
+[Street before](qa/2026-09-28-p1-scenes/street-before.png) /
+[after](qa/2026-09-28-p1-scenes/street-after.png) /
+[phone](qa/2026-09-28-p1-scenes/street-phone.png).
+[Den before](qa/2026-09-28-p1-scenes/den-before.png) /
+[after](qa/2026-09-28-p1-scenes/den-after.png) /
+[phone](qa/2026-09-28-p1-scenes/den-phone.png) /
+[landscape reduced motion](qa/2026-09-28-p1-scenes/den-landscape-reduced.png).
+[Clinic before](qa/2026-09-28-p1-scenes/clinic-before.png) /
+[after](qa/2026-09-28-p1-scenes/clinic-after.png) /
+[phone](qa/2026-09-28-p1-scenes/clinic-phone.png) /
+[intake phone](qa/2026-09-28-p1-scenes/intake-phone.png).
+These are matched-position composition comparisons, not matched animation/light/traffic frames.
+
+Limits: no new physical iPhone/touch validation, intro replay, full-story/fresh-case run,
+combat or audio listening. Phone control activation used semantic keyboard actions.
+Continuity is covered numerically rather than a recorded frame sequence. No performance claim.
+Live saves/settings untouched. Local checkpoint only; no push or publication. P1 complete;
+P2 begins with the archive’s broad glow/mist and overlapping light passes in the Memory Den.

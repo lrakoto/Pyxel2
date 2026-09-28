@@ -265,3 +265,12 @@ The camera eases into and out of these views without zoom, facing-direction snap
 drift. Its reach scales down on narrow screens; reduced motion keeps the original framing.
 Conversation shots remain authoritative, and arrivals/resuming a save use the destination’s
 own composition. Other scenes retain their existing camera while the studio proves the approach.
+
+
+### September 28 — Composed views across the district
+
+The studio’s exploration framing now extends to Sector 07, the Memory Den and Meridian Clinic.
+Views gently favor Mei’s window and the occupied street entrances, the Den’s paper records and
+memory column, and the clinic’s intake desk and cold-storage cabinet. Ordinary tracking remains
+between these landmarks. Narrow screens reduce the pull; reduced motion disables it.
+Clues, route markers, reflections and floor picking continue to use the same camera.
