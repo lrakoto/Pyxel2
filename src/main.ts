@@ -12,6 +12,7 @@ import { DialogueReader, nativeActivation } from './dialogue-reader.ts';
 import { labelPlacement } from './field-layout.ts';
 import { RenderProbe } from './render-probe.ts';
 import { AreaTransition } from './area-transition.ts';
+import { explorationCamera } from './exploration-camera.ts';
 import { bindFullscreen } from './fullscreen.ts';
 import { RECORD_MOUNTS } from './notebook.ts';
 import { readCheckpoint } from './checkpoint.ts';
@@ -162,7 +163,7 @@ class Game {
     grounded: true,
     facing: 1,
   };
-  camera = clamp(model.save.x - this.viewW * 0.48, 0, AREAS[model.save.area].width - this.viewW);
+  camera = 0;
   time = 0;
   started = false;
   archiveChanged = false;
@@ -236,6 +237,7 @@ class Game {
   }
   constructor() {
     this.loadPreferences();
+    this.camera = this.explorationView();
     this.bind();
     this.refreshArea();
     this.sync();
@@ -243,11 +245,7 @@ class Game {
       const r = $('stage').getBoundingClientRect();
       this.renderDirty = true;
       this.renderer.resize(Math.round((H * r.width) / r.height));
-      this.camera = clamp(
-        this.player.x - this.viewW * 0.48,
-        0,
-        this.currentArea.width - this.viewW,
-      );
+      this.camera = this.explorationView();
       this.syncHotspots();
     });
     this.resizeObserver.observe($('stage'));
@@ -567,6 +565,14 @@ class Game {
   get currentArea() {
     return AREAS[this.model.save.area];
   }
+  explorationView() {
+    return explorationCamera(
+      this.currentArea,
+      this.player.x,
+      this.viewW,
+      this.reducedMotion || !!this.combat,
+    );
+  }
   get modal() {
     return $<HTMLDialogElement>('panel').open;
   }
@@ -805,7 +811,7 @@ class Game {
     $('hotspots').classList.remove('inactive');
     $('focus-btn').setAttribute('aria-pressed', 'false');
     $('focus-status').hidden = true;
-    this.camera = clamp(save.x - this.viewW * 0.48, 0, this.currentArea.width - this.viewW);
+    this.camera = this.explorationView();
     this.refreshArea();
     this.renderDirty = true;
     this.begin();
@@ -1443,11 +1449,7 @@ class Game {
       this.player.vy = 0;
       this.player.grounded = true;
       this.nearest = null;
-      this.camera = clamp(
-        this.player.x - this.viewW * 0.48,
-        0,
-        this.currentArea.width - this.viewW,
-      );
+      this.camera = this.explorationView();
       this.audio.area(id);
       this.refreshArea();
       this.sync();
@@ -2147,12 +2149,13 @@ class Game {
           !this.reducedMotion && (this.staging || this.lines.length)
             ? this.interactionSubject
             : null;
-        const desired = clamp(
-          (focus ? this.player.x * 0.55 + focus.x * 0.45 : this.player.x) -
-            this.viewW * (focus ? 0.5 : 0.48),
-          0,
-          this.currentArea.width - this.viewW,
-        );
+        const desired = focus
+          ? clamp(
+              this.player.x * 0.55 + focus.x * 0.45 - this.viewW * 0.5,
+              0,
+              this.currentArea.width - this.viewW,
+            )
+          : this.explorationView();
         this.camera += (desired - this.camera) * (1 - Math.exp(-elapsed * 5));
       }
       if (!this.modal || this.renderDirty) {

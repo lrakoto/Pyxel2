@@ -682,3 +682,47 @@ America/Los_Angeles, with routine notifications muted. The durable implementatio
 requires bounded local commits, repository checks, isolated browser verification and an
 honest run log. No gameplay changed in this checkpoint. Re-ran all 167 tests, formatting, production build
 and diff checks successfully; no new gameplay/browser playtest is claimed for this setup.
+
+
+## September 28 — P1 studio exploration framing
+
+Implemented two stateless focal zones in `exploration-camera.ts`, anchored to the painted
+subject below the work bulb and to the receiver cylinder. The smooth bias is bounded by
+64 world pixels / 8% of view width and narrows with the viewport. Existing interpolation
+provides movement. Reduced motion disables the added composition; dialogue and cinematic
+focus retain priority. Initialization, save restore, resize and covered travel swaps resolve
+the current room. Other areas and combat retain their existing framing. No new save state,
+assets, dependencies, lore or movement changes.
+
+Automated: **172 tests passed**. Five new tests cover directional attraction, monotonic
+subpixel sweeps through zone boundaries/overlap at 300/390/620/960/1280 internal widths, all
+studio clue approach positions from either side, bias/room limits, reduced motion, oversized
+views and no previous-room state. Format, strict TypeScript/production build and diff checks
+passed. Tests exercise the target composition; no new frame-rate/performance claim.
+
+Browser: isolated `http://127.0.0.1:4197/`, existing folder 01. Resumed the stored studio
+position and captured desktop before/after framing. Examined painting, residue and receiver
+through semantic marker controls, including their existing re-examination CRT scenes. At
+390 × 844, painting/receiver compositions kept the detective and subject in view. Toggling
+reduced motion returned the receiver marker from 55.78% to the established 60.17% placement
+at internal width 460. Checked reduced-motion landscape at 844 × 390. Restored normal motion
+and default viewport. Routed studio → street → Den → street → studio through the map,
+verified the studio entrance camera was zero (exit at 8.85% of the 960-pixel view), and
+repeated the painting approach. A desktop floor click below the painting landed with the
+marker at 45.10%, against a computed 45.11% target, and cleared the walking destination.
+No browser console errors observed.
+
+Evidence: [desktop before](qa/2026-09-28-p1/gravity-p1-before-desktop.png),
+[desktop after](qa/2026-09-28-p1/gravity-p1-after-desktop.png),
+[phone painting](qa/2026-09-28-p1/gravity-p1-phone-painting.png),
+[phone receiver](qa/2026-09-28-p1/gravity-p1-phone-receiver.png),
+[landscape reduced motion](qa/2026-09-28-p1/gravity-p1-landscape-reduced.png).
+Before/after use the same saved actor position, but different animation/light moments.
+
+Limits: phone pointer automation did not reliably activate the intended marker; keyboard
+activation of exact controls was reliable. Physical iPhone/tap behavior remains a manual
+check. No new intro, combat, audio-by-ear or complete-story playtest. Camera continuity is
+covered numerically, not with a captured frame sequence. Renderer retains its existing pixel
+rounding; no new transform is introduced for markers, reflections or picking. Live Pages
+saves/settings were untouched. P1 remains partial: street/Den/clinic authored zones are next.
+Local checkpoint only; no push or publication.

@@ -134,6 +134,11 @@ These were settled through review with the user. Keep them unless the user chang
   the document is visible. Swap under full cover, release input after reveal, preserve the
   final route across each leg. Gravity resets movement/footfall state on room changes; the
   imported boot padding is removed in all exploration scenes, not combat.
+- **Exploration framing:** `exploration-camera.ts` adds bounded, stateless composition around
+  the studio painting and receiver. The bias tapers with distance and narrows with the viewport;
+  reduced motion and combat use the original framing. Dialogue and intro keep their own focus.
+  Constructor, save restore, resize and covered room swaps resolve the current area directly.
+  Street, Den and clinic composition is still unauthored.
 - **Interior depth:** `interiorGlassDepth` reuses each plate inside fixed glass apertures,
   before lighting/reflections. Reduced motion disables the small view-dependent offset.
 - **Interaction polish:** `field-layout.ts` places captions beside nearby actors; marker DOM

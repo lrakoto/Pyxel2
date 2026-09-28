@@ -8,9 +8,9 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: CRT Previous/reveal controls and native keyboard activation.
-The REPLACED study is complete. Its proposed camera/material/acting changes are **not yet
-implemented** merely because they are listed here.
+Latest completed product pass: P1 studio composition prototype; 172 passing tests.
+The REPLACED study is complete. Only changes explicitly recorded below are implemented;
+the remaining camera/material/acting proposals are still queued.
 
 Schedule: hourly in this chat, through September 28 at 11:59 PM America/Los_Angeles.
 Automation ID: `gravity-hourly-improvement-passes`. Delayed runs after that date must not
@@ -45,7 +45,7 @@ No broad refactor, new dependency or new rendering engine just to keep a session
 
 Sequence is a priority order, not a promise that each item fits exactly one hour.
 
-### P1 — Authored exploration framing · TODO
+### P1 — Authored exploration framing · IN PROGRESS (studio complete)
 
 - Add a pure camera-composition helper with a small number of landmark zones. Start in the
   studio (painting and receiver) to prove the design; then extend to street, Den and clinic.
@@ -133,7 +133,9 @@ hardware behavior, and whether anything was published (currently: nothing).
 
 - Research: complete; direct developer accounts plus official visual reference study recorded.
 - Scheduling: active hourly for today; local-file automation, in this same conversation.
-- P1–P8: queued; future sessions must update each status honestly.
+- P1: studio framing implemented and checked. Next: extend authored zones to street, Den and
+  clinic using the same helper, with scene-specific before/after review.
+- P2–P8: queued.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
 
@@ -146,3 +148,45 @@ four direct developer accounts; inspected three official stills and sampled the 
 Created the priority queue and finite hourly schedule. No gameplay changes in this research
 checkpoint. Re-ran 167 tests plus build/format/diff checks successfully; this setup does not claim a
 new gameplay/browser playtest. Next action: P1, the studio composition prototype.
+
+
+### Pass 1 — September 28, 10:37 AM Pacific · Studio composition
+
+Implemented a pure `exploration-camera.ts` helper, with two authored studio focal points:
+the painting below the work bulb and the receiver’s glass cylinder. Smooth distance weighting
+shares attention with the subject, capped at 64 world pixels / 8% of view width. Narrow views
+shrink each zone’s reach. No facing-dependent snap, timer or persistent camera memory.
+Existing tracking interpolation handles the movement; dialogue/intro remain authoritative.
+Reduced motion disables the added bias. Other rooms and combat retain their original framing.
+Constructor, resize, save restore and covered area swaps resolve the current room directly.
+
+Validation: **172 tests passed**, format, production build and diff checks passed. New tests
+sweep all zone boundaries/overlaps at five viewport widths for monotonic continuity; check
+all studio clue approach positions from both directions; bound the bias and scene edges;
+verify reduced motion, oversized views and independence from prior rooms. The first directional
+assertion put the receiver beyond the room-edge camera clamp; corrected its sample to an
+unclamped position while retaining separate edge-limit coverage. No implementation rollback.
+
+Browser: isolated `127.0.0.1:4197`, folder 01. Compared the painting at the same saved position
+before/after; inspected painting and receiver at 390 × 844, and receiver in reduced-motion
+844 × 390. Opened painting/residue/receiver examinations, traversed studio → street → Den and
+returned via map to the studio entrance; verified the entrance camera reset to zero and
+repeated the painting approach. Normal motion and default viewport restored. A desktop floor click directly below the painting
+landed with its marker at 45.10% (computed camera target: 45.11%, within pointer rounding),
+and cleared the walking destination. No console errors.
+
+Screenshots: [before](qa/2026-09-28-p1/gravity-p1-before-desktop.png),
+[after](qa/2026-09-28-p1/gravity-p1-after-desktop.png),
+[phone painting](qa/2026-09-28-p1/gravity-p1-phone-painting.png),
+[phone receiver](qa/2026-09-28-p1/gravity-p1-phone-receiver.png),
+[landscape / reduced motion](qa/2026-09-28-p1/gravity-p1-landscape-reduced.png).
+These are composition comparisons, not synchronized animation frames.
+
+Limits: camera-zone continuity is tested numerically rather than a recorded frame-by-frame
+walk. Pointer activation in the phone browser was unreliable; exact semantic controls activated
+by keyboard completed the examination checks. No physical iPhone, audio listening, intro
+replay, combat playtest or full case playthrough. Save format/content and sprite assets unchanged;
+only the isolated test folder progressed. No live saves/settings changed. Local checkpoint only.
+
+Next: finish P1 in street/Den/clinic; author around existing visual subjects and apply the same
+small-screen/route checks. P2 lighting work follows; do not inflate glow to compensate for framing.

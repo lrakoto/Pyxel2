@@ -256,3 +256,12 @@ characters and story bible, prioritizing authored framing, motivated lighting, p
 interaction and environmental evidence. [Hourly passes](docs/HOURLY_PASSES.md) tracks the
 bounded implementation queue, validation and end-of-day review route. Listed proposals are
 not automatically implemented features.
+
+
+### September 28 — Studio composition
+
+Exploration now gently shares the frame with the studio’s painting and neural receiver.
+The camera eases into and out of these views without zoom, facing-direction snaps or idle
+drift. Its reach scales down on narrow screens; reduced motion keeps the original framing.
+Conversation shots remain authoritative, and arrivals/resuming a save use the destination’s
+own composition. Other scenes retain their existing camera while the studio proves the approach.
