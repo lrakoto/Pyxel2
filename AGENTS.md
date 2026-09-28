@@ -143,6 +143,9 @@ These were settled through review with the user. Keep them unless the user chang
   Landmark positions follow physical fixtures, never hidden clues or save progress.
 - **Interior depth:** `interiorGlassDepth` reuses each plate inside fixed glass apertures,
   before lighting/reflections. Reduced motion disables the small view-dependent offset.
+  The clinic's near-plane privacy screen has three hinged fabric leaves, open frame gaps and
+  separate supported feet. All parts share its existing 1.075 camera multiplier and the
+  `foregroundAlpha` actor-clearance fade. It has no independent sway or animation.
 - **Den light balance:** the plate supplies the archive's luminous projection rings. Its
   fixture uses a restrained halo/flare, with steady condensation confined to the plinth;
   avoid restoring a broad cyan wash across the glass. Fixture intensity feeds the existing

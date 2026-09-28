@@ -949,3 +949,45 @@ Limits: no physical touch/phone, audio listening, fresh/full-story, combat, meas
 performance or frame-by-frame recovery footage. Compact dialogue obscuration and Lyra's
 clue-coordinate machine target remain known follow-ups. No push/publication. Next: P4
 selective foreground depth; keep the important action/evidence clear.
+
+## September 28 — P4 clinic foreground screen
+
+Changed only the clinic privacy-screen drawing in `visual-details.ts`. Three flat rectangles
+became hinged leaves with sloped rails, suspended fabric, open frame gaps, stitched hems,
+shared vertical supports and separate contact feet/shadows. The established camera multiplier
+1.075 and whole-screen actor-clearance fade are unchanged; no new animation or renderer pass.
+The drip stand, other rooms, sprites, gameplay, movement, combat, saves and canon are untouched.
+
+Required checks: **177 tests passed**, format, strict TypeScript/production build and diff.
+No new tests that mirror drawing coordinates. Existing foreground-clearance and arrival tests
+pass alongside all logic tests. Game JS 234.10 kB / 78.27 kB gzip; not a performance measurement.
+
+Browser on isolated `127.0.0.1:4197`, folder 01 (19 records / 8 deductions):
+- Entry before/after uses the same train spawn and left camera clamp. Cabinet before/after
+  shares marker 51.50%, canvas width 960. Normal-light/idle phases differ between stills.
+- Reload/resume kept the cabinet approach. Ground clicks walked back through the screen;
+  exit/train return and the cabinet route crossed it in the other direction. A held overlap
+  shows the existing transparency keeping Gravity readable. The far crate approach checked
+  the right camera clamp, with the screen's joints and feet remaining connected.
+- Portrait reduced-motion preview requested at 390 × 844, internal width 460, plus a floor
+  click across the near prop; landscape reduced-motion preview at 844 × 390. Existing compact
+  HUD overlap remains and limits lower-body/prop visibility. No new opaque barrier added.
+- Reopened cabinet/crate evidence. Returned to normal motion/default viewport; no console
+  errors. User's public saves/settings untouched, only the isolated test folder used.
+
+[Entry before](qa/2026-09-28-p4-screen/entry-before.png) /
+[after](qa/2026-09-28-p4-screen/entry-after.png),
+[cabinet before](qa/2026-09-28-p4-screen/cabinet-before.png) /
+[after](qa/2026-09-28-p4-screen/cabinet-after.png),
+[solid screen](qa/2026-09-28-p4-screen/solid-screen-after.png) /
+[overlap](qa/2026-09-28-p4-screen/overlap-after.png),
+[portrait](qa/2026-09-28-p4-screen/portrait-reduced.png) /
+[narrow crossing](qa/2026-09-28-p4-screen/portrait-crossing.png) /
+[landscape](qa/2026-09-28-p4-screen/landscape-reduced.png) /
+[right camera stop](qa/2026-09-28-p4-screen/right-camera-stop.png).
+
+Limits: no frame-by-frame traversal recording, physical touch/iPhone, audio listening,
+fresh/full-story, combat or measured performance pass. Near-plane camera movement in reduced
+motion follows the pre-existing behavior; the new geometry is static. Known compact-HUD and
+Lyra examination-target issues remain queued. No push/publication. Next: P5 earned details
+for the studio or Den, derived solely from active-save evidence.

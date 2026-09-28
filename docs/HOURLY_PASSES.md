@@ -8,10 +8,10 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P3 raised console contact; 177 passing tests.
-P1–P3 bounded reviews are complete. P4 selective foreground depth is next.
+Latest completed product pass: P4 clinic folding screen; 177 passing tests.
+P1–P4 bounded reviews are complete. P5 save-derived room details are next.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
-the remaining camera/material/acting proposals are still queued.
+the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
 Schedule: hourly in this chat, through September 28 at 11:59 PM America/Los_Angeles.
 Automation ID: `gravity-hourly-improvement-passes`. Delayed runs after that date must not
@@ -79,7 +79,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   and instant movement cancellation. Keep contact/recovery timing meaningful at low frame rates.
 - Check character lab and gameplay together; extend geometry and timing tests where needed.
 
-### P4 — Selective foreground depth · TODO
+### P4 — Selective foreground depth · COMPLETE
 
 - Improve one near-layer aperture, curtain or cabinet edge that makes a scene feel layered.
   Reuse existing plate pixels/code-native surfaces. Near props should bracket the actor and
@@ -145,8 +145,10 @@ hardware behavior, and whether anything was published (currently: nothing).
   Street reviewed and retained; no global lighting rewrite. Verification limits remain below.
 - P3: complete — reviewed representative actions across the four areas; raised the clinic
   console reach to its key strip. Body, soles, scarf socket and timing remain fixed.
-- P4: next — one selective foreground aperture/edge, preserving actor and evidence visibility.
-- P5–P8: queued.
+- P4: complete — clinic screen now has hinged fabric leaves, open frame gaps and supported
+  feet; existing parallax and actor-clearance fade retained.
+- P5: next — extend save-derived details in the studio or Den.
+- P6–P8: queued.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
 
@@ -463,3 +465,57 @@ No physical iPhone/touch, audio listening, fresh/full-story, combat or performan
 Lyra's below-bench examination target remains the separate P6 issue. Local checkpoint only;
 no push/publication. Next: P4 selective foreground depth—inspect an existing aperture/edge
 before adding detail, checking both travel directions and narrow-screen actor visibility.
+
+### Pass 7 — September 28, 4:39 PM Pacific · Folded foreground screen
+
+P4 complete with one clinic-only scenery change. Reviewed `drawInteriorForeground`, near
+architecture/furniture, glass relief and compositor ordering. The privacy screen at x790
+was three coplanar solid rectangles: it read as a cabinet despite its intended fabric.
+Reworked those same leaves into a shallow zigzag with shared hinge positions. Each leaf has
+an angled top/bottom rail, suspended worn fabric, an open strip above and below the cloth,
+stitching and attachment loops. Four shared stiles end in separate feet and contact shadows.
+The dark alternate face gives depth without a new light source or haze.
+
+Every part uses the existing `cam * 1.075` near-plane transform. Preserved the screen's
+existing whole-object `foregroundAlpha` fade and approximate footprint, so crossing Gravity
+stays readable. No new sway, clock, state, asset, dependency or compositing pass. Original
+plates and the clinic drip stand are untouched. No actor, speed, combat, save or story changes;
+no implementation rollback.
+
+Validation: **177 tests passed**, formatting, strict TypeScript/production build and diff
+checks passed. No new constant-mirroring tests for code-drawn scenery; retained clearance,
+arrival, camera and character tests were rerun. Game JS 234.10 kB / 78.27 kB gzip. No measured
+performance claim.
+
+Browser: isolated `127.0.0.1:4197`, folder 01, 19 records / 8 deductions. Matched entry views
+use the normal train arrival and left camera clamp; cabinet idle before/after shares marker
+51.50% at internal width 960. Normal-motion light/idle phases differ; compare screen geometry,
+not illumination. Resumed the cabinet checkpoint after reload. Crossed right-to-left with
+floor clicks, returned by the street/train and crossed left-to-right toward cold storage;
+checked a held overlap view and the right camera stop at outbound crates. Supports, fabric
+and hinges stayed together; the screen fades as a unit over Gravity. Existing cabinet/crate
+examinations still open normally.
+
+Checked portrait reduced motion (requested 390 × 844, internal canvas width 460), a narrow
+floor-click crossing, and landscape reduced motion (844 × 390). The existing compact HUD
+covers some lower actor/foreground pixels; the open screen adds no new opaque barrier.
+Normal motion/default viewport restored. No console errors. Public save/settings untouched;
+only the isolated test file was used.
+
+Evidence: [entry before](qa/2026-09-28-p4-screen/entry-before.png) /
+[after](qa/2026-09-28-p4-screen/entry-after.png),
+[cabinet before](qa/2026-09-28-p4-screen/cabinet-before.png) /
+[after](qa/2026-09-28-p4-screen/cabinet-after.png),
+[overlap](qa/2026-09-28-p4-screen/overlap-after.png),
+[solid screen](qa/2026-09-28-p4-screen/solid-screen-after.png),
+[portrait reduced](qa/2026-09-28-p4-screen/portrait-reduced.png) /
+[narrow crossing](qa/2026-09-28-p4-screen/portrait-crossing.png) /
+[landscape reduced](qa/2026-09-28-p4-screen/landscape-reduced.png),
+[right camera stop](qa/2026-09-28-p4-screen/right-camera-stop.png).
+
+Limits: static snapshots and normal navigation, not a frame-by-frame crossing recording.
+No physical iPhone/touch, audio listening, fresh/full-story, combat or performance test.
+Reduced motion preserves the prior near-plane camera response; this pass introduces no
+independent motion. Compact HUD obscuration and P6 machine targeting remain separate follow-ups.
+Local checkpoint only; nothing pushed/published. Next: P5, one earned studio/Den detail from
+held records using `story-details.ts`; verify fresh, earned and restored earlier states.

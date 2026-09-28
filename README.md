@@ -303,3 +303,10 @@ reaching below them. Her feet, torso and scarf attachment remain fixed. The low 
 on bench-height devices. Both variants use the existing settle/recovery timing and appear
 in the character lab; reduced motion holds the finished pose. See [QA](docs/QA.md) for
 before/after views and the compact-screen visibility limitation.
+
+### September 28 — A folded screen in the foreground
+
+The clinic privacy screen now has angled leaves, hanging fabric, small frame openings and
+separate feet with contact shadows. It reads as a folding screen instead of a flat cabinet.
+Its existing parallax and fade keep Gravity visible as she passes behind it. This adds no
+new motion, lighting or assets. Comparisons are in [QA](docs/QA.md).

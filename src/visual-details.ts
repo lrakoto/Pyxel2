@@ -218,29 +218,66 @@ function drawClinicForeground(
   c.beginPath();
   c.ellipse(screen + 47, 519, 63, 7, 0, 0, Math.PI * 2);
   c.fill();
-  for (let panel = 0; panel < 3; panel++) {
-    const x = screen + panel * 32;
-    c.fillStyle = '#0d1618';
-    c.fillRect(x, 318, 30, 200);
-    c.fillStyle = panel % 2 ? '#213430' : '#293b33';
-    c.fillRect(x + 3, 324, 24, 170);
-    // Folded canvas, stitched seams and rubbed edges keep this plane as worn as the plate.
+  // A zigzag footprint gives the three leaves real hinges and alternating faces.
+  // Every rail, fabric panel and foot shares this near-plane offset; no sliding parts.
+  const hinges = [
+    { x: 0, y: 318 },
+    { x: 32, y: 328 },
+    { x: 62, y: 318 },
+    { x: 94, y: 326 },
+  ];
+  for (let panel = 0; panel < hinges.length - 1; panel++) {
+    const left = hinges[panel],
+      right = hinges[panel + 1],
+      width = right.x - left.x;
+    c.save();
+    c.transform(1, (right.y - left.y) / width, 0, 1, screen + left.x, left.y);
+    // Open above and below the cloth: see the room through a supported frame.
+    c.fillStyle = '#142022';
+    c.fillRect(0, 0, width, 3);
+    c.fillRect(0, 176, width, 3);
+    c.fillRect(0, 0, 3, 196);
+    c.fillRect(width - 3, 0, 3, 196);
+    c.fillStyle = panel % 2 ? '#1c2d29' : '#304037';
+    c.fillRect(3, 22, width - 6, 150);
+    // Suspended canvas, stitched hem, rubbed folds and small attachment loops.
+    c.fillStyle = '#65756a';
+    for (const hook of [7, width - 8]) {
+      c.fillRect(hook, 3, 1, 20);
+      c.fillRect(hook - 1, 21, 3, 2);
+    }
     for (let fold = 0; fold < 4; fold++) {
-      c.fillStyle = fold % 2 ? '#40514665' : '#10252188';
-      c.fillRect(x + 4 + fold * 6, 326, 2 + (fold % 2), 166);
+      c.fillStyle = fold % 2 ? '#52604b55' : '#10252188';
+      c.fillRect(4 + fold * 5, 24, 2 + (fold % 2), 146);
     }
     c.fillStyle = '#75827638';
-    for (let stitch = 0; stitch < 29; stitch++) c.fillRect(x + 5, 328 + stitch * 5, 1, 2);
+    for (let stitch = 0; stitch < 28; stitch++) c.fillRect(5, 26 + stitch * 5, 1, 2);
+    c.fillRect(4, 169, width - 8, 1);
     c.fillStyle = '#101f1c66';
     for (let wear = 0; wear < 28; wear++)
-      c.fillRect(x + 5 + ((wear * 13 + panel * 3) % 20), 337 + ((wear * 23) % 149), 2, 1);
+      c.fillRect(5 + ((wear * 13 + panel * 3) % (width - 12)), 32 + ((wear * 23) % 131), 2, 1);
     c.fillStyle = '#4c605d';
-    c.fillRect(x, 318, 30, 2);
+    c.fillRect(0, 0, width, 1);
     c.fillStyle = '#60777366';
-    c.fillRect(x, 321, 1, 183);
-    c.fillStyle = '#101a1c';
-    c.fillRect(x - 2, 514, 8, 6);
-    c.fillRect(x + 24, 514, 8, 6);
+    c.fillRect(0, 3, 1, 181);
+    c.restore();
+  }
+  for (const hinge of hinges) {
+    const x = screen + hinge.x,
+      y = hinge.y + 196;
+    c.fillStyle = '#02090bb0';
+    c.beginPath();
+    c.ellipse(x + 1, y + 4, 10, 2, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = '#152224';
+    c.fillRect(x - 5, y, 12, 3);
+    c.fillStyle = '#050c0e';
+    c.fillRect(x - 5, y + 3, 3, 3);
+    c.fillRect(x + 4, y + 3, 3, 3);
+    // Hinges sit exactly at the shared vertical stile, joining neighboring leaves.
+    c.fillStyle = '#53655b';
+    c.fillRect(x, hinge.y + 34, 3, 5);
+    c.fillRect(x, hinge.y + 145, 3, 5);
   }
   const stand = 1250 - offset;
   c.globalAlpha = foregroundAlpha(stand - 16, 32, clear);
