@@ -8,7 +8,8 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P1 composed exploration across all four areas; 175 passing tests.
+Latest completed product pass: P2 Memory Den light balance; 175 passing tests. P1 is complete
+across all four areas; the remaining rooms in P2 are still queued.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining camera/material/acting proposals are still queued.
 
@@ -59,7 +60,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   correct click-to-walk/marker registration; phone width; incoming doorway and map routes.
 - Likely seams: new pure camera helper, the camera portion of `main.ts`; tests of boundaries.
 
-### P2 — Light and value hierarchy · TODO
+### P2 — Light and value hierarchy · IN PROGRESS (Den complete)
 
 - Inspect the strongest light in each room and its relation to Gravity's dark outfit, white
   boots, scarf and active clue. Improve one scene at a time; don't add a global tint wash.
@@ -135,7 +136,8 @@ hardware behavior, and whether anything was published (currently: nothing).
 - Scheduling: active hourly for today; local-file automation, in this same conversation.
 - P1: complete across street, studio, Den and clinic. Desktop/portrait comparisons, reduced
   motion and routes checked; screenshots and explicit hardware limits recorded below.
-- P2: next, beginning with the Den’s broad archive glow and competing light layers.
+- P2: Den complete — clearer archive housing/glass, smaller flare, low steady condensation.
+  Next: studio light/mist overlap, then inspect street and clinic before deciding changes.
 - P3–P8: queued.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
@@ -245,3 +247,48 @@ Next: P2, a focused Den lighting pass. Inspect `renderer.ts` fixture halo/flare 
 `roomVeil` before changing anything. The column is already the subject; reduce competing
 wash and retain glass/frame detail, Gravity’s silhouette and Lyra’s source-consistent glow.
 Use matched reduced-motion captures for the still comparison and normal motion for live checks.
+
+
+### Pass 3 — September 28, 12:37 PM Pacific · Memory Den light balance
+
+Inspected the source Den plate and the existing halo, flare, edge sheen, ambient mist,
+interior mood, glass finish and veil passes before editing. The source already carries strong
+projection rings; runtime overlays softened the housing and created a large pale hotspot.
+Kept the source art and all existing systems. Reduced memory-column intensity 2.4 → 1.85,
+flare scale .34 → .18 and monitor-wall intensity 1.3 → 1.1. The shared fixture values continue
+to feed halos, cached edge sheen and Gravity's rim. Replaced the breathing 600 × 350 mist wash
+(alpha .125–.175) with a steady 340 × 66 condensation pocket (alpha .055) at the plinth.
+Lyra's light strength, eye, projection beam, machine hops and reflection remain unchanged.
+No new art, dependencies, movement, combat, save or narrative changes; no rejected experiment.
+
+Validation: **175 tests passed**, formatting, strict TypeScript/production build and diff
+checks passed. No new tests for visual constants; existing behavior coverage was rerun.
+Isolated browser `127.0.0.1:4197`, folder 01: resumed after reload at the same archive position
+(x763, marker 53.94% at internal width960). Matched reduced-motion idle and held terminal
+examination views show the narrower highlight and clearer housing/glass without flattening
+the projection. Inspected 390 × 844 portrait reduced motion and 844 × 390 landscape normal
+motion. Normal archive re-examination preserves the beam; “Listen beneath the memory” moves
+Lyra's light to the machine and darkens the shell eye; closing restores the lit drone and its
+floor pool. Normal motion/default viewport restored. No console errors observed.
+
+Screenshots: [idle before](qa/2026-09-28-p2-den/den-before-idle.png) /
+[after](qa/2026-09-28-p2-den/den-after-idle.png),
+[examine before](qa/2026-09-28-p2-den/den-before-examine.png) /
+[after](qa/2026-09-28-p2-den/den-after-examine.png),
+[portrait reduced](qa/2026-09-28-p2-den/den-phone-reduced.png),
+[normal examination](qa/2026-09-28-p2-den/den-normal-examine.png),
+[occupied machine](qa/2026-09-28-p2-den/den-occupied-machine.png) /
+[returned drone](qa/2026-09-28-p2-den/den-normal-return.png),
+[landscape](qa/2026-09-28-p2-den/den-landscape.png).
+
+Limits: moving-light screenshots establish occupied/returned states, not a frame-by-frame
+recording of the short transit arc. CRT obscures the upper machine during dialogue. Mobile
+screenshots use desktop viewport emulation and semantic keyboard activation; existing compact
+landscape/portrait HUD still overlaps some lower character pixels. No layout changes in this
+pass, physical iPhone, audio listening, combat, intro replay or fresh/full-story test. No
+performance claim. Public saves/settings untouched. Local checkpoint only; nothing published.
+
+Next: continue P2 in the studio. Compare the warm wash near the painting and the broad mist
+around the receiver against their source plate, using matched reduced-motion idle/action views.
+Inspect the street's building/train hierarchy and clinic afterward; preserve scenes that already
+read well rather than applying the Den's values globally. P3–P8 remain queued.

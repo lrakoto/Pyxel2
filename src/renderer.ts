@@ -306,8 +306,9 @@ export class Renderer {
       c.globalAlpha = 0.055;
       c.drawImage(this.mist, 818 - cam, 398, 265, 76);
     } else {
-      c.globalAlpha = 0.15 + Math.sin(t * 0.8) * 0.025;
-      c.drawImage(this.mist, 510 - cam, 180, 600, 350);
+      // Condensation pools at the archive plinth, leaving glass and machinery clear.
+      c.globalAlpha = 0.055;
+      c.drawImage(this.mist, 655 - cam, 403, 340, 66);
     }
     c.globalCompositeOperation = 'source-over';
     c.globalAlpha = 1;

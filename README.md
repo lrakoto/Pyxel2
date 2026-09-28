@@ -274,3 +274,10 @@ Views gently favor Mei’s window and the occupied street entrances, the Den’s
 memory column, and the clinic’s intake desk and cold-storage cabinet. Ordinary tracking remains
 between these landmarks. Narrow screens reduce the pull; reduced motion disables it.
 Clues, route markers, reflections and floor picking continue to use the same camera.
+
+### September 28 — Clearer light in the Memory Den
+
+The archive keeps its bright cyan projection, with a smaller flare and less surrounding haze
+so the dark machinery and glass remain visible. Condensation now sits low around its base;
+the monitor wall takes a quieter supporting role. Lyra retains her existing light and machine
+visits. Matched idle/examination views and phone layouts are recorded in [QA](docs/QA.md).

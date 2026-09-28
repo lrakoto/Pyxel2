@@ -143,6 +143,10 @@ These were settled through review with the user. Keep them unless the user chang
   Landmark positions follow physical fixtures, never hidden clues or save progress.
 - **Interior depth:** `interiorGlassDepth` reuses each plate inside fixed glass apertures,
   before lighting/reflections. Reduced motion disables the small view-dependent offset.
+- **Den light balance:** the plate supplies the archive's luminous projection rings. Its
+  fixture uses a restrained halo/flare, with steady condensation confined to the plinth;
+  avoid restoring a broad cyan wash across the glass. Fixture intensity feeds the existing
+  halo, cached sheen and actor rim together. Lyra's independent signal light stays unchanged.
 - **Interaction polish:** `field-layout.ts` places captions beside nearby actors; marker DOM
   updates are cached by position/state. Focus mode still reveals labels. `PoseRecovery` in
   `gravity-acting.ts` reverses authored action frames for 0.3 s, cancelled by movement/reduced

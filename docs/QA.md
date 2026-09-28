@@ -774,3 +774,43 @@ combat or audio listening. Phone control activation used semantic keyboard actio
 Continuity is covered numerically rather than a recorded frame sequence. No performance claim.
 Live saves/settings untouched. Local checkpoint only; no push or publication. P1 complete;
 P2 begins with the archive’s broad glow/mist and overlapping light passes in the Memory Den.
+
+
+## September 28 — P2 Memory Den light balance
+
+Den-only tuning: memory-column intensity 2.4 → 1.85 and flare .34 → .18; monitor wall
+1.3 → 1.1. The wide breathing mist over the archive is now a steady, shallow condensation
+pocket at the plinth (.055 opacity, 340 × 66). Existing shared lighting drives sheen and actor
+rim, while Lyra's independent glow/hops/reflections are untouched. Source art, geometry,
+clue gates, animation, movement, saves and combat unchanged. No new renderer subsystem.
+
+Required checks passed: **175 tests**, formatting, strict TypeScript/production build and
+`git diff --check`. Production game JS 233.49 kB / 78.08 kB gzip. These sizes are build output,
+not a performance measurement. No tests added just to assert art-direction constants.
+
+Browser checks on isolated `127.0.0.1:4197`, test folder 01 (19 records / 8 connections):
+- Resumed the same archive approach after reload, x763, internal width960 and archive marker
+  53.94%. Reduced motion holds ambient lighting and actor poses for the matched idle/examine
+  comparison. Both views retain bright projection lines with clearer dark housing and glass.
+- Reopened and closed the recovered archive CRT. At normal motion its projection beam remains.
+- Examined “Listen beneath the memory”: the occupied-machine state darkens Lyra's shell and
+  moves her light to the column. Closing restores the lit eye and floor pool at the drone.
+- Inspected portrait 390 × 844 in reduced motion and landscape 844 × 390 in normal motion.
+  Restored the default viewport and normal motion before leaving the preview. No console errors.
+
+Evidence: [idle before](qa/2026-09-28-p2-den/den-before-idle.png) /
+[after](qa/2026-09-28-p2-den/den-after-idle.png);
+[examine before](qa/2026-09-28-p2-den/den-before-examine.png) /
+[after](qa/2026-09-28-p2-den/den-after-examine.png);
+[portrait](qa/2026-09-28-p2-den/den-phone-reduced.png) /
+[landscape](qa/2026-09-28-p2-den/den-landscape.png);
+[normal projection](qa/2026-09-28-p2-den/den-normal-examine.png) /
+[occupied machine](qa/2026-09-28-p2-den/den-occupied-machine.png) /
+[returned drone](qa/2026-09-28-p2-den/den-normal-return.png).
+
+Limits: still captures show machine occupancy/return, not the transit arc frame by frame;
+CRT covers the upper machine during examination. Phone checks are emulation with semantic
+keyboard activation, not physical touch testing. Existing compact HUD covers some lower
+character pixels; no layout fix claimed. No new audio-by-ear, combat, intro, fresh-case or
+complete-story run. Live Pages saves/settings untouched. No push/publication. P2 remains in
+progress: studio light/mist overlap next, then inspect street and clinic independently.

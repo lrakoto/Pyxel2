@@ -570,8 +570,9 @@ export const AREAS: Record<AreaId, Area> = {
     ground: 438,
     lights: [
       { x: 79, y: 227, color: '#ffb066', intensity: 0.9, flicker: 0.2, flare: 0.18 }, // stairwell lamp
-      { x: 823, y: 201, color: '#5ef0ea', intensity: 2.4, flicker: 0.18, flare: 0.34 }, // memory column
-      { x: 1196, y: 195, color: '#4fd6e8', intensity: 1.3, flicker: 0.6 }, // monitor wall
+      // The plate already carries the bright projection rings; let the housing stay dark.
+      { x: 823, y: 201, color: '#5ef0ea', intensity: 1.85, flicker: 0.18, flare: 0.18 }, // memory column
+      { x: 1196, y: 195, color: '#4fd6e8', intensity: 1.1, flicker: 0.6 }, // monitor wall
     ],
     // Below the grid, so nothing to see out of: the weather gets in as
     // condensation on the archive glass and as leaks from the pipe runs.
