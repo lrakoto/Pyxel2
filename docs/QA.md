@@ -789,7 +789,7 @@ Required checks passed: **175 tests**, formatting, strict TypeScript/production 
 not a performance measurement. No tests added just to assert art-direction constants.
 
 Browser checks on isolated `127.0.0.1:4197`, test folder 01 (19 records / 8 connections):
-- Resumed the same archive approach after reload, x763, internal width960 and archive marker
+- Resumed the same archive approach after reload, x763, internal width 960 and archive marker
   53.94%. Reduced motion holds ambient lighting and actor poses for the matched idle/examine
   comparison. Both views retain bright projection lines with clearer dark housing and glass.
 - Reopened and closed the recovered archive CRT. At normal motion its projection beam remains.
@@ -860,3 +860,46 @@ not captured during its short timed visit. No frame-by-frame transit footage, ph
 fresh/full-story playthrough, audio listening, combat, intro or performance verification.
 Compact HUD overlaps remain. Live saves/settings untouched. No push or publication.
 Next: street/clinic P2 review, then P3 physical action contact.
+
+
+## September 28 — P2 cold-storage light and street review
+
+Clinic-only content tuning: cold-storage intensity 1.7 → 1.35; removed flare .22. The cabinet
+contains many lit cartridges, so a central point flare was obscuring the shelf artwork.
+The existing halo/sheen/air/rim pipeline consumes the reduced intensity; fixture coordinates,
+flicker timing, cabinet glass/mist, Lyra's light, other fixtures, source assets and all game
+logic are unchanged. Street/code review retained the current foundation, fog and train treatment.
+Combat rendering, movement, saves and story are untouched.
+
+Required checks passed: **175 tests**, format, strict TypeScript/production build and diff.
+Game JS 233.52 kB / 78.08 kB gzip; no performance claim or new constant-mirroring test.
+
+Isolated browser `127.0.0.1:4197`, folder 01, 19 records/8 deductions:
+- Routed studio → Mei → street camera, then the map's night train to Meridian. Camera revisit
+  and repeated cabinet examination completed through the CRT. No full-story progress claim.
+- Reload/resume retained cabinet approach. Reduced-motion idle before/after shares marker
+  position 53.94% at internal width 960. Cartridge hues stay distinct without the central flare.
+  Examination captures share the held action but differ slightly in camera framing: arrival
+  interpolation stops on opening reduced-motion dialogue. Idle images are the aligned pair.
+- Checked 390 × 844 portrait reduced motion, normal cabinet examination/return, and 844 × 390
+  landscape. Lyra's eye dims while the machine is occupied and returns with her glow afterward.
+  Normal motion/default viewport restored; no console errors observed.
+
+[Street at Mei](qa/2026-09-28-p2-clinic/street-review-mei.png) /
+[central street](qa/2026-09-28-p2-clinic/street-review-central.png) /
+[clinic arrival](qa/2026-09-28-p2-clinic/clinic-entry-review.png).
+[Cabinet idle before](qa/2026-09-28-p2-clinic/cabinet-before-idle.png) /
+[after](qa/2026-09-28-p2-clinic/cabinet-after-idle.png);
+[examine before](qa/2026-09-28-p2-clinic/cabinet-before-examine.png) /
+[after](qa/2026-09-28-p2-clinic/cabinet-after-examine.png);
+[portrait reduced](qa/2026-09-28-p2-clinic/cabinet-phone-reduced.png) /
+[normal examination](qa/2026-09-28-p2-clinic/cabinet-normal-examine.png) /
+[landscape](qa/2026-09-28-p2-clinic/clinic-landscape.png).
+
+Limits: train carriages were absent in the street stills; reviewed their drawing order/colors
+in code, without a new complete pass capture. Street review sampled Mei/central views.
+No physical phone/touch, audio, combat, intro, fresh/full-story or performance test. Compact
+HUD overlap and Lyra's clue-coordinate examination target remain known follow-ups. Static
+occupancy/return screenshots do not verify every transit frame. Only isolated test progress
+changed; public saves/settings untouched. Nothing pushed or published. P2 bounded review is
+complete; P3 physical action/contact audit is next.

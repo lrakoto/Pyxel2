@@ -8,8 +8,8 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P2 studio light balance; 175 passing tests. P1 is complete
-across all four areas; P2 covers the Den and studio, with street/clinic review still queued.
+Latest completed product pass: P2 clinic light balance and street review; 175 passing tests.
+P1 and the first P2 review are complete across the four areas. P3 physical action contact is next.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining camera/material/acting proposals are still queued.
 
@@ -60,7 +60,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   correct click-to-walk/marker registration; phone width; incoming doorway and map routes.
 - Likely seams: new pure camera helper, the camera portion of `main.ts`; tests of boundaries.
 
-### P2 — Light and value hierarchy · IN PROGRESS (Den and studio complete)
+### P2 — Light and value hierarchy · COMPLETE
 
 - Inspect the strongest light in each room and its relation to Gravity's dark outfit, white
   boots, scarf and active clue. Improve one scene at a time; don't add a global tint wash.
@@ -141,8 +141,10 @@ hardware behavior, and whether anything was published (currently: nothing).
   motion and routes checked; screenshots and explicit hardware limits recorded below.
 - P2: Den complete — clearer archive housing/glass, smaller flare, low steady condensation.
   Studio complete — localized warm bounce, restrained flares, corrected receiver light,
-  mist below the bench. Next: inspect street and clinic before deciding further changes.
-- P3–P8: queued.
+  mist below the bench. Clinic complete — diffuse cabinet light preserves cartridge rows.
+  Street reviewed and retained; no global lighting rewrite. Verification limits remain below.
+- P3: next — inspect physical contact in existing study, terminal and crouch actions.
+- P4–P8: queued.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
 
@@ -268,7 +270,7 @@ No new art, dependencies, movement, combat, save or narrative changes; no reject
 Validation: **175 tests passed**, formatting, strict TypeScript/production build and diff
 checks passed. No new tests for visual constants; existing behavior coverage was rerun.
 Isolated browser `127.0.0.1:4197`, folder 01: resumed after reload at the same archive position
-(x763, marker 53.94% at internal width960). Matched reduced-motion idle and held terminal
+(x763, marker 53.94% at internal width 960). Matched reduced-motion idle and held terminal
 examination views show the narrower highlight and clearer housing/glass without flattening
 the projection. Inspected 390 × 844 portrait reduced motion and 844 × 390 landscape normal
 motion. Normal archive re-examination preserves the beam; “Listen beneath the memory” moves
@@ -318,7 +320,7 @@ Validation: **175 tests passed**, format, strict TypeScript/production build and
 passed. No new assertions for art-direction constants. Browser used isolated `127.0.0.1:4197`,
 folder 01, 19 records / 8 deductions. Followed Den → street → studio via the map, resumed the
 receiver position after reload, repeated painting/receiver examinations, and compared idle
-views in reduced motion: painting marker 53.83%, receiver 68.75% at internal width960, before
+views in reduced motion: painting marker 53.83%, receiver 68.75% at internal width 960, before
 and after. Painting study captures have a small framing difference because reduced-motion
 examination freezes the camera's remaining arrival interpolation; idle comparisons are aligned.
 Receiver idle and examination comparisons are aligned at the room-edge camera clamp.
@@ -350,3 +352,54 @@ audio listening, combat, intro, fresh-case/full-story or performance test. Phone
 still overlap lower actor pixels in compact layouts. Static captures are not a transit-arc
 recording. Local checkpoint only; nothing pushed/published. Next: finish P2 by inspecting
 street/train and clinic hierarchy, changing only demonstrated problems; then P3 action contact.
+
+
+### Pass 5 — September 28, 2:37 PM Pacific · Clinic light and street review
+
+Finished the first P2 review. Inspected the street at Mei's window and the street camera,
+plus its cached midground, continuous foundation/rail support, fog and train drawing order.
+Dark middle buildings remain separated from the distant skyline and the warm frontage;
+retained the existing street treatment. No street/combat rendering changes. Train carriages
+were not present in the saved stills, so their current colors/order were reviewed in code.
+
+The clinic source plate shows individually lit cartridge rows, but the runtime point flare
+bleached the middle shelf. Removed that cold-storage flare and reduced its fixture intensity
+1.7 → 1.35. Existing halo, sheen, air and actor-rim consumers inherit the same value. Kept
+fixture position/color/flicker, low cabinet mist, ceiling lights, warm intake lamp, red terminal,
+Lyra's signal strength and reflections. No new rendering system, asset, dependency, animation,
+speed, save, story or combat changes. No rejected/reverted implementation.
+
+Validation: **175 tests passed**, format, strict TypeScript/production build and diff checks
+passed. No new test for an art-direction constant. Browser: isolated `127.0.0.1:4197`, folder
+01 (19 records / 8 deductions). Traveled studio → street/Mei → street camera → clinic by map
+and train; reopened camera and cold-storage examinations. Reload/resume preserved the cabinet
+approach. Reduced-motion idle before/after uses the same marker position 53.94%, internal
+width 960; middle-row cartridge colors now remain visible. Examination captures show the same
+held action but have a small camera difference from arrival interpolation freezing when the
+reduced-motion dialogue opens. Treat idle captures as the aligned lighting comparison.
+
+Checked portrait 390 × 844 in reduced motion, normal-motion cabinet examination/return and
+landscape 844 × 390. Lyra's shell eye dims during machine occupancy and relights on return;
+her active glow still reads against the dimmer cabinet. Default viewport and normal motion
+restored. No console errors. Only the isolated test file gained the existing camera revisit
+note; public saves/settings untouched.
+
+Evidence: [street / Mei](qa/2026-09-28-p2-clinic/street-review-mei.png),
+[central street](qa/2026-09-28-p2-clinic/street-review-central.png),
+[clinic arrival](qa/2026-09-28-p2-clinic/clinic-entry-review.png),
+[cabinet idle before](qa/2026-09-28-p2-clinic/cabinet-before-idle.png) /
+[after](qa/2026-09-28-p2-clinic/cabinet-after-idle.png),
+[examine before](qa/2026-09-28-p2-clinic/cabinet-before-examine.png) /
+[after](qa/2026-09-28-p2-clinic/cabinet-after-examine.png),
+[portrait reduced](qa/2026-09-28-p2-clinic/cabinet-phone-reduced.png),
+[normal examination](qa/2026-09-28-p2-clinic/cabinet-normal-examine.png),
+[landscape](qa/2026-09-28-p2-clinic/clinic-landscape.png).
+
+Limits: no physical iPhone/touch, audio listening, combat, intro, fresh/full-story or measured
+performance pass. Mobile uses viewport emulation and semantic keyboard controls; compact HUD
+still covers lower actor pixels. Screenshots show occupied/returned states, not transit-arc
+motion. Street review sampled two views; no new full train-pass capture. P2 completion means
+this bounded scene-lighting review is done, not that every lighting/material issue is exhausted.
+Local checkpoint only; no push/publication. Next: P3. Audit physical study/terminal/crouch
+contact across the four areas, beginning with the clinic's cabinet/control height and studio
+receiver workbench. Keep the already-recorded Lyra fixture-target mismatch for P6.

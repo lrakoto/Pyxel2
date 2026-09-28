@@ -658,8 +658,8 @@ export const AREAS: Record<AreaId, Area> = {
       { x: 760, y: 56, color: '#cfe4ff', intensity: 1.15, flicker: 0.52 }, // failing tube, recliners
       { x: 1176, y: 56, color: '#cfe4ff', intensity: 0.95, flicker: 0.12 }, // loading bay
       { x: 410, y: 253, color: '#ffc17c', intensity: 0.7 }, // counter lamp
-      // Light behind glass, so it earns a flare; the terminal is a diffuse screen.
-      { x: 930, y: 236, color: '#7fdcff', intensity: 1.7, flicker: 0.12, flare: 0.22 }, // cold storage
+      // Many small cartridge lights behind glass: a soft spill, not one dazzling point.
+      { x: 930, y: 236, color: '#7fdcff', intensity: 1.35, flicker: 0.12 }, // cold storage
       { x: 1360, y: 262, color: '#ff5a48', intensity: 0.85, flicker: 0.45 }, // outbound terminal
       { x: 80, y: 360, color: '#ffb066', intensity: 0.8 }, // sodium light under the service door
     ],

@@ -151,6 +151,9 @@ These were settled through review with the user. Keep them unless the user chang
   damp haze below its bench. The receiver tube is at x1224/y236 in the stretched runtime
   plate; its practical light and Lyra's ambient socket share that position. Examination
   signals still use clue positions; improving those physical targets is queued separately.
+- **Clinic light balance:** cold storage emits a soft cyan spill from rows of cartridges;
+  it has no point flare obscuring the middle shelf. Keep its glass, cartridge colors and
+  existing low mist legible. Ceiling tubes, intake lamp and Lyra retain their own light.
 - **Interaction polish:** `field-layout.ts` places captions beside nearby actors; marker DOM
   updates are cached by position/state. Focus mode still reveals labels. `PoseRecovery` in
   `gravity-acting.ts` reverses authored action frames for 0.3 s, cancelled by movement/reduced

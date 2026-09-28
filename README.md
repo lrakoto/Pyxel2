@@ -288,3 +288,10 @@ Graves' painting keeps its warm work light with a smaller bulb flare and a tight
 bounce light. The neural receiver's glow now sits on its glass tube, with restrained haze
 beneath the bench so the cage, cables and supports remain visible. Lyra's ambient visit
 target follows the corrected tube position. Desktop and phone comparisons are in [QA](docs/QA.md).
+
+### September 28 — Cold-storage glass and cartridge clarity
+
+Meridian's cabinet now lights the room with a softer cyan spill. Removing the central flare
+keeps the cartridge rows and their colors visible through the glass, while preserving the
+floor reflection and Lyra's light. Street lighting was reviewed and retained. This completes
+the first lighting review; physical investigation poses are next in the [hourly plan](docs/HOURLY_PASSES.md).
