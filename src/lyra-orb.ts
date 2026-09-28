@@ -202,7 +202,7 @@ export const ORB_SOCKETS: Record<AreaId, OrbPoint[]> = {
   ],
   studio: [
     { x: 227, y: 213 }, // terminal screen
-    { x: 1251, y: 236 }, // neural receiver
+    { x: 1224, y: 236 }, // neural receiver tube, aligned with its practical light
   ],
   den: [
     { x: 823, y: 201 }, // memory column

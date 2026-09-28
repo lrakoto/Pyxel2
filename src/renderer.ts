@@ -299,8 +299,12 @@ export class Renderer {
       c.drawImage(this.light, 100 - cam, 235, 380, 280);
       c.drawImage(this.mist, 1290 - cam, 290, 330, 220);
     } else if (area === 'studio') {
-      c.drawImage(this.light, 520 - cam, 30, 530, 430);
-      c.drawImage(this.mist, 1050 - cam, 200, 350, 300);
+      // The painting already holds the bulb's warm pool; keep extra bounce close to it.
+      c.globalAlpha = 0.045;
+      c.drawImage(this.light, 608 - cam, 88, 360, 300);
+      // Damp air sits beneath the receiver bench, leaving its glass and cage readable.
+      c.globalAlpha = 0.04;
+      c.drawImage(this.mist, 1100 - cam, 410, 260, 68);
     } else if (area === 'clinic') {
       // Cold air pools at the cabinet's feet; keep the glass and evidence clear.
       c.globalAlpha = 0.055;

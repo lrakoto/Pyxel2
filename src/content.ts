@@ -483,8 +483,9 @@ export const AREAS: Record<AreaId, Area> = {
       // A bare bulb hung into the room and a lit glass cylinder: both are
       // point sources, so both flare. The terminal screen beside them is
       // diffuse and keeps its halo alone.
-      { x: 788, y: 87, color: '#ffc271', intensity: 2.1, flicker: 0.55, flare: 0.3 }, // failing bulb
-      { x: 1251, y: 236, color: '#4fe6e0', intensity: 1.6, flicker: 0.25, flare: 0.22 }, // neural receiver
+      { x: 788, y: 87, color: '#ffc271', intensity: 1.7, flicker: 0.55, flare: 0.18 }, // failing bulb
+      // Centre the catch on the luminous tube, not the metal cage beside it.
+      { x: 1224, y: 236, color: '#4fe6e0', intensity: 1.25, flicker: 0.25, flare: 0.12 }, // neural receiver
       { x: 60, y: 330, color: '#ffb066', intensity: 0.9 }, // street through the door
     ],
     water: {

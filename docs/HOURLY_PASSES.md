@@ -8,8 +8,8 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P2 Memory Den light balance; 175 passing tests. P1 is complete
-across all four areas; the remaining rooms in P2 are still queued.
+Latest completed product pass: P2 studio light balance; 175 passing tests. P1 is complete
+across all four areas; P2 covers the Den and studio, with street/clinic review still queued.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining camera/material/acting proposals are still queued.
 
@@ -60,7 +60,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   correct click-to-walk/marker registration; phone width; incoming doorway and map routes.
 - Likely seams: new pure camera helper, the camera portion of `main.ts`; tests of boundaries.
 
-### P2 — Light and value hierarchy · IN PROGRESS (Den complete)
+### P2 — Light and value hierarchy · IN PROGRESS (Den and studio complete)
 
 - Inspect the strongest light in each room and its relation to Gravity's dark outfit, white
   boots, scarf and active clue. Improve one scene at a time; don't add a global tint wash.
@@ -104,6 +104,9 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
 - Prefer a precise machine reaction or restrained eye behavior over more particles. Verify
   interruption by walking, conversation, pause, scene travel and reduced motion.
 - Do not change her identity, form, companion gates or unresolved origin.
+- Observed in P2: receiver examinations send the eye/light to the clue marker at (1200,350),
+  below the workbench. Ambient visits use the physical tube socket (1224,236). Resolve
+  authored machine targets for examinations without moving interaction markers/approaches.
 
 ### P7 — Human evidence and tactile close-ups · TODO
 
@@ -137,7 +140,8 @@ hardware behavior, and whether anything was published (currently: nothing).
 - P1: complete across street, studio, Den and clinic. Desktop/portrait comparisons, reduced
   motion and routes checked; screenshots and explicit hardware limits recorded below.
 - P2: Den complete — clearer archive housing/glass, smaller flare, low steady condensation.
-  Next: studio light/mist overlap, then inspect street and clinic before deciding changes.
+  Studio complete — localized warm bounce, restrained flares, corrected receiver light,
+  mist below the bench. Next: inspect street and clinic before deciding further changes.
 - P3–P8: queued.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
@@ -292,3 +296,57 @@ Next: continue P2 in the studio. Compare the warm wash near the painting and the
 around the receiver against their source plate, using matched reduced-motion idle/action views.
 Inspect the street's building/train hierarchy and clinic afterward; preserve scenes that already
 read well rather than applying the Den's values globally. P3–P8 remain queued.
+
+
+### Pass 4 — September 28, 1:37 PM Pacific · Studio light balance
+
+Reviewed the source plate and runtime halo/flare/sheen, warm wash, mist, pigment flecks,
+glass finish and dust. Kept the warm painting/cold machinery contrast in the existing art.
+Reduced bulb intensity 2.1 → 1.7 and flare .30 → .18; receiver intensity 1.6 → 1.25 and
+flare .22 → .12. The receiver catch visibly sat beside its tube. Measured the stretched
+1500 × 540 runtime plate (not an aspect-preserving crop): cyan tube peaks at x1223–1224.
+Moved its fixture and Lyra's ambient socket from x1251 to x1224, retaining y236. The existing
+fixture values still drive halo, sheen and actor rim. No camera, clue or approach changes.
+
+Replaced the studio's shared breathing wash with steady local treatment: warm bounce
+360 × 300 at .045 opacity below the bulb, and damp haze 260 × 68 at .04 below the receiver
+bench. Preserved window light, pigment flecks, source art, existing flicker timing and
+Lyra's independent signal strength. No new assets/dependencies, animation/speed changes,
+combat, save schema or story changes. No implementation rollback.
+
+Validation: **175 tests passed**, format, strict TypeScript/production build and diff checks
+passed. No new assertions for art-direction constants. Browser used isolated `127.0.0.1:4197`,
+folder 01, 19 records / 8 deductions. Followed Den → street → studio via the map, resumed the
+receiver position after reload, repeated painting/receiver examinations, and compared idle
+views in reduced motion: painting marker 53.83%, receiver 68.75% at internal width960, before
+and after. Painting study captures have a small framing difference because reduced-motion
+examination freezes the camera's remaining arrival interpolation; idle comparisons are aligned.
+Receiver idle and examination comparisons are aligned at the room-edge camera clamp.
+
+Checked painting at 390 × 844 with reduced motion, receiver at 390 × 844 in normal motion,
+and room at 844 × 390. Normal receiver examination dims Lyra's shell and moves its light
+out; closing restores her lit eye/floor pool. New ambient socket coordinates were inspected
+in code but the short ambient visit was not separately captured. No console errors. Normal
+motion and default viewport restored. A return floor click selected the unfinished-portrait
+marker instead; closed that examination and used exact semantic controls afterward. This
+file gained the existing portrait and testimony revisit notes; no public save was touched.
+
+Evidence: [painting idle before](qa/2026-09-28-p2-studio/painting-before-idle.png) /
+[after](qa/2026-09-28-p2-studio/painting-after-idle.png),
+[study before](qa/2026-09-28-p2-studio/painting-before-study.png) /
+[after](qa/2026-09-28-p2-studio/painting-after-study.png),
+[receiver idle before](qa/2026-09-28-p2-studio/receiver-before-idle.png) /
+[after](qa/2026-09-28-p2-studio/receiver-after-idle.png),
+[receiver examination before](qa/2026-09-28-p2-studio/receiver-before-examine.png) /
+[after](qa/2026-09-28-p2-studio/receiver-after-examine.png),
+[painting portrait](qa/2026-09-28-p2-studio/painting-phone-reduced.png),
+[receiver portrait](qa/2026-09-28-p2-studio/receiver-phone.png),
+[normal examination](qa/2026-09-28-p2-studio/receiver-normal-examine.png),
+[landscape](qa/2026-09-28-p2-studio/studio-landscape.png).
+
+Limits: examination machine targeting remains at the clue marker and can look detached from
+the physical machine; recorded concrete P6 follow-up above. No new physical iPhone/touch,
+audio listening, combat, intro, fresh-case/full-story or performance test. Phone controls
+still overlap lower actor pixels in compact layouts. Static captures are not a transit-arc
+recording. Local checkpoint only; nothing pushed/published. Next: finish P2 by inspecting
+street/train and clinic hierarchy, changing only demonstrated problems; then P3 action contact.

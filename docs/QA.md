@@ -814,3 +814,49 @@ keyboard activation, not physical touch testing. Existing compact HUD covers som
 character pixels; no layout fix claimed. No new audio-by-ear, combat, intro, fresh-case or
 complete-story run. Live Pages saves/settings untouched. No push/publication. P2 remains in
 progress: studio light/mist overlap next, then inspect street and clinic independently.
+
+
+## September 28 — P2 studio lighting and receiver alignment
+
+Studio-only visual tuning: bulb intensity 1.7 / flare .18, receiver intensity 1.25 / flare .12;
+smaller steady painting bounce (.045, 360 × 300) and low receiver haze (.04, 260 × 68). Moved
+receiver fixture and ambient Lyra socket from (1251,236) to (1224,236), matching the luminous
+tube on the stretched 1500 × 540 runtime plate. No source art, actor poses, movement, camera,
+clue/approach coordinates, combat, save schema or narrative changes. Shared halo/sheen/rim
+behavior and Lyra's independent lighting remain intact.
+
+Automated: **175 tests passed**, format, strict TypeScript/production build and diff checks
+passed. Existing Lyra travel/occupancy/reduced-motion tests reran; no new tests merely asserting
+visual constants. Production game JS 233.53 kB / 78.08 kB gzip; no performance claim.
+
+Browser: isolated `127.0.0.1:4197`, folder 01. Map route Den → street → studio, receiver resume
+after reload, painting and receiver re-examinations. Reduced-motion idle comparisons use the
+same approach sides and marker positions (painting 53.83%, receiver 68.75%, width 960).
+The painting study shots differ slightly in framing: camera interpolation stops when reduced-
+motion dialogue opens. Receiver captures share the edge clamp. Both held poses remain readable;
+the corrected receiver catch sits on the tube instead of the cage beside it.
+
+[Painting idle before](qa/2026-09-28-p2-studio/painting-before-idle.png) /
+[after](qa/2026-09-28-p2-studio/painting-after-idle.png);
+[study before](qa/2026-09-28-p2-studio/painting-before-study.png) /
+[after](qa/2026-09-28-p2-studio/painting-after-study.png);
+[receiver idle before](qa/2026-09-28-p2-studio/receiver-before-idle.png) /
+[after](qa/2026-09-28-p2-studio/receiver-after-idle.png);
+[receiver examination before](qa/2026-09-28-p2-studio/receiver-before-examine.png) /
+[after](qa/2026-09-28-p2-studio/receiver-after-examine.png).
+
+Inspected [painting portrait, reduced motion](qa/2026-09-28-p2-studio/painting-phone-reduced.png)
+and [receiver portrait, normal motion](qa/2026-09-28-p2-studio/receiver-phone.png) at 390 × 844;
+[landscape](qa/2026-09-28-p2-studio/studio-landscape.png) at 844 × 390. Normal
+[receiver examination](qa/2026-09-28-p2-studio/receiver-normal-examine.png) darkens Lyra's drone
+while the signal is out; closing restores eye/glow. No console errors. Normal motion/default
+viewport restored. An attempted floor click activated the unfinished portrait; subsequent
+travel used exact semantic controls. Only the test file gained existing portrait/testimony notes.
+
+Limits/follow-up: physical machine examination targeting is still tied to clue markers;
+the receiver signal appears below the workbench. P6 should use authored fixture targets while
+preserving marker and approach positions. The adjusted ambient socket was reviewed in code,
+not captured during its short timed visit. No frame-by-frame transit footage, physical phone,
+fresh/full-story playthrough, audio listening, combat, intro or performance verification.
+Compact HUD overlaps remain. Live saves/settings untouched. No push or publication.
+Next: street/clinic P2 review, then P3 physical action contact.

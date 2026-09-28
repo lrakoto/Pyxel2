@@ -281,3 +281,10 @@ The archive keeps its bright cyan projection, with a smaller flare and less surr
 so the dark machinery and glass remain visible. Condensation now sits low around its base;
 the monitor wall takes a quieter supporting role. Lyra retains her existing light and machine
 visits. Matched idle/examination views and phone layouts are recorded in [QA](docs/QA.md).
+
+### September 28 — Studio light and material clarity
+
+Graves' painting keeps its warm work light with a smaller bulb flare and a tighter pool of
+bounce light. The neural receiver's glow now sits on its glass tube, with restrained haze
+beneath the bench so the cage, cables and supports remain visible. Lyra's ambient visit
+target follows the corrected tube position. Desktop and phone comparisons are in [QA](docs/QA.md).

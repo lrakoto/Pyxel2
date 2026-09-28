@@ -147,6 +147,10 @@ These were settled through review with the user. Keep them unless the user chang
   fixture uses a restrained halo/flare, with steady condensation confined to the plinth;
   avoid restoring a broad cyan wash across the glass. Fixture intensity feeds the existing
   halo, cached sheen and actor rim together. Lyra's independent signal light stays unchanged.
+- **Studio light balance:** keep the painting's warm bounce localized and the receiver's
+  damp haze below its bench. The receiver tube is at x1224/y236 in the stretched runtime
+  plate; its practical light and Lyra's ambient socket share that position. Examination
+  signals still use clue positions; improving those physical targets is queued separately.
 - **Interaction polish:** `field-layout.ts` places captions beside nearby actors; marker DOM
   updates are cached by position/state. Focus mode still reveals labels. `PoseRecovery` in
   `gravity-acting.ts` reverses authored action frames for 0.3 s, cancelled by movement/reduced
