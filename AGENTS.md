@@ -196,3 +196,11 @@ These were settled through review with the user. Keep them unless the user chang
 - The street's foreground layer has a matte that is keyed out at load time. It needs a real
   alpha layer.
 - `main.ts` should be split into input, panels and transitions as content grows.
+
+## September 28 autonomous improvement queue
+
+The user authorized hourly improvements for today. Start with
+[docs/HOURLY_PASSES.md](docs/HOURLY_PASSES.md) and the evidence-backed
+[docs/REPLACED_RESEARCH.md](docs/REPLACED_RESEARCH.md). Update queue status and the run log
+on every pass; research proposals are not implemented behavior or new canon. Preserve all
+settled decisions above, especially combat ownership and the local-only delivery boundary.

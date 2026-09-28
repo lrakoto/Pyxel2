@@ -667,3 +667,18 @@ both 233 px). Reviewed the same line and controls at 844 × 390 landscape, then 
 viewport. These are browser viewport checks, not a physical iPhone test. No live Pages save
 or settings were touched. No new full-story, combat or audio-by-ear playtest. Local checkpoint;
 not published to Pages.
+
+## September 28 — REPLACED research and scheduled work
+
+Documentation/setup only. Read the current local canon and relevant rendering/staging code.
+Sources: official publisher overview and screenshots, director's Xbox Wire article, direct
+interviews in GamingBolt, Bonus Action and Game Developer, and the publisher-linked launch
+trailer. Inspected three official stills in the browser and sampled trailer playback; not a
+full REPLACED playthrough or exact animation timing study. The research brief labels original
+proposals separately from documented source facts. No reference-game assets were imported.
+
+Created and verified the app's same-chat hourly schedule through the end of September 28
+America/Los_Angeles, with routine notifications muted. The durable implementation queue
+requires bounded local commits, repository checks, isolated browser verification and an
+honest run log. No gameplay changed in this checkpoint. Re-ran all 167 tests, formatting, production build
+and diff checks successfully; no new gameplay/browser playtest is claimed for this setup.

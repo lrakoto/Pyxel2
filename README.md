@@ -247,3 +247,12 @@ conversation; existing save files and story outcomes are unchanged.
 Enter and Space now belong to the focused interface control, preventing a button activation from
 also advancing dialogue through the game's keyboard handler. The E shortcut remains available.
 Phone reading keys have 44 px minimum tap height and stay together within the CRT layout.
+
+### September 28 — REPLACED study and hourly improvement plan
+
+[Research and visual direction](docs/REPLACED_RESEARCH.md) separates developer-sourced
+findings from original GRAVITY proposals. The plan keeps the current renderer, pixel
+characters and story bible, prioritizing authored framing, motivated lighting, physical
+interaction and environmental evidence. [Hourly passes](docs/HOURLY_PASSES.md) tracks the
+bounded implementation queue, validation and end-of-day review route. Listed proposals are
+not automatically implemented features.
