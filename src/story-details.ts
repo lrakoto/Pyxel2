@@ -6,6 +6,7 @@ const EXAMINED_RECORDS = ['diary', 'painting', 'device'] as const satisfies read
 type ExaminedRecord = (typeof EXAMINED_RECORDS)[number];
 export interface StoryDetails {
   examined: ExaminedRecord[];
+  witnessComparison: boolean;
   archiveRecovered: boolean;
   memoryPreserved: boolean;
   clinicRecords: ClueId[];
@@ -17,6 +18,11 @@ export function storyDetails(save: SaveData): StoryDetails {
   return {
     examined:
       save.area === 'studio' ? EXAMINED_RECORDS.filter((id) => save.clues.includes(id)) : [],
+    witnessComparison:
+      save.area === 'studio' &&
+      save.clues.includes('diary') &&
+      save.clues.includes('painting') &&
+      save.deductions.includes('voices'),
     archiveRecovered,
     clinicRecords:
       save.area === 'clinic' && save.shipment
@@ -52,6 +58,77 @@ function evidenceTab(c: CanvasRenderingContext2D, x: number, y: number, width: n
   c.fillRect(x + width - 2, y + 4, 2, 2);
 }
 
+function witnessComparison(c: CanvasRenderingContext2D) {
+  // Gravity's two pencil copies hang from the painting's existing bottom rail.
+  // They compare the journal margins with an eye in the painting, not new evidence.
+  c.save();
+  c.translate(798, 313);
+  for (const [x, y] of [
+    [0, 0],
+    [25, 2],
+  ]) {
+    c.fillStyle = '#080c0bae';
+    c.fillRect(x + 2, y + 3, 24, 31);
+    c.fillStyle = x === 0 ? '#776b50' : '#71654b';
+    c.beginPath();
+    c.moveTo(x, y + 2);
+    c.lineTo(x + 23, y + 1);
+    c.lineTo(x + 23, y + 27);
+    c.lineTo(x + 19, y + 31);
+    c.lineTo(x, y + 30);
+    c.closePath();
+    c.fill();
+    c.fillStyle = '#96805c';
+    c.fillRect(x + 1, y + 2, 21, 1);
+    c.fillStyle = '#635d46';
+    for (let i = 0; i < 11; i++) {
+      c.fillRect(x + 2 + ((i * 7) % 19), y + 5 + ((i * 11) % 21), 1 + (i % 2), 1);
+    }
+    c.fillStyle = '#514b39';
+    c.fillRect(x + 19, y + 27, 4, 1);
+    c.fillRect(x + 19, y + 28, 1, 3);
+    // Folded metal clips share the rail at y=313; neither page floats below it.
+    c.fillStyle = '#1b2420';
+    c.fillRect(x + 8, -2, 6, 6 + y);
+    c.fillStyle = '#6d7562';
+    c.fillRect(x + 9, -2, 4, 1);
+    c.fillRect(x + 10, -1, 1, 4 + y);
+  }
+  // Uneven diary lines, with one scratched-out phrase left intact.
+  c.fillStyle = '#484735';
+  for (let row = 0; row < 4; row++) {
+    c.fillRect(4, 8 + row * 4, 9 + (row % 3) * 3, 1);
+  }
+  c.fillRect(7, 13, 11, 1);
+  // An incomplete face study: keep the drawing rough, like the source journal.
+  c.strokeStyle = '#484735';
+  c.lineWidth = 1;
+  c.beginPath();
+  c.moveTo(30, 14);
+  c.lineTo(32, 9);
+  c.lineTo(38, 7);
+  c.lineTo(43, 11);
+  c.lineTo(42, 22);
+  c.lineTo(37, 27);
+  c.lineTo(32, 23);
+  c.moveTo(38, 15);
+  c.lineTo(36, 20);
+  c.lineTo(39, 20);
+  c.moveTo(35, 23);
+  c.lineTo(39, 23);
+  c.stroke();
+  // The same unlit neural mark in the journal margin and the copied eye.
+  c.fillStyle = '#344d48';
+  for (const [x, y] of [
+    [16, 23],
+    [32, 14],
+  ]) {
+    c.fillRect(x, y, 4, 1);
+    c.fillRect(x + 2, y - 1, 1, 4);
+  }
+  c.restore();
+}
+
 /** Small progress marks embedded in the room, drawn before people and live reflections. */
 export function drawStoryDetails(
   c: CanvasRenderingContext2D,
@@ -69,6 +146,7 @@ export function drawStoryDetails(
     const tab = RECORD_TABS[id];
     evidenceTab(c, tab.x, tab.y, tab.width);
   }
+  if (details.witnessComparison) witnessComparison(c);
   if (details.clinicRecords.includes('manifest')) evidenceTab(c, 348, 330, 9);
   if (details.clinicRecords.includes('cartridge')) {
     // A copied lot number on the cabinet lip, anchored to the glass rack.

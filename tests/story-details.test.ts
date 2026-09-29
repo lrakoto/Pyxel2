@@ -20,11 +20,54 @@ test('new cases have no earned room changes in any location', () => {
   for (const area of ['street', 'studio', 'den', 'clinic'] as const) {
     assert.deepEqual(storyDetails({ ...freshSave(), area }), {
       examined: [],
+      witnessComparison: false,
       archiveRecovered: false,
       memoryPreserved: false,
       clinicRecords: [],
     });
   }
+});
+
+test('studio comparison requires the completed journal/painting connection, not collection alone', () => {
+  const model = new CaseModel({ ...freshSave(), area: 'studio' });
+  model.collect('diary');
+  assert.equal(storyDetails(model.save).witnessComparison, false);
+  model.collect('painting');
+  assert.equal(storyDetails(model.save).witnessComparison, false);
+  model.connect('diary', 'painting');
+  assert.equal(storyDetails(model.save).witnessComparison, true);
+  for (const missing of ['diary', 'painting'] as const) {
+    assert.equal(
+      storyDetails({ ...model.save, clues: model.save.clues.filter((id) => id !== missing) })
+        .witnessComparison,
+      false,
+    );
+  }
+  for (const area of ['street', 'den', 'clinic'] as const) {
+    assert.equal(storyDetails({ ...model.save, area }).witnessComparison, false);
+  }
+});
+
+test('restoring and switching cases rebuilds the comparison without altering saved records', () => {
+  const model = new CaseModel({ ...freshSave(), area: 'studio' });
+  model.collect('diary');
+  model.collect('painting');
+  const earlier = JSON.stringify(model.save);
+  model.connect('painting', 'diary');
+  const earned = JSON.stringify(model.save);
+  for (const [raw, expected] of [
+    [earned, true],
+    [earlier, false],
+    [earned, true],
+  ] as const) {
+    model.save = parseSave(raw);
+    const before = JSON.stringify(model.save);
+    assert.equal(storyDetails(model.save).witnessComparison, expected);
+    assert.equal(JSON.stringify(model.save), before);
+    assert.equal(model.save.version, 1);
+  }
+  model.save = { ...freshSave(), area: 'studio' };
+  assert.equal(storyDetails(model.save).witnessComparison, false);
 });
 
 test('studio tabs mark only examined objects and never follow players into other areas', () => {

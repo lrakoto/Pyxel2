@@ -310,3 +310,11 @@ The clinic privacy screen now has angled leaves, hanging fabric, small frame ope
 separate feet with contact shadows. It reads as a folding screen instead of a flat cabinet.
 Its existing parallax and fade keep Gravity visible as she passes behind it. This adds no
 new motion, lighting or assets. Comparisons are in [QA](docs/QA.md).
+
+
+### September 28 — The studio remembers a connection
+
+Connecting Marlon’s journal to the painting now leaves two worn comparison slips clipped
+beneath its frame. Their shared pencil mark recalls the deduction without adding another
+clue. They follow the active case: earlier checkpoints and fresh folders restore the room’s
+previous appearance. See [QA](docs/QA.md) for save-state and phone-layout comparisons.

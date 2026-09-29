@@ -991,3 +991,44 @@ fresh/full-story, combat or measured performance pass. Near-plane camera movemen
 motion follows the pre-existing behavior; the new geometry is static. Known compact-HUD and
 Lyra examination-target issues remain queued. No push/publication. Next: P5 earned details
 for the studio or Den, derived solely from active-save evidence.
+
+
+## September 28 — P5 save-derived studio comparison
+
+Two small paper copies now hang from the painting's lower rail after the existing `voices`
+connection. Their journal marks/face study repeat already-established evidence. Derived
+from the active studio save plus `diary`, `painting` and `voices`; no persistent visual state,
+new records or save migration. Source art, character appearance, speeds and combat unchanged.
+The original brighter paper was subdued and textured after visual review.
+
+**179 tests passed**, format check, strict TypeScript/production build and diff check passed.
+New tests cover exact gating, malformed missing-record state, other areas, serialized
+restore/fresh-file switching and save immutability. Game JS 235.33 kB / 78.67 kB gzip.
+
+A temporary storage-free page on `127.0.0.1:4197` used the production Renderer/CaseModel/
+parseSave with synthetic data, no archive/preferences access. Same renderer, fixed camera
+350, width960, Gravity x740 and reduced motion: fresh → collected-only → earned → earlier
+restore → earned → fresh file → earned. Papers correctly clear/reappear. Width460/camera550
+normal-motion sample also checked. Fixture removed after testing.
+
+[Fresh](qa/2026-09-28-p5-memory/fresh.png) /
+[collected](qa/2026-09-28-p5-memory/collected.png) /
+[earned with enlarged crop](qa/2026-09-28-p5-memory/earned.png) /
+[restored](qa/2026-09-28-p5-memory/restored.png) /
+[switched fresh](qa/2026-09-28-p5-memory/switched-fresh.png) /
+[narrow normal](qa/2026-09-28-p5-memory/narrow-normal.png).
+
+Real-game local folder01 (19 records / 8 connections): clinic→studio route, resume, painting
+approach/re-examination/close; paper detail registered with the frame and existing tab.
+[Desktop normal](qa/2026-09-28-p5-memory/game-earned.png),
+[portrait reduced](qa/2026-09-28-p5-memory/game-portrait-reduced.png),
+[landscape reduced](qa/2026-09-28-p5-memory/game-landscape-reduced.png).
+Requested preview sizes 390×844 / 844×390. Normal/default restored, no console errors,
+public saves/settings untouched. The automation's pointer checkbox toggle failed; keyboard
+Space worked and was verified. No new motion is introduced by this static detail.
+
+Limits: synthetic restore exercised the actual parser/model, not archive-UI recovery; no
+full story replay or physical phone/touch/audio/combat/performance test. Compact HUD still
+covers lower scene elements; at landscape phone scale these papers are scenery rather than
+legible records. No push/publication. Next: P6 Lyra examination targets (receiver eye currently
+visits the clue marker below the physical tube). Consolidated status is in HOURLY_PASSES.md.

@@ -165,7 +165,9 @@ These were settled through review with the user. Keep them unless the user chang
   The clinic's outbound terminal uses `terminal-high`, a raised forearm variant aligned with
   its wall-mounted controls. Other machines keep the low reach. Both share the 0.68 s settle,
   planted body, scarf socket and recovery; the character lab exposes both variants.
-  Clinic progress details in `story-details.ts` derive from held records, never cached.
+  Room details in `story-details.ts` derive from the active save, never cached. Studio
+  comparison slips require `diary` + `painting` + the `voices` deduction; collection alone
+  only adds existing tabs. Den memory and clinic record marks keep their existing gates.
   Local-only `?profile=1` / `&marker-cache=0` provides a frame CPU/marker-write comparison.
 - **Screens:** in-world conversations use the CRT screen. The notebook (J) stays paper, in the
   olive case jacket. `dialogue-reader.ts` owns transient reveal/review position; Previous never

@@ -8,8 +8,8 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P4 clinic folding screen; 177 passing tests.
-P1–P4 bounded reviews are complete. P5 save-derived room details are next.
+Latest completed product pass: P5 studio witness comparison; 179 passing tests.
+P1–P5 bounded passes are complete. P6 Lyra machine targets are next.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
@@ -88,7 +88,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   bounds, especially on a narrow viewport. Prefer restrained occlusion to adding more fog.
 - If real alpha asset work is needed, follow asset/skill instructions and keep the source.
 
-### P5 — The room remembers the investigation · TODO
+### P5 — The room remembers the investigation · COMPLETE
 
 - Extend the existing save-derived story-details system with one useful earned detail per
   under-served area. Start with a studio or Den detail; clinic marks already exist.
@@ -147,8 +147,10 @@ hardware behavior, and whether anything was published (currently: nothing).
   console reach to its key strip. Body, soles, scarf socket and timing remain fixed.
 - P4: complete — clinic screen now has hinged fabric leaves, open frame gaps and supported
   feet; existing parallax and actor-clearance fade retained.
-- P5: next — extend save-derived details in the studio or Den.
-- P6–P8: queued.
+- P5: complete — earned paper comparison beneath the studio painting, gated by both records
+  and the voices deduction. Existing Den memory/clinic marks retained; restore behavior checked.
+- P6: next — correct Lyra’s physical machine targets during examinations.
+- P7–P8: queued.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
 
@@ -519,3 +521,56 @@ Reduced motion preserves the prior near-plane camera response; this pass introdu
 independent motion. Compact HUD obscuration and P6 machine targeting remain separate follow-ups.
 Local checkpoint only; nothing pushed/published. Next: P5, one earned studio/Den detail from
 held records using `story-details.ts`; verify fresh, earned and restored earlier states.
+
+
+### Pass 8 — September 28, 5:40 PM Pacific · P5 studio witness comparison
+
+Starting checkpoint `8f23dba`; clean working tree. Read local guide, canon, research, queue,
+existing story-details and narrative before choosing work. Den already preserves the bird
+from the resolved memory; clinic already has earned marks. Extended the studio instead.
+
+`story-details.ts` now derives `witnessComparison` from studio location, held `diary` and
+`painting` records, and the existing `voices` deduction. Two small worn paper copies hang
+from the painting's bottom rail: journal lines and a rough face study carry the same unlit
+mark. Metal clips, folded corners, subdued paper, pencil and contact shadows attach them
+to the room. This visualizes the existing connection; no new clue, dialogue, required
+interaction, canonical revelation, save field, source asset, motion or light. First bright
+paper experiment was darkened/textured after preview to sit within the scene's values.
+
+**179 tests passed**, formatting, strict TypeScript/production build and diff check passed.
+Two new tests cover collection-versus-deduction, missing records, other areas, serialized
+restores, fresh-file switching, immutability and version 1. Existing Den/clinic tests pass.
+Game JS 235.33 kB / 78.67 kB gzip; not a performance claim.
+
+Verification used isolated `127.0.0.1:4197`:
+- A temporary storage-free fixture called the production Renderer, CaseModel and parseSave.
+  Fresh → both records → connected → restored before connection → earned → fresh file →
+  earned all rendered correctly using one renderer, proving no stale papers across cases.
+  Fixed time 12 (reduced renderer time 0), Gravity x740, camera350 at width960; a normal
+  width460/camera550 view checked placement. Enlarged crop shows attachment and paper finish.
+  The fixture was removed after verification; no archive or preference writes through it.
+- Real game folder01 (19 records / 8 connections): clinic→studio map route, resume, painting
+  approach/re-examination and close. The earned papers sit on the rail behind Gravity,
+  beside the existing examined tab. Portrait and landscape reduced-motion previews requested
+  at 390×844 / 844×390 keep the detail attached. Small landscape scale and compact HUD still
+  constrain scene visibility. Normal motion/default viewport restored; preview left at painting.
+- Browser console errors: none in fixture or game. A browser checkbox click failed to toggle;
+  the native Space control worked and state was verified. No physical-phone conclusion.
+
+Evidence: [fresh](qa/2026-09-28-p5-memory/fresh.png),
+[collected only](qa/2026-09-28-p5-memory/collected.png),
+[earned](qa/2026-09-28-p5-memory/earned.png),
+[earlier restore](qa/2026-09-28-p5-memory/restored.png),
+[fresh-file switch](qa/2026-09-28-p5-memory/switched-fresh.png),
+[narrow normal](qa/2026-09-28-p5-memory/narrow-normal.png),
+[game](qa/2026-09-28-p5-memory/game-earned.png),
+[portrait](qa/2026-09-28-p5-memory/game-portrait-reduced.png),
+[landscape](qa/2026-09-28-p5-memory/game-landscape-reduced.png).
+
+Limits: checkpoint switching was exercised through the production parser/model in a synthetic
+fixture, not the archive UI; no full fresh story replay, physical touch/iPhone, audio, combat
+or measured performance pass. This detail is intentionally secondary scenery, not a readable
+record at phone scale. Public saves/settings untouched. Local checkpoint only, no publication.
+P5 is complete for this bounded pass: studio now has deduction-specific scenery; existing
+Den/clinic changes remain sufficient. Next: P6, align Lyra's examination target with the
+receiver tube socket (1224,236), preserving clue marker/approach and one shared light signal.
