@@ -1156,3 +1156,84 @@ reduced-motion game interruption/Previous/reveal remain in P8; this drawing has 
 or new lines. Local checkpoint only, nothing pushed/published. Next: P8, prioritize portrait
 CRT transport visibility and scene clearance, then four-area/signal integration and the
 existing render probe. Stop all edits by 8 PM September 29 Pacific.
+
+## September 29 · P8a reachable CRT transport and integration
+
+Started from clean `6dd7edb`; P6 and P7 were complete, so selected P8's demonstrated
+portrait reading issue. The original CRT scrolled as a whole, pushing Close below the first
+position. Wrapped spoken text in a named keyboard-focusable region; header and transport
+stay fixed. New/previous lines reset the text scroll; letter reveal preserves it. Arrow,
+Page and Home/End navigation in the focused region bypass world-input prevention.
+The existing full-line announcement describes the region; typed letters stay aria-hidden.
+Portrait context uses one compact line. No new motion, story rules, save fields, assets,
+dependencies, movement or combat changes.
+
+**181 tests passed**, format, strict TypeScript/production build and diff checks passed.
+No implementation-mirroring test added for this small DOM/CSS change; browser checks below
+verify the actual behavior. Game JS 237.48 kB / 79.43 kB gzip; CSS 93.08 kB / 22.04 kB gzip.
+
+Actual game verification used only `http://127.0.0.1:4197/?profile=1`:
+
+- Local folder01 started with 19 records/8 connections. At 390×844 the consent reader's
+  Close control stays inside the monitor and is 44 px tall. Final text viewport is 78 px
+  with 97 px content. End reveals the final words without moving transport. Receiver
+  ArrowUp verified scroll from 19.5 px back to zero after the input guard was added.
+- Actual 844×390 landscape keeps controls visible. It still covers much of the scene;
+  this pass fixes control reach, not all landscape composition.
+- Paused during a clue, toggled reduced motion through settings, returned to the same
+  line, checked scrolling at 390×844, then restored normal motion/default viewport.
+  Two-line Lyra conversation: Continue → short Gravity line at scroll zero → Previous
+  restores the completed Lyra line → Continue → Close. No duplicate advancement.
+- Travelled clinic → street/train → Den → street → studio → street/Mei through normal
+  map routing. Den column and studio receiver re-examinations showed original earned text
+  and a dark companion shell while occupied. CRT partly covers the fixture, so these
+  stills do not prove unobscured socket alignment or a continuous departure/return.
+- Connected consent/seal, then intake/sale in the existing third case. Used records become
+  disabled with red checks; board changes from 1/3 to 3/3 core connections and offers the
+  existing buyer conversation. Reloaded: archive showed 19 records/10 connections in
+  Sector07; resumed and verified matches after switching away and restoring folder01.
+- Created only the visibly empty local folder03, named “Sep 29 reader QA”; skipped intro,
+  collected the street camera, closed and re-read it. Count remained one; only the camera
+  illustration appeared, no companion or later-case artwork. Folder02 unchanged; folder01
+  restored active. No public save/preferences touched. No console errors.
+- CUA/native and rich DOM snapshots represent toggle buttons differently. Initial checkbox
+  selectors missed; inspected DOM roles and used the actual buttons. Duplicate archive names
+  were disambiguated with observed slot attributes. No product failure or rollback.
+
+Measured ordinary idle CPU, normal motion, default 1280×720 browser viewport and 1280×540
+world canvas, existing development probe (one short rolling sample per scene):
+
+| Scene | Median | p95 | Frames | Marker writes |
+| --- | ---: | ---: | ---: | ---: |
+| Clinic | 0.90 ms | 2.40 ms | 58 | 0 |
+| Den | 1.90 ms | 3.90 ms | 33 | 0 |
+| Studio | 1.70 ms | 3.80 ms | 37 | 0 |
+| Street | 1.80 ms | 2.90 ms | 52 | 0 |
+
+These are whole-frame JavaScript/Canvas submission costs on this Mac, not GPU time, FPS,
+sustained or physical-phone results. Screenshots may show the next rolling window. Startup,
+modal and resize windows were excluded. No baseline A/B or optimization claim; no cache
+introduced on this evidence.
+
+Evidence: [portrait after](qa/2026-09-29-p8-reader/portrait-after.png) /
+[prior portrait](qa/2026-09-29-p7-consent/game-portrait.png),
+[landscape](qa/2026-09-29-p8-reader/landscape-after.png),
+[reduced scrolled portrait](qa/2026-09-29-p8-reader/portrait-reduced-scrolled.png),
+[Den examination](qa/2026-09-29-p8-reader/den-machine-reader.png) /
+[studio examination](qa/2026-09-29-p8-reader/studio-machine-reader.png),
+[fresh camera](qa/2026-09-29-p8-reader/fresh-camera.png),
+[connection result](qa/2026-09-29-p8-reader/board-connections.png) /
+[restored board](qa/2026-09-29-p8-reader/board-restored.png) /
+[resume summary](qa/2026-09-29-p8-reader/resume-connections.png),
+[clinic CPU](qa/2026-09-29-p8-reader/profile-clinic.png) /
+[Den CPU](qa/2026-09-29-p8-reader/profile-den.png) /
+[studio CPU](qa/2026-09-29-p8-reader/profile-studio.png) /
+[street CPU](qa/2026-09-29-p8-reader/profile-street.png).
+Before/after phone views share dimensions/clue, not identical animation time.
+
+Limits/next: P8b remains live walk/conversation interruption during a hop and continuous
+return, explicit rapid Reveal/E inputs, and landscape scene clearance. Pure tests cover
+signal interruption/reading logic but are not these browser checks. No full fresh story
+replay, ending conversation, physical iPhone/touch, audio by ear or combat playtest.
+README/AGENTS updated. Local checkpoint only; nothing pushed, merged or published.
+All edits remain bounded by September 29's 8 PM Pacific cutoff.

@@ -8,8 +8,9 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P7 tactile consent evidence; 181 passing tests.
-P1–P7 bounded passes are complete. P8 integration is next.
+Latest completed product pass: P8a reachable CRT transport; 181 passing tests.
+P1–P7 bounded passes are complete. P8 has a verified integration checkpoint; the remaining
+live interruption/landscape checks are listed below, not treated as complete.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
@@ -123,7 +124,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
 - Completed one original close-up: the clinic's existing signed consent. Folded/handled
   paper and declining pen fluency reinforce its existing observation; no new narrative gate.
 
-### P8 — Measured performance and integration · TODO
+### P8 — Measured performance and integration · PARTIAL
 
 - Profile the most affected scenes with the existing development probe. Inspect real costs;
   don't claim FPS improvement from fewer update calls alone. Cache static work only where
@@ -132,6 +133,10 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   phone layouts. Keep combat playtesting reserved for the user.
 - Consolidate screenshots and a short review route with exact test conditions. Finish with a
   clean, reviewable checkpoint; use spare sessions for demonstrated regressions, not scope creep.
+- P8a complete: fixed CRT transport, real portrait/landscape and reduced-motion reading,
+  four-area travel/CPU samples, fresh and repeated clue, two new board links, reload and folder
+  restoration. P8b remains: live walking/conversation interruption during Lyra's hop, continuous
+  return observation, explicit rapid Reveal/E inputs and better landscape scene clearance.
 
 ## End-of-day review route
 
@@ -160,10 +165,29 @@ hardware behavior, and whether anything was published (currently: nothing).
   the tube, Den the column and clinic the cabinet controls. Labels/approaches stay fixed.
 - P7: complete — original signed-consent close-up, shared by CRT/notebook, with paper wear
   and declining handwriting. Existing names, text, record ownership and deduction gates stay fixed.
-- P8: next — measured integration, actual interruption/travel and compact HUD. Portrait CRT
-  controls are below the first scroll position for the consent re-examination; review this first.
+- P8a: complete — long spoken text now scrolls inside a fixed CRT header/transport. Real
+  portrait Close is fully visible; previous-line, pause/reduced-motion, travel, fresh clue,
+  board matching, reload and folder restoration checked. Four ordinary idle CPU samples
+  recorded; no speculative caching or FPS claim. P8b live hop interruptions and landscape
+  clearance remain open. See the latest run record and QA for conditions.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
+
+### September 29, 8 PM review handoff
+
+Local changes since the research checkpoint: authored framing in four areas; restrained
+Den/studio/clinic lighting; a higher clinic console reach; hinged clinic privacy screen;
+earned studio comparison papers; six physical machine targets for Lyra; handled consent
+paper with declining handwriting; and reachable CRT reading controls. Approved character
+art, movement, combat, canon and save schema remain intact. All changes are local on
+`feat/intro-cinematic`; GitHub Pages still shows the earlier deployed version.
+
+For review, use the local preview on `127.0.0.1:4197`: studio painting/receiver → street →
+Den → clinic consent/storage → notebook. Compare portrait and reduced motion. Local test
+folder01 has 19 records/10 connections, awaiting the existing “Name the buyer with Lyra”
+beat. Folder03, “Sep 29 reader QA,” has one fresh camera record; folder02 was preserved.
+Public saves/settings are untouched. The remaining P8b checks are useful next work if the
+user renews authorization; no work is assumed after tonight's 8 PM cutoff.
 
 ## Run log
 
@@ -709,3 +733,84 @@ reduced-motion game interruption/Previous/reveal remain in P8; this drawing has 
 or new lines. Local checkpoint only, nothing pushed/published. Next: P8, prioritize portrait
 CRT transport visibility and scene clearance, then four-area/signal integration and the
 existing render probe. Stop all edits by 8 PM September 29 Pacific.
+
+### Pass 11 — September 29, 6:56 PM Pacific · P8a reachable CRT transport and integration
+
+Started from clean `6dd7edb`; P6 and P7 were complete, so selected P8's demonstrated
+portrait reading issue. The original CRT scrolled as a whole, pushing Close below the first
+position. Wrapped spoken text in a named keyboard-focusable region; header and transport
+stay fixed. New/previous lines reset the text scroll; letter reveal preserves it. Arrow,
+Page and Home/End navigation in the focused region bypass world-input prevention.
+The existing full-line announcement describes the region; typed letters stay aria-hidden.
+Portrait context uses one compact line. No new motion, story rules, save fields, assets,
+dependencies, movement or combat changes.
+
+**181 tests passed**, format, strict TypeScript/production build and diff checks passed.
+No implementation-mirroring test added for this small DOM/CSS change; browser checks below
+verify the actual behavior. Game JS 237.48 kB / 79.43 kB gzip; CSS 93.08 kB / 22.04 kB gzip.
+
+Actual game verification used only `http://127.0.0.1:4197/?profile=1`:
+
+- Local folder01 started with 19 records/8 connections. At 390×844 the consent reader's
+  Close control stays inside the monitor and is 44 px tall. Final text viewport is 78 px
+  with 97 px content. End reveals the final words without moving transport. Receiver
+  ArrowUp verified scroll from 19.5 px back to zero after the input guard was added.
+- Actual 844×390 landscape keeps controls visible. It still covers much of the scene;
+  this pass fixes control reach, not all landscape composition.
+- Paused during a clue, toggled reduced motion through settings, returned to the same
+  line, checked scrolling at 390×844, then restored normal motion/default viewport.
+  Two-line Lyra conversation: Continue → short Gravity line at scroll zero → Previous
+  restores the completed Lyra line → Continue → Close. No duplicate advancement.
+- Travelled clinic → street/train → Den → street → studio → street/Mei through normal
+  map routing. Den column and studio receiver re-examinations showed original earned text
+  and a dark companion shell while occupied. CRT partly covers the fixture, so these
+  stills do not prove unobscured socket alignment or a continuous departure/return.
+- Connected consent/seal, then intake/sale in the existing third case. Used records become
+  disabled with red checks; board changes from 1/3 to 3/3 core connections and offers the
+  existing buyer conversation. Reloaded: archive showed 19 records/10 connections in
+  Sector07; resumed and verified matches after switching away and restoring folder01.
+- Created only the visibly empty local folder03, named “Sep 29 reader QA”; skipped intro,
+  collected the street camera, closed and re-read it. Count remained one; only the camera
+  illustration appeared, no companion or later-case artwork. Folder02 unchanged; folder01
+  restored active. No public save/preferences touched. No console errors.
+- CUA/native and rich DOM snapshots represent toggle buttons differently. Initial checkbox
+  selectors missed; inspected DOM roles and used the actual buttons. Duplicate archive names
+  were disambiguated with observed slot attributes. No product failure or rollback.
+
+Measured ordinary idle CPU, normal motion, default 1280×720 browser viewport and 1280×540
+world canvas, existing development probe (one short rolling sample per scene):
+
+| Scene | Median | p95 | Frames | Marker writes |
+| --- | ---: | ---: | ---: | ---: |
+| Clinic | 0.90 ms | 2.40 ms | 58 | 0 |
+| Den | 1.90 ms | 3.90 ms | 33 | 0 |
+| Studio | 1.70 ms | 3.80 ms | 37 | 0 |
+| Street | 1.80 ms | 2.90 ms | 52 | 0 |
+
+These are whole-frame JavaScript/Canvas submission costs on this Mac, not GPU time, FPS,
+sustained or physical-phone results. Screenshots may show the next rolling window. Startup,
+modal and resize windows were excluded. No baseline A/B or optimization claim; no cache
+introduced on this evidence.
+
+Evidence: [portrait after](qa/2026-09-29-p8-reader/portrait-after.png) /
+[prior portrait](qa/2026-09-29-p7-consent/game-portrait.png),
+[landscape](qa/2026-09-29-p8-reader/landscape-after.png),
+[reduced scrolled portrait](qa/2026-09-29-p8-reader/portrait-reduced-scrolled.png),
+[Den examination](qa/2026-09-29-p8-reader/den-machine-reader.png) /
+[studio examination](qa/2026-09-29-p8-reader/studio-machine-reader.png),
+[fresh camera](qa/2026-09-29-p8-reader/fresh-camera.png),
+[connection result](qa/2026-09-29-p8-reader/board-connections.png) /
+[restored board](qa/2026-09-29-p8-reader/board-restored.png) /
+[resume summary](qa/2026-09-29-p8-reader/resume-connections.png),
+[clinic CPU](qa/2026-09-29-p8-reader/profile-clinic.png) /
+[Den CPU](qa/2026-09-29-p8-reader/profile-den.png) /
+[studio CPU](qa/2026-09-29-p8-reader/profile-studio.png) /
+[street CPU](qa/2026-09-29-p8-reader/profile-street.png).
+Before/after phone views share dimensions/clue, not identical animation time.
+
+Limits/next: P8b remains live walk/conversation interruption during a hop and continuous
+return, explicit rapid Reveal/E inputs, and landscape scene clearance. Pure tests cover
+signal interruption/reading logic but are not these browser checks. No full fresh story
+replay, ending conversation, physical iPhone/touch, audio by ear or combat playtest.
+README/AGENTS updated. Local checkpoint only; nothing pushed, merged or published.
+All edits remain bounded by September 29's 8 PM Pacific cutoff.

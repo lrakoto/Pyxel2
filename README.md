@@ -340,3 +340,11 @@ a stapled backing sheet, a lifted corner and quiet ink smears. The weekly signat
 fluency and pressure, making Gravity's existing observation visible in the object itself.
 The CRT, evidence card and notebook share this original vector illustration. Record text,
 clue/deduction gates and save compatibility remain unchanged.
+
+### September 29 — Reading controls stay within reach
+
+The CRT now scrolls its spoken text separately from the speaker header and transport keys.
+Previous, Reveal/Continue and Close remain visible when a long observation exceeds a phone
+screen. The text region supports keyboard scrolling and uses the full line for its accessible
+description. Each new or reviewed line starts at the top; normal letter reveal preserves the
+reading position. Portrait context labels use one compact line.

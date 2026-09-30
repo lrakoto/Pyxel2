@@ -435,3 +435,43 @@
     justify-content: space-between;
   }
 }
+
+/* The raster scrolls; the monitor's transport keys stay within reach. */
+#stage #dialogue {
+  overflow: hidden;
+}
+#stage #dialogue .dialogue-copy {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+#stage #dialogue .dialogue-top,
+#stage #dialogue .dialogue-bottom {
+  flex: 0 0 auto;
+}
+#stage #dialogue .dialogue-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #617962 #15251c;
+  scrollbar-width: thin;
+}
+#stage #dialogue .dialogue-body:focus-visible {
+  outline: 1px solid #a9c39a;
+  outline-offset: -1px;
+}
+#stage #dialogue #dialogue-text {
+  min-height: 0;
+}
+@media (max-width: 600px) {
+  #stage #dialogue .dialogue-bottom {
+    gap: 4px 8px;
+  }
+  #stage #dialogue .dialogue-bottom > span {
+    max-width: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

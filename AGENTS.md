@@ -176,6 +176,9 @@ These were settled through review with the user. Keep them unless the user chang
   triggers story completion. Reveal line / Continue / Close reflect the actual action. Native
   controls own Enter/Space, while E remains the game shortcut. Phone reading keys are at least
   44 px tall. Reading history is not saved and resets for each new conversation.
+  The CRT header/transport remain fixed while `#dialogue-body` scrolls. It is keyboard
+  focusable and described by the full spoken-line announcement. A new/reviewed line resets
+  its scroll position; typewriter updates do not. Keep Close reachable at narrow heights.
   `evidence-art.ts` shares original vector close-ups across the CRT, board and record reader.
   The signed consent form has worn folds, a lifted corner and progressively less fluent ink;
   this illustrates the existing observation without adding a victim name or new clue.
