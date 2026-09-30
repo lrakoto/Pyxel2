@@ -331,3 +331,12 @@ at the Den's memory column and on the clinic cabinet controls. Street-camera and
 console targets remain aligned. Clue labels and Gravity's approach/reach are unchanged.
 The existing single signal still drives her eye, room light, wet rim and reflected pool;
 reduced motion retains steady occupation and an instant return.
+
+
+### September 29 — A human trace in the consent form
+
+The clinic's signed consent close-up now looks handled: worn paper edges, fold relief,
+a stapled backing sheet, a lifted corner and quiet ink smears. The weekly signatures lose
+fluency and pressure, making Gravity's existing observation visible in the object itself.
+The CRT, evidence card and notebook share this original vector illustration. Record text,
+clue/deduction gates and save compatibility remain unchanged.

@@ -63,18 +63,54 @@ const drawings: Partial<Record<ClueId, string>> = {
     .join(
       '',
     )}${Array.from({ length: 26 }, (_, i) => `<rect x="${58 + ((i * 37) % 242)}" y="${i % 2 ? 22 + ((i * 11) % 9) : 206 - ((i * 7) % 9)}" width="${2 + (i % 4)}" height="2" fill="#cfe9ec" opacity=".35"/>`).join('')}<text x="66" y="200" fill="#8fb7b6" font-size="9">KEEP BELOW 4°C · DO NOT OPEN</text>`,
-  consent: `<path d="M66 16H294V224H66Z" fill="#cfc7a6"/><path d="M270 24h7v7h7v7h-7v7h-7v-7h-7v-7h7z" fill="#6f8f86"/><text x="80" y="36" fill="#394a43" font-size="8">MERIDIAN · COMMUNITY NEURAL HEALTH</text><text x="80" y="62" fill="#303c38" font-size="10">Therapeutic creativity archiving</text><text x="80" y="80" fill="#4b483d" font-size="9">PAYMENT · 2 MEAL CREDITS</text>${[
-    ['M86 118q12-12 22-2t24-4q12 6 26-3', 100],
-    ['M86 146q8-10 14 0l6-8q10 8 18-2l6 6q10-8 16 4', 128],
-    ['M86 174l6-6 4 7 5-9 3 8 7-5 2 6 6-7 3 9 5-4 4 3', 156],
-  ]
-    .map(
-      ([path, y]) =>
-        `<path d="M80 ${Number(y) + 24}H210" stroke="#8f876a"/><path d="${path}" fill="none" stroke="#2f3b46" stroke-width="1.5"/><text x="222" y="${Number(y) + 22}" fill="#6a6450" font-size="8">WEEK ${(Number(y) - 72) / 28}</text>`,
-    )
-    .join(
-      '',
-    )}${Array.from({ length: 5 }, (_, i) => `<path d="M80 ${196 + i * 5}h${150 - (i % 3) * 22}" stroke="#8d8568" stroke-width=".8"/>`).join('')}${veil(270, 205, 0.55, '#7d6f5a')}`,
+  // Repeated consent: a handled sheet, with the same hand losing fluency each week.
+  // Surface wear adds no names, dates or conclusions beyond the existing record.
+  consent: `<path d="M72 22 300 20 300 226 75 229Z" fill="#050e12" opacity=".7"/>
+    <path d="M70 20 296 18 296 222 73 226Z" fill="#807d67" stroke="#514f40"/>
+    <path d="M66 16 289 17 293 151 291 202 274 224 67 222 65 181Z" fill="#bdb598" stroke="#726e59"/>
+    <path d="M68 18 287 19M68 18 67 178" fill="none" stroke="#e6dcc0" opacity=".6"/>
+    <path d="M68 220 273 222 289 203" fill="none" stroke="#514f42" opacity=".55"/>
+    <path d="M274 202 291 202 274 224Z" fill="#4c4a3c" opacity=".45"/>
+    <path d="M274 201 290 202 274 220Z" fill="#d9d0b2" stroke="#918971" stroke-width=".6"/>
+    <path d="M181 18 178 86 183 143 180 221" fill="none" stroke="#6d6753" opacity=".22" stroke-width="2"/>
+    <path d="M183 19 180 86 185 143 182 220" fill="none" stroke="#eee4c8" opacity=".3"/>
+    <path d="M68 91 132 92 180 90 289 93" fill="none" stroke="#77705c" opacity=".24"/>
+    <path d="M69 93 132 94 181 92 290 95" fill="none" stroke="#e5dabc" opacity=".4"/>
+    <path d="M73 23h13m-13 3h13" stroke="#464d48" stroke-width="1.6"/>
+    <path d="M74 22h11" stroke="#b7b9a7" stroke-width="1.3"/>
+    <path d="M73 25v3m13-3v3" stroke="#4a4538" stroke-width="1.3"/>
+    <path d="M270 24h7v7h7v7h-7v7h-7v-7h-7v-7h7z" fill="#6f8f86"/>
+    <text x="80" y="36" fill="#394a43" font-size="8">MERIDIAN · COMMUNITY NEURAL HEALTH</text>
+    <text x="80" y="62" fill="#303c38" font-size="10">Therapeutic creativity archiving</text>
+    <text x="80" y="80" fill="#4b483d" font-size="9">PAYMENT · 2 MEAL CREDITS</text>
+    ${[
+      [
+        'M86 118l5-9q3-4 5 0l-5 15m-3-5q8-7 13-3q4 4-2 5q-6 0-2-7l5-6q5-5 6-1l-1 12q1 5 5 0l7-9q2-3 3 1l-1 6q2 5 5 0l9-8q5-5 6-1l-4 10q2 4 7-1l9-6q5-3 6 0q-1 3-4 4l15-3m-38 9 30-5',
+        100,
+        1.8,
+      ],
+      [
+        'M86 146l6-8 5 9m-7-4q10-6 12 0l4-10q3-4 6 1l-1 9 7-5 3 6q4 0 7-6l4 8 7-5 4 6 9-4',
+        128,
+        1.4,
+      ],
+      ['M86 174l6-6 4 7 5-9 3 8 7-5 2 6 6-7 3 9 5-4 4 3', 156, 1.1],
+    ]
+      .map(
+        ([path, y, pressure]) =>
+          `<path d="M80 ${Number(y) + 24}H210" stroke="#8f876a"/>
+          <path d="${path}" transform="translate(.6 .8)" fill="none" stroke="#e8dfc4" stroke-width="2.2" opacity=".45"/>
+          <path d="${path}" fill="none" stroke="#303d46" stroke-width="${pressure}" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="222" y="${Number(y) + 22}" fill="#6a6450" font-size="8">WEEK ${(Number(y) - 72) / 28}</text>`,
+      )
+      .join('')}
+    <g fill="none" stroke="#424d4b" opacity=".14" stroke-linecap="round">
+      <path d="M149 110q13 2 18 0m-13 4h10m-11 3h5" stroke-width="2"/>
+      <path d="M85 182q8 3 16 1m-13 3 8-1" stroke-width="1.2"/>
+    </g>
+    ${Array.from({ length: 5 }, (_, i) => `<path d="M80 ${196 + i * 5}h${150 - (i % 3) * 22}" stroke="#8d8568" stroke-width=".8"/>`).join('')}
+    <path d="M67 49l3 8m-3 112 2 7m219-111 2 5m-1 82-3 8M81 220l13 1" stroke="#625f4d" opacity=".5"/>
+    ${veil(258, 205, 0.55, '#7d6f5a')}`,
   seal: `<rect x="34" y="26" width="292" height="190" fill="#4a4034"/>${[62, 98, 170].map((y) => `<path d="M34 ${y}H326" stroke="#2f2923" stroke-width="3"/>`).join('')}<path d="M34 26H326M34 216H326" stroke="#2a241f" stroke-width="5"/><text x="56" y="52" fill="#a39777" font-size="15" font-family="monospace" letter-spacing="3">KEEP COLD</text><path d="M34 116H326V152H34Z" fill="#8e3b31"/><path d="M34 121H326M34 147H326" stroke="#b25a4d" opacity=".6"/><circle cx="180" cy="134" r="31" fill="#a8473a" stroke="#6d2a22" stroke-width="4"/><circle cx="180" cy="134" r="24" fill="none" stroke="#c9705f" opacity=".7"/>${veil(180, 133, 1.25, '#f0cdb8')}<text x="56" y="196" fill="#a39777" font-size="10">NO MANIFEST · COURIER 03:00</text>`,
   sale: `<rect x="40" y="18" width="280" height="182" rx="8" fill="#1d2326" stroke="#5f6b6b"/><rect x="54" y="30" width="252" height="156" fill="#0c1112"/><text x="66" y="50" fill="#d9695a" font-size="10">OUTBOUND · SALES LOG</text><path d="M64 57H296" stroke="#3b2522"/><text x="66" y="76" fill="#c9a07a" font-size="11">LOT B-0419</text><text x="66" y="94" fill="#8f9c94" font-size="9">RESERVED</text><text x="150" y="94" fill="#8f9c94" font-size="9">T-3 DAYS</text><text x="66" y="110" fill="#8f9c94" font-size="9">STATUS</text><text x="150" y="110" fill="#8f9c94" font-size="9">PAID IN FULL</text><rect x="62" y="119" width="204" height="21" fill="#3a1714"/><text x="66" y="134" fill="#ff8a78" font-size="11">BUYER · THE BROKER</text><rect x="194" y="124" width="7" height="12" fill="#ff8a78"/><text x="66" y="160" fill="#6b7a73" font-size="8">“Nothing is sacred once someone is</text><text x="66" y="172" fill="#6b7a73" font-size="8">hungry enough to sell it.”</text>${Array.from({ length: 26 }, (_, i) => `<path d="M54 ${32 + i * 6}H306" stroke="#ffffff" opacity=".035"/>`).join('')}<path d="M158 200h44l9 18h-62z" fill="#2b3234"/>`,
 };

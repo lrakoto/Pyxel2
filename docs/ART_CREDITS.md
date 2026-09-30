@@ -100,3 +100,11 @@ This is a different model from Gravity and the previous Warped Caves Lyra. The l
 compares the approved humanoid model's previous pale projection with its current
 cyber finish and previews the same reactions and timing as the game.
 `src/lyra-projection.ts` supplies the shared emitter and scan effects.
+
+
+## Signed consent close-up — September 29
+
+Original vector paths in `src/evidence-art.ts`: handled paper, staple, folds, lifted corner,
+ink pressure and abstract declining handwriting. Builds on this project's existing consent
+illustration and record; no imported art, named signature or third-party asset/license.
+The same SVG is used in the CRT, evidence card and record reader. No REPLACED artwork is used.

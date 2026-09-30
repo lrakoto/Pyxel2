@@ -8,8 +8,8 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P6 physical machine targets; 181 passing tests.
-P1–P6 bounded passes are complete. P7 tactile evidence is next, then P8 integration.
+Latest completed product pass: P7 tactile consent evidence; 181 passing tests.
+P1–P7 bounded passes are complete. P8 integration is next.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
@@ -113,13 +113,15 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   Fixed-time renderer previews and pure signal tests verify occupancy/return; real-game
   conversation/travel interruptions remain part of P8's integration route.
 
-### P7 — Human evidence and tactile close-ups · TODO
+### P7 — Human evidence and tactile close-ups · COMPLETE
 
 - Add one short optional observation consistent with the bible, or improve one existing
   evidence illustration with a human trace that helps the current clue read.
 - Keep the CRT and olive notebook. Avoid new mini-games, exposition dumps or collectible lists.
 - Verify exact clue/deduction gating and no spoiler on a fresh save. Text must fit the mobile
   CRT and work with Previous/reveal controls; no blinking effect needed.
+- Completed one original close-up: the clinic's existing signed consent. Folded/handled
+  paper and declining pen fluency reinforce its existing observation; no new narrative gate.
 
 ### P8 — Measured performance and integration · TODO
 
@@ -156,8 +158,10 @@ hardware behavior, and whether anything was published (currently: nothing).
   and the voices deduction. Existing Den memory/clinic marks retained; restore behavior checked.
 - P6: complete — physical examination targets share ambient sockets; receiver/spool occupy
   the tube, Den the column and clinic the cabinet controls. Labels/approaches stay fixed.
-- P7: next — one existing evidence close-up with an original human trace and exact gating.
-- P8: queued — measured integration, including actual interruption/travel and compact HUD.
+- P7: complete — original signed-consent close-up, shared by CRT/notebook, with paper wear
+  and declining handwriting. Existing names, text, record ownership and deduction gates stay fixed.
+- P8: next — measured integration, actual interruption/travel and compact HUD. Portrait CRT
+  controls are below the first scroll position for the consent re-examination; review this first.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
 
@@ -642,3 +646,66 @@ No physical iPhone/touch, audio by ear, combat, archive UI or performance claim.
 saves/settings untouched. Local checkpoint only, nothing pushed/published. Next: P7,
 improve one existing evidence close-up with a restrained canon-consistent human trace;
 then P8 integration and compact-HUD review, bounded by today's 8 PM deadline.
+
+
+### Pass 10 — September 29, 5:56 PM Pacific · P7 tactile signed consent
+
+Started from clean `bd3a76f`, after reading local guide, canon, research, queue and history.
+P6 is already complete; selected the highest unfinished item, P7. Chose an existing clue
+instead of adding dialogue: the clinic consent observation already describes signatures
+forgetting their own fluency. The generic three strokes previously read as waveforms.
+
+Reworked only the `consent` drawing in `evidence-art.ts`: worn asymmetric paper, attached
+backing sheet/contact shadow, small metal staple, subdued fold relief and a raised dog-ear.
+The first signature now has abstract cursive loops; the second falters, the third keeps
+shorter jagged marks. Ink pressure decreases, with slight indentation and handling smears.
+Preserved all printed text, week labels, clinic cross and folded-veil meaning. The mark moves
+left enough to avoid the lifted corner. Original code-native SVG, no external assets, filter,
+animation, dependency, victim name, canon revelation, new clue or save change. Shared CRT,
+board and record-reader call sites already use this illustration. Other evidence unchanged.
+
+**181 tests passed**, format, strict TypeScript/production build and diff checks passed.
+No new tests for decorative drawing coordinates; existing save/gate/reading tests pass.
+Game JS 237.17 kB / 79.33 kB gzip. No FPS/performance claim.
+
+Browser evidence on isolated `127.0.0.1:4197`:
+- Temporary storage-free fixture imported production art, styles and CaseModel. Captured
+  original/revised CRT, enlarged detail and notebook mount. Synthetic held → fresh clears
+  the illustration, then held restores it. No save/preferences access. The first fixture
+  notebook wrapper used the wrong text styles; corrected it to production record-reader
+  markup before recording final evidence. Removed the fixture after verification.
+- Requested 390×844 / 844×390 reduced-motion fixture views: paper and signatures remain
+  legible as shapes and add no motion. The fixture explicitly uses a taller sample stage;
+  those images prove component width/wrapping, not full game phone-height behavior.
+- Actual game local folder01 (19 records, 8 connections): resumed, map route from studio
+  through street/night train to clinic, selected donor recliners, read the existing earned
+  “Where the names stop” re-examination, closed, opened notebook, inspected the consent,
+  returned to board and closed. One earned field note was recorded only in this isolated
+  test folder. The SVG appears correctly in both real CRT and real notebook.
+- Actual normal-motion CRT at 390×844 and 844×390: text/art stay inside the screens.
+  Portrait puts the bottom transport controls below the initial scroll position; landscape
+  keeps Close visible but overlays most of the scene. This pre-existing constrained layout
+  remains a P8 priority; the illustration introduces no layout changes.
+- Default viewport/normal motion restored. No console errors in fixture or game. Resume
+  initially matched both underlying/title and panel controls; scoping to #panel resolved it.
+  Public saves/preferences untouched; preview left in clinic for integration work.
+
+Evidence: [CRT before](qa/2026-09-29-p7-consent/crt-before.png) /
+[after](qa/2026-09-29-p7-consent/crt-after.png),
+[detail](qa/2026-09-29-p7-consent/detail-after.png),
+[notebook mount](qa/2026-09-29-p7-consent/record-after.png),
+[fresh fixture](qa/2026-09-29-p7-consent/fresh.png),
+[fixture portrait reduced](qa/2026-09-29-p7-consent/portrait-reduced.png) /
+[landscape reduced](qa/2026-09-29-p7-consent/landscape-reduced.png),
+[actual CRT desktop](qa/2026-09-29-p7-consent/game-desktop.png),
+[actual portrait](qa/2026-09-29-p7-consent/game-portrait.png) /
+[landscape](qa/2026-09-29-p7-consent/game-landscape.png),
+[actual notebook](qa/2026-09-29-p7-consent/game-notebook.png).
+
+Limits: no full fresh-story replay, physical iPhone/touch, audio by ear, combat or measured
+profile pass. Fresh ownership sample is synthetic; actual inspectRecord ownership guard
+and shipment availability gates are unchanged, not a new browser progression test. Actual
+reduced-motion game interruption/Previous/reveal remain in P8; this drawing has no motion
+or new lines. Local checkpoint only, nothing pushed/published. Next: P8, prioritize portrait
+CRT transport visibility and scene clearance, then four-area/signal integration and the
+existing render probe. Stop all edits by 8 PM September 29 Pacific.
