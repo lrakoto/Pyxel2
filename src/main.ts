@@ -63,7 +63,7 @@ import { Renderer, H } from './renderer.ts';
 import { AudioEngine } from './audio.ts';
 import { Combat } from './combat.ts';
 import { Cinematic, INTRO } from './cinematic.ts';
-import { MACHINE_CLUES, lyraPresence, type LyraHop } from './lyra-orb.ts';
+import { examinationSocket, lyraPresence, type LyraHop } from './lyra-orb.ts';
 import {
   INSIGHTS,
   boardHint,
@@ -1176,13 +1176,13 @@ class Game {
       this.player.facing = Math.sign(h.x - this.player.x) || this.player.facing;
       this.interactionSubject = h;
       // Machine evidence: Lyra steps into it while Gravity reads it, if she's here.
+      const socket = examinationSocket(this.model.save.area, h.clue);
       if (
-        h.clue &&
-        MACHINE_CLUES.includes(h.clue) &&
+        socket &&
         lyraPresence(this.model.save.area, this.model.deduced, this.model.save.companion).kind !==
           'none'
       )
-        this.lyraHop = { to: { x: h.x, y: h.y }, start: this.time, end: null };
+        this.lyraHop = { to: socket, start: this.time, end: null };
       this.interactionTime = this.lineTime = 0;
       this.model.save.resumeHotspot = h.id;
       this.persist();

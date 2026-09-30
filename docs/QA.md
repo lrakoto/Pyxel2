@@ -1032,3 +1032,64 @@ full story replay or physical phone/touch/audio/combat/performance test. Compact
 covers lower scene elements; at landscape phone scale these papers are scenery rather than
 legible records. No push/publication. Next: P6 Lyra examination targets (receiver eye currently
 visits the clue marker below the physical tube). Consolidated status is in HOURLY_PASSES.md.
+
+
+## September 29 — P6 physical machine examination targets and renewed schedule
+
+Resumed the three-file P6 draft left after yesterday's interrupted run, from committed
+`49cc975`. Read local guide, canon, queue, research, history and complete draft diff; no
+other agent edits were present. User renewed work until 8 PM today. Updated the existing
+same-chat automation (no duplicate): ACTIVE, hourly, ending September 30 03:00 UTC,
+failed-run notifications only. The saved prompt explicitly stops edits at 8 PM Pacific.
+
+Added pure `examinationSocket(area, clue)` to `lyra-orb.ts` and wired it into the existing
+examination hop in `main.ts`. Six existing clues share physical ambient targets: street
+camera (550,300), studio receiver/spool (1224,236), Den column (823,201), clinic storage
+controls (927,412) and outbound terminal (1360,262). The receiver's label was below the
+bench; cabinet evidence was over the glass. Both now occupy machinery. Ambient order and
+coordinates remain unchanged. Clue labels, approaches, gestures, story gates, archive
+projection beat and hop departure/return lifecycle are preserved. No new particles,
+brightness, art, lore, dependencies, save fields or combat/movement changes.
+
+**181 tests passed**, formatting and strict TypeScript/production build passed; final diff
+check passed. New tests cover all six targets, wrong-area/non-machine rejection, shared
+ambient positions and unchanged clue data, held/pause signal determinism, shell darkness,
+return to the current shell after movement, reduced-motion return and cleared occupancy.
+Game JS 235.33 kB / 78.67 kB gzip; no measured performance claim.
+
+Browser verification used a temporary storage-free page at `127.0.0.1:4197` with the
+production Renderer/CaseModel, synthetic companion/contact state and fixed sample times.
+No saves/preferences read or written. The page was removed after testing.
+- Matched receiver before/after: time11, width960, identical camera/player, old label
+  target (1200,350) versus physical socket. The eye now fits the tube; shell is dark.
+- Reviewed all six clues, including the spool sharing the receiver. Den eye is on the
+  column ring; storage eye is on the cabinet base controls rather than across cartridges.
+- Sampled departure10.2, hold11, return12.2 (Gravity's x shifted80), home/reset13. Normal
+  return spark/light agree; held eye and returned shell do not remain lit together.
+- Width460 reduced-motion hold and release checked: steady fixture eye then immediate
+  return to the shell. This is a narrow renderer check, not a physical phone/UI playtest.
+- Console errors: none in the working fixture. Server startup first failed to bind under
+  the sandbox; an approved local-only retry restored Vite. Failed browser tabs initially
+  showed connection-refused pages. No continuing preview blocker or security bypass.
+
+Evidence: [receiver before](qa/2026-09-29-p6-sockets/receiver-before.png) /
+[after](qa/2026-09-29-p6-sockets/receiver-after.png),
+[departure](qa/2026-09-29-p6-sockets/departure.png) /
+[return](qa/2026-09-29-p6-sockets/return.png) /
+[home](qa/2026-09-29-p6-sockets/home.png) /
+[reset](qa/2026-09-29-p6-sockets/reset.png),
+[spool](qa/2026-09-29-p6-sockets/dispatch.png),
+[Den](qa/2026-09-29-p6-sockets/den-column.png),
+[storage](qa/2026-09-29-p6-sockets/storage.png),
+[outbound](qa/2026-09-29-p6-sockets/outbound.png),
+[camera](qa/2026-09-29-p6-sockets/street-camera.png),
+[narrow reduced hold](qa/2026-09-29-p6-sockets/narrow-reduced.png) /
+[return](qa/2026-09-29-p6-sockets/narrow-reduced-return.png).
+
+Limits: fixed samples, not continuous animation/real-game CRT, action pose or scene-travel
+playthrough. Reset sample passes null hop, not an area transition UI. Pause/moving-shell
+behavior is covered by pure tests; live conversation/area interruption belongs to P8.
+No physical iPhone/touch, audio by ear, combat, archive UI or performance claim. Public
+saves/settings untouched. Local checkpoint only, nothing pushed/published. Next: P7,
+improve one existing evidence close-up with a restrained canon-consistent human trace;
+then P8 integration and compact-HUD review, bounded by today's 8 PM deadline.

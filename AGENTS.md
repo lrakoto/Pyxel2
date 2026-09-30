@@ -127,6 +127,8 @@ These were settled through review with the user. Keep them unless the user chang
   joins Gravity she keeps a post (the street outside the Den, her terminal inside it). As a
   companion she follows Gravity's shoulder everywhere, docking at her terminal in the Den. Her
   arc is locked: she was watching Gravity before they met (see the story bible).
+  Machine examinations use `examinationSocket` in `lyra-orb.ts`, sharing physical targets
+  with ambient visits. Clue labels and Gravity's approach positions remain independent.
 - **Case board:** completed cards are scoped to the displayed case. Records reused by a later
   case keep a cross-reference to the source file, without reopening the earlier case’s matches.
   Opening the notebook starts at the case tabs; returning from a record preserves its place.
@@ -152,8 +154,8 @@ These were settled through review with the user. Keep them unless the user chang
   halo, cached sheen and actor rim together. Lyra's independent signal light stays unchanged.
 - **Studio light balance:** keep the painting's warm bounce localized and the receiver's
   damp haze below its bench. The receiver tube is at x1224/y236 in the stretched runtime
-  plate; its practical light and Lyra's ambient socket share that position. Examination
-  signals still use clue positions; improving those physical targets is queued separately.
+  plate; its practical light and Lyra's ambient/examination socket share that position.
+  Both receiver and dispatch-spool examinations occupy this tube.
 - **Clinic light balance:** cold storage emits a soft cyan spill from rows of cartridges;
   it has no point flare obscuring the middle shelf. Keep its glass, cartridge colors and
   existing low mist legible. Ceiling tubes, intake lamp and Lyra retain their own light.
@@ -223,9 +225,10 @@ These were settled through review with the user. Keep them unless the user chang
   alpha layer.
 - `main.ts` should be split into input, panels and transitions as content grows.
 
-## September 28 autonomous improvement queue
+## September 28–29 autonomous improvement queue
 
-The user authorized hourly improvements for today. Start with
+The user renewed hourly work through **September 29, 2026 at 8 PM America/Los_Angeles**.
+Stop edits at that deadline; delayed runs must not implement anything. Start with
 [docs/HOURLY_PASSES.md](docs/HOURLY_PASSES.md) and the evidence-backed
 [docs/REPLACED_RESEARCH.md](docs/REPLACED_RESEARCH.md). Update queue status and the run log
 on every pass; research proposals are not implemented behavior or new canon. Preserve all

@@ -1,4 +1,4 @@
-import type { AreaId } from './content.ts';
+import type { AreaId, ClueId } from './content.ts';
 
 /**
  * Lyra's drone: a small floating shell with a single eye. She is an AI who lives in the city's
@@ -191,32 +191,50 @@ export function lyraSignal(
 }
 export type LyraSignal = ReturnType<typeof lyraSignal>;
 
+const STREET_CAMERA = { x: 550, y: 300 };
+const RECEIVER_TUBE = { x: 1224, y: 236 };
+const MEMORY_COLUMN = { x: 823, y: 201 };
+const STORAGE_CONTROLS = { x: 927, y: 412 };
+const OUTBOUND_TERMINAL = { x: 1360, y: 262 };
+
 /** Machines she can occupy, measured off each plate. */
 export const ORB_SOCKETS: Record<AreaId, OrbPoint[]> = {
   street: [
     { x: 420, y: 345 }, // vending machines
-    { x: 550, y: 300 }, // the street camera
+    STREET_CAMERA,
     { x: 1008, y: 312 }, // GRAVES sign
     { x: 1259, y: 205 }, // the failing kanji tube
     { x: 1547, y: 274 }, // MEMORY DEN sign
   ],
   studio: [
     { x: 227, y: 213 }, // terminal screen
-    { x: 1224, y: 236 }, // neural receiver tube, aligned with its practical light
+    RECEIVER_TUBE, // aligned with its practical light
   ],
   den: [
-    { x: 823, y: 201 }, // memory column
+    MEMORY_COLUMN,
     { x: 1196, y: 195 }, // monitor wall
   ],
   // Measured off the finished Meridian plate, in 1500 × 540 world coordinates.
   clinic: [
     { x: 267, y: 286 }, // intake monitor
-    { x: 927, y: 412 }, // cold-storage controls beneath the glass
-    { x: 1360, y: 262 }, // outbound terminal
+    STORAGE_CONTROLS, // beneath the glass
+    OUTBOUND_TERMINAL,
   ],
 };
 /** Machine evidence she steps into while Gravity examines it. */
 export const MACHINE_CLUES = ['camera', 'device', 'transfer', 'chime', 'cartridge', 'sale'];
+
+const EXAMINATION_SOCKETS: Partial<Record<AreaId, Partial<Record<ClueId, OrbPoint>>>> = {
+  street: { camera: STREET_CAMERA },
+  studio: { device: RECEIVER_TUBE, transfer: RECEIVER_TUBE },
+  den: { chime: MEMORY_COLUMN },
+  clinic: { cartridge: STORAGE_CONTROLS, sale: OUTBOUND_TERMINAL },
+};
+
+/** Occupy the physical machine, independently of the clue label and Gravity's approach. */
+export function examinationSocket(area: AreaId, clue: ClueId | undefined): OrbPoint | null {
+  return clue ? (EXAMINATION_SOCKETS[area]?.[clue] ?? null) : null;
+}
 
 const AMBIENT_WINDOW = 34;
 const AMBIENT_OFFSET = 20;

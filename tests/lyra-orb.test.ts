@@ -1,11 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { AREAS, type AreaId, type ClueId } from '../src/content.ts';
 import {
   HOP_TRAVEL,
   AmbientHopSession,
   ORB_SIZE,
   ORB_SOCKETS,
   ambientHop,
+  examinationSocket,
   companionAnchor,
   hopState,
   lyraPresence,
@@ -16,6 +18,52 @@ import {
 
 const at = (pixels: number[], x: number, y: number) => pixels[y * ORB_SIZE + x];
 const c = (ORB_SIZE - 1) / 2;
+
+test('examinations share physical ambient sockets without moving clue labels', () => {
+  const before = JSON.stringify(AREAS);
+  const expected: [AreaId, ClueId, number, number][] = [
+    ['street', 'camera', 550, 300],
+    ['studio', 'device', 1224, 236],
+    ['studio', 'transfer', 1224, 236],
+    ['den', 'chime', 823, 201],
+    ['clinic', 'cartridge', 927, 412],
+    ['clinic', 'sale', 1360, 262],
+  ];
+  for (const [area, clue, x, y] of expected) {
+    const socket = examinationSocket(area, clue);
+    assert.deepEqual(socket, { x, y });
+    assert.ok(ORB_SOCKETS[area].includes(socket!), 'one shared ambient/examination position');
+    for (const other of Object.keys(AREAS) as AreaId[]) {
+      if (other !== area) assert.equal(examinationSocket(other, clue), null);
+    }
+  }
+  assert.equal(examinationSocket('studio', 'diary'), null);
+  assert.equal(examinationSocket('den', 'fragment'), null, 'archive projection keeps its own beat');
+  assert.equal(examinationSocket('street', undefined), null);
+  assert.equal(JSON.stringify(AREAS), before);
+  assert.equal(AREAS.studio.hotspots.find((h) => h.clue === 'device')!.y, 350);
+});
+
+test('receiver eye and shared light hold at the tube, then return to the current shell', () => {
+  const to = examinationSocket('studio', 'device')!;
+  const hop = { to, start: 10, end: null as number | null };
+  const shell = { x: 1090, y: 280 };
+  for (const reduced of [false, true]) {
+    const held = lyraSignal(hop, 11, shell, reduced);
+    assert.deepEqual(held.light, to);
+    assert.equal(held.state?.shell, 0, 'no second lit eye in the shell');
+    assert.equal(held.state?.machine, 1);
+    assert.deepEqual(lyraSignal(hop, 11, shell, reduced), held, 'pause freezes the signal');
+    assert.deepEqual(lyraSignal(hop, 80, { x: 1000, y: 280 }, reduced).light, to);
+  }
+  hop.end = 80;
+  const movedShell = { x: 1000, y: 280 };
+  const returning = lyraSignal(hop, 80.2, movedShell, false);
+  assert.deepEqual(returning.light, returning.state?.spark);
+  assert.deepEqual(lyraSignal(hop, 81, movedShell, false).light, movedShell);
+  assert.deepEqual(lyraSignal(hop, 80, movedShell, true).light, movedShell);
+  assert.equal(lyraSignal(null, 81, movedShell, false).state, null, 'scene reset clears occupancy');
+});
 
 test('ambient visits retain their machine when Gravity moves and finish once', () => {
   const visit = new AmbientHopSession();

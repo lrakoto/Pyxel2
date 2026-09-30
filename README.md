@@ -257,6 +257,9 @@ interaction and environmental evidence. [Hourly passes](docs/HOURLY_PASSES.md) t
 bounded implementation queue, validation and end-of-day review route. Listed proposals are
 not automatically implemented features.
 
+The user renewed the hourly sessions through September 29 at 8 PM America/Los_Angeles.
+Checkpoint commits stay local; no new public deployment is authorized by this schedule.
+
 
 ### September 28 — Studio composition
 
@@ -318,3 +321,13 @@ Connecting Marlon’s journal to the painting now leaves two worn comparison sli
 beneath its frame. Their shared pencil mark recalls the deduction without adding another
 clue. They follow the active case: earlier checkpoints and fresh folders restore the room’s
 previous appearance. See [QA](docs/QA.md) for save-state and phone-layout comparisons.
+
+
+### September 29 — Lyra occupies the physical machine
+
+Machine examinations now use the same authored fixture positions as Lyra's ambient visits.
+Her eye/light sits inside the studio receiver tube for both receiver and spool evidence,
+at the Den's memory column and on the clinic cabinet controls. Street-camera and outbound
+console targets remain aligned. Clue labels and Gravity's approach/reach are unchanged.
+The existing single signal still drives her eye, room light, wet rim and reflected pool;
+reduced motion retains steady occupation and an instant return.

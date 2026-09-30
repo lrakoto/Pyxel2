@@ -1,4 +1,4 @@
-# Hourly improvement passes — September 28, 2026
+# Hourly improvement passes — September 28–29, 2026
 
 ## Mission and current checkpoint
 
@@ -8,14 +8,15 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P5 studio witness comparison; 179 passing tests.
-P1–P5 bounded passes are complete. P6 Lyra machine targets are next.
+Latest completed product pass: P6 physical machine targets; 181 passing tests.
+P1–P6 bounded passes are complete. P7 tactile evidence is next, then P8 integration.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
-Schedule: hourly in this chat, through September 28 at 11:59 PM America/Los_Angeles.
-Automation ID: `gravity-hourly-improvement-passes`. Delayed runs after that date must not
-make edits. This is a finite day of work, not an indefinite background mandate.
+Schedule: hourly in this chat, renewed by the user through **September 29 at 8 PM
+America/Los_Angeles** (September 30, 03:00 UTC). This supersedes the September 28 limit.
+Automation ID: `gravity-hourly-improvement-passes`. Stop all edits at the deadline;
+delayed runs after it must not make edits. This is finite work, not an indefinite mandate.
 Local execution requires the computer to be awake and the desktop app running.
 
 ## Session protocol
@@ -97,7 +98,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
 - Prove fresh → earned → earlier checkpoint/case switch. No standalone visual memory that
   survives a save reset. No new lore revelation or mandatory clue without explicit design.
 
-### P6 — Lyra's machine presence · TODO
+### P6 — Lyra's machine presence · COMPLETE
 
 - Improve clarity of departure, occupied fixture and return using the existing shared signal
   position. The eye/light/reflection must agree; don't render a second active Lyra by accident.
@@ -107,6 +108,10 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
 - Observed in P2: receiver examinations send the eye/light to the clue marker at (1200,350),
   below the workbench. Ambient visits use the physical tube socket (1224,236). Resolve
   authored machine targets for examinations without moving interaction markers/approaches.
+- Completed the bounded targeting pass: six existing machine clues share their physical
+  ambient sockets. Shared signal timing, story gates and interruption lifecycle remain intact.
+  Fixed-time renderer previews and pure signal tests verify occupancy/return; real-game
+  conversation/travel interruptions remain part of P8's integration route.
 
 ### P7 — Human evidence and tactile close-ups · TODO
 
@@ -136,7 +141,7 @@ hardware behavior, and whether anything was published (currently: nothing).
 ## Consolidated status
 
 - Research: complete; direct developer accounts plus official visual reference study recorded.
-- Scheduling: active hourly for today; local-file automation, in this same conversation.
+- Scheduling: renewed hourly through September 29 at 8 PM Pacific, in this conversation.
 - P1: complete across street, studio, Den and clinic. Desktop/portrait comparisons, reduced
   motion and routes checked; screenshots and explicit hardware limits recorded below.
 - P2: Den complete — clearer archive housing/glass, smaller flare, low steady condensation.
@@ -149,8 +154,10 @@ hardware behavior, and whether anything was published (currently: nothing).
   feet; existing parallax and actor-clearance fade retained.
 - P5: complete — earned paper comparison beneath the studio painting, gated by both records
   and the voices deduction. Existing Den memory/clinic marks retained; restore behavior checked.
-- P6: next — correct Lyra’s physical machine targets during examinations.
-- P7–P8: queued.
+- P6: complete — physical examination targets share ambient sockets; receiver/spool occupy
+  the tube, Den the column and clinic the cabinet controls. Labels/approaches stay fixed.
+- P7: next — one existing evidence close-up with an original human trace and exact gating.
+- P8: queued — measured integration, including actual interruption/travel and compact HUD.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
 
@@ -574,3 +581,64 @@ record at phone scale. Public saves/settings untouched. Local checkpoint only, n
 P5 is complete for this bounded pass: studio now has deduction-specific scenery; existing
 Den/clinic changes remain sufficient. Next: P6, align Lyra's examination target with the
 receiver tube socket (1224,236), preserving clue marker/approach and one shared light signal.
+
+
+### Pass 9 — September 29, 4:54 PM Pacific · P6 physical machine targets
+
+Resumed the three-file P6 draft left after yesterday's interrupted run, from committed
+`49cc975`. Read local guide, canon, queue, research, history and complete draft diff; no
+other agent edits were present. User renewed work until 8 PM today. Updated the existing
+same-chat automation (no duplicate): ACTIVE, hourly, ending September 30 03:00 UTC,
+failed-run notifications only. The saved prompt explicitly stops edits at 8 PM Pacific.
+
+Added pure `examinationSocket(area, clue)` to `lyra-orb.ts` and wired it into the existing
+examination hop in `main.ts`. Six existing clues share physical ambient targets: street
+camera (550,300), studio receiver/spool (1224,236), Den column (823,201), clinic storage
+controls (927,412) and outbound terminal (1360,262). The receiver's label was below the
+bench; cabinet evidence was over the glass. Both now occupy machinery. Ambient order and
+coordinates remain unchanged. Clue labels, approaches, gestures, story gates, archive
+projection beat and hop departure/return lifecycle are preserved. No new particles,
+brightness, art, lore, dependencies, save fields or combat/movement changes.
+
+**181 tests passed**, formatting and strict TypeScript/production build passed; final diff
+check passed. New tests cover all six targets, wrong-area/non-machine rejection, shared
+ambient positions and unchanged clue data, held/pause signal determinism, shell darkness,
+return to the current shell after movement, reduced-motion return and cleared occupancy.
+Game JS 235.33 kB / 78.67 kB gzip; no measured performance claim.
+
+Browser verification used a temporary storage-free page at `127.0.0.1:4197` with the
+production Renderer/CaseModel, synthetic companion/contact state and fixed sample times.
+No saves/preferences read or written. The page was removed after testing.
+- Matched receiver before/after: time11, width960, identical camera/player, old label
+  target (1200,350) versus physical socket. The eye now fits the tube; shell is dark.
+- Reviewed all six clues, including the spool sharing the receiver. Den eye is on the
+  column ring; storage eye is on the cabinet base controls rather than across cartridges.
+- Sampled departure10.2, hold11, return12.2 (Gravity's x shifted80), home/reset13. Normal
+  return spark/light agree; held eye and returned shell do not remain lit together.
+- Width460 reduced-motion hold and release checked: steady fixture eye then immediate
+  return to the shell. This is a narrow renderer check, not a physical phone/UI playtest.
+- Console errors: none in the working fixture. Server startup first failed to bind under
+  the sandbox; an approved local-only retry restored Vite. Failed browser tabs initially
+  showed connection-refused pages. No continuing preview blocker or security bypass.
+
+Evidence: [receiver before](qa/2026-09-29-p6-sockets/receiver-before.png) /
+[after](qa/2026-09-29-p6-sockets/receiver-after.png),
+[departure](qa/2026-09-29-p6-sockets/departure.png) /
+[return](qa/2026-09-29-p6-sockets/return.png) /
+[home](qa/2026-09-29-p6-sockets/home.png) /
+[reset](qa/2026-09-29-p6-sockets/reset.png),
+[spool](qa/2026-09-29-p6-sockets/dispatch.png),
+[Den](qa/2026-09-29-p6-sockets/den-column.png),
+[storage](qa/2026-09-29-p6-sockets/storage.png),
+[outbound](qa/2026-09-29-p6-sockets/outbound.png),
+[camera](qa/2026-09-29-p6-sockets/street-camera.png),
+[narrow reduced hold](qa/2026-09-29-p6-sockets/narrow-reduced.png) /
+[return](qa/2026-09-29-p6-sockets/narrow-reduced-return.png).
+
+Limits: fixed samples, not continuous animation/real-game CRT, action pose or scene-travel
+playthrough. Reset sample passes null hop, not an area transition UI. Pause/moving-shell
+behavior is covered by pure tests; live conversation/area interruption belongs to P8.
+No physical iPhone/touch, audio by ear, combat, archive UI or performance claim. Public
+saves/settings untouched. Local checkpoint only, nothing pushed/published. Next: P7,
+improve one existing evidence close-up with a restrained canon-consistent human trace;
+then P8 integration and compact-HUD review, bounded by today's 8 PM deadline.
