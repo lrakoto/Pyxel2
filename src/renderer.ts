@@ -1039,6 +1039,10 @@ export class Renderer {
   }
   /** The shell holds a post, or drifts after Gravity with a little lag as her companion. */
   private orbAt: { x: number; y: number; area: AreaId | null } = { x: 0, y: 0, area: null };
+  /** Caption clearance uses the shell's rendered lag, rather than a second follower. */
+  companionPosition(area: AreaId): Readonly<OrbPoint> | null {
+    return this.orbAt.area === area ? this.orbAt : null;
+  }
   private placeOrb(
     presence: LyraPresence,
     area: AreaId,

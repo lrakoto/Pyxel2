@@ -154,7 +154,7 @@ through the existing return arc without delaying dialogue. Immediate reset remai
 motion, absent/docked companion, explicit examination and area/clock changes. The machine
 stays locked while walking; departure/occupancy interruption, pause and no-restart have tests.
 
-### P9 — Companion-aware caption clearance · QUEUED
+### P9 — Companion-aware caption clearance · COMPLETE
 
 During P8c's leftward clinic walk, the nearby Cold storage caption obscured the returning
 drone eye once Gravity stopped beside the cabinet. Screenshot: [caption overlap](qa/2026-10-01-p8c/caption-occlusion.jpg).
@@ -162,6 +162,24 @@ Use the existing field-layout caption placement to clear the companion as well a
 keep marker anchors/picking unchanged, captions readable and static layout deterministic.
 Verify both facings at this cabinet, caption boundaries on phone widths, and docked/absent
 Lyra. Add pure placement tests if the clearance logic changes. Do not solve it with a new HUD.
+
+Side captions now reserve a bounded envelope around the renderer's existing shell position,
+including follower lag. Colliding captions lift above Gravity's hair, with inward alignment
+near stage edges. Marker anchors and picking stay unchanged. Both clinic facings, portrait
+edge/reduced-motion layout, landscape and Den docking reviewed. Three new pure tests;
+186 total pass. Full conditions and limits are in Pass 14 below.
+
+### P10 — Keyboard-selected revisit readability · QUEUED
+
+P9's portrait edge check exposed a remaining, separate readability issue: a collected Cold
+storage marker stays dim when keyboard-focused outside proximity. See
+[focused reduced-motion edge](qa/2026-10-01-p9/clinic-edge-reduced.jpg). Existing
+`.hotspot.collected:not(.near):not(:hover)` sets the whole button to 0.35 opacity and
+overrides focus/selected brightness. In the next pass, confirm computed focus/selection
+styles through real inputs, then retain quiet unselected records while making keyboard focus
+and an explicit walking destination readable. Preserve collected ticks, REVISIT hints,
+marker targets and the new actor clearance. Check selected/ordinary states, keyboard/native
+activation and portrait bounds; this is a small existing-CSS fix, not a new navigation system.
 
 ### October 1 follow-up passes — QUEUED
 
@@ -211,6 +229,9 @@ hardware behavior, and whether anything was published (currently: nothing).
   return and conversation recall. A route begun during occupancy reaches the Den correctly.
   Departure interruption and hard-reset edges have pure regression tests. Capture timing,
   phase limits and all tool/setup failures are recorded below.
+- P9: complete — captions clear the rendered companion shell and Gravity's hair while their
+  marker stays fixed. Both clinic facings, portrait edge/reduced motion, landscape and docked
+  Den checks recorded; 186 tests pass. P10 queues the demonstrated dim keyboard revisit label.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - The previous batch through `3f0fa2a` was subsequently pushed to the development branch
   at the user's request. Today's new passes remain local until another push request.
@@ -1023,3 +1044,64 @@ demonstrated visual issue: the Cold storage caption hides Lyra's eye beside a le
 Gravity after the walk ([overlap](qa/2026-10-01-p8c/caption-occlusion.jpg)). Extend existing
 caption clearance rather than changing the approved companion design. All changes remain
 local; nothing pushed, merged or published. October 1 hourly authorization still ends 6 PM.
+
+### Pass 14 — October 1, 2:25 PM Pacific · P9 captions leave room for Lyra
+
+Started from clean `e612ecc`; read local guide, canon, research, plan and recent commits.
+P8b/P8c are complete for their recorded bounded checks. Selected queued P9: the previous
+clinic screenshot showed Cold storage's side caption covering the drone eye after a
+leftward walk. That existing screenshot is the baseline, not a newly synchronized capture.
+
+Extended the existing pure field-layout rule, rather than moving the marker or adding UI.
+Near-body side captions use a conservative 190 CSS-pixel envelope (the existing width cap),
+24-pixel half-height and a 12-figure-unit shell margin covering the 17-pixel art and idle bob.
+When that envelope intersects the shell, the caption lifts above Gravity's hair. Edge
+captions align inward at their marker centre. Distant/default-below captions retain their
+prior layout. Renderer exposes its existing area-filtered, smoothed shell anchor; there is
+no duplicate follower or signal state. Stage CSS scale is sampled in the existing resize
+observer, not with per-frame DOM measurements. The marker cache includes the lift and its
+write counter includes the extra CSS property. No animation, movement, audio, story,
+assets, saves, combat, machine targets or interaction positions changed. README/AGENTS updated.
+
+Three pure regression tests cover both caption sides, real versus lagged-away shell,
+vertical separation, absent companion, stage-scale changes, inward viewport edges,
+distant/high markers and hair clearance across street/interior figure scales. The first
+hair-boundary assertion hit floating subtraction precision; the test now allows 1e-9 CSS
+pixels, with production geometry unchanged. Final **186 tests passed**, format, strict
+TypeScript/Vite build and diff checks passed. Final bundle sizes are recorded in QA.
+
+Live UI used only **DISPOSABLE QA Oct 1** on http://127.0.0.1:4198/; no hidden state, injected
+clock or runtime teleport. Existing map route, clue marker, ground clicks and reader Close
+were used. Hot reload resumed through the real archive, keeping its 19 records/10 links.
+
+- At 1280×720, walked to both sides of the clinic cabinet. Captions sit above the hair,
+  leaving each facing's drone eye visible. Cold storage dot stays centred at (704.31,362.18)
+  on both sides; caption bounds (656.99,274.05)–(751.64,302.05).
+- At 390×844, lifted caption bounds (172.78,344.20)–(252.20,366.70), inside stage
+  (12,213)–(378,643). Clicked the same evidence button and saw the correct Neural Cargo CRT;
+  Close returned normally. At the right edge, inward caption bounds were
+  (229.52,344.20)–(308.94,366.70). Reduced motion retains the same static layout.
+- At 844×390, the noncolliding side caption stays beside the cabinet, clear of the shell.
+  A ground click first landed on the existing Revisit prompt, opening its CRT; closed it and
+  retargeted below the prompt. This was ordinary hit testing, not a defect or forced input.
+- Routed to the Den and walked beside Lyra's docked terminal; observed capsule/label clearance
+  without changing story progress. Absence fallback is pure-tested, not a fresh-story replay.
+- No console errors. Normal motion, focus off and default viewport restored before handoff.
+
+Evidence: [right-facing](qa/2026-10-01-p9/clinic-right.jpg) /
+[left-facing](qa/2026-10-01-p9/clinic-left.jpg),
+[portrait](qa/2026-10-01-p9/clinic-portrait.jpg) /
+[portrait edge](qa/2026-10-01-p9/clinic-portrait-edge.jpg) /
+[edge reduced motion and keyboard focus](qa/2026-10-01-p9/clinic-edge-reduced.jpg),
+[landscape](qa/2026-10-01-p9/clinic-landscape.jpg) /
+[docked Den](qa/2026-10-01-p9/den-docked.jpg). JPEG captures preserve full scene context;
+conditions match by scene/layout, not animation time.
+
+Limits: shell clearance is deliberately conservative, not a general text/prop collision
+solver; authored default-below markers stay untouched. No physical iPhone/coarse-pointer,
+fullscreen, audio by ear, fresh-story replay, exhaustive all-hotspot review, GPU/FPS or
+combat claim. During the edge check the distant collected label stayed dim even when
+keyboard-focused; source shows the collected opacity rule overrides focus/selection.
+Queued P10 to confirm and fix that narrow CSS issue. Local checkpoint only, no push, merge
+or publication; other saves/settings untouched. Next hourly pass remains authorized until
+October 1, 6 PM Pacific; schedule stays active for now.

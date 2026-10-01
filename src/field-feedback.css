@@ -148,6 +148,23 @@
 .hotspot[data-label-side='left'] .hotspot-label {
   right: calc(50% + 24px);
 }
+.hotspot[data-label-side='above'] .hotspot-label {
+  position: absolute;
+  bottom: calc(50% + var(--caption-lift, 24px));
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+  max-width: min(190px, 37vw);
+}
+.hotspot.edge-left[data-label-side='above'] .hotspot-label {
+  left: 50%;
+  transform: none;
+}
+.hotspot.edge-right[data-label-side='above'] .hotspot-label {
+  left: auto;
+  right: 50%;
+  transform: none;
+}
 .stage:not(.scanning)
   .hotspot:not(.near):not(.destination-selected):not(:hover):not(:focus-visible)
   .hotspot-label {

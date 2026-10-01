@@ -1349,3 +1349,54 @@ departure interruption is regression-tested, not separately triggered live. P8 c
 these bounded checks; no exhaustive all-phase hardware claim. Next P9: the existing caption
 hides Lyra during the clinic left-facing stop; [actual overlap](qa/2026-10-01-p8c/caption-occlusion.jpg).
 Local checkpoint only; nothing pushed, merged or published; existing/public saves untouched.
+
+## October 1 — P9 companion-aware caption clearance
+
+Baseline clean `e612ecc`. Fixed the demonstrated clinic caption/eye overlap in existing
+`field-layout.ts`; renderer's area-filtered shell position provides the same follower lag as
+its drawing. A bounded side-caption envelope chooses above-hair placement only when it
+intersects Lyra. Scale comes from the existing stage resize observer; above captions align
+inward at edge marker centres. Cache state includes lift. Authored marker, click target,
+approach position, distant/default-below captions, motion, speeds, saves and combat unchanged.
+README and local guide now describe clearance and mark P8's bounded checks complete.
+
+Three new pure tests cover both sides, lag/vertical separation, absent companion, CSS scale,
+viewport edges, unchanged distant/high placement and hair clearance at three stage scales
+and all current figure sizes. Initial exact boundary assertion failed due to floating-point
+subtraction; the assertion allows 1e-9 pixels, with geometry unchanged.
+**186 tests passed**, format, strict TypeScript/build and diff checks passed.
+Main JS **238.07 kB / 79.71 kB gzip**, CSS **94.23 / 22.20**, shared orb **6.20 / 2.85**.
+No performance claim; build emits the existing empty art manifest when no Aseprite is present.
+
+Actual browser checks were on named **DISPOSABLE QA Oct 1**, 127.0.0.1:4198, through archive
+Continue, map routes, real clue/ground buttons and CRT Close. No injected state/clock or
+runtime game reads. The prior P8c overlap screenshot is the baseline; after frames share the
+scene and relevant facing, not exact motion time. Both clinic facings clear the eye and hair;
+marker centre stayed (704.31,362.18). At 390×844, caption (172.78,344.20)–(252.20,366.70)
+and right-edge caption (229.52,344.20)–(308.94,366.70) fit inside stage (12,213)–(378,643).
+Clicked that portrait marker and received the correct Neural Cargo CRT, then closed normally.
+844×390 retained a noncolliding side caption, as intended. A ground click hit the Revisit
+prompt first; its normal CRT was closed and the ground retargeted below it. Reduced-motion
+edge layout and a normal-motion docked Den terminal were reviewed. Den caption
+(884.00,273.34)–(928.89,301.34) sits above the shell. No console errors.
+
+[Right-facing](qa/2026-10-01-p9/clinic-right.jpg) ·
+[left-facing](qa/2026-10-01-p9/clinic-left.jpg) ·
+[portrait](qa/2026-10-01-p9/clinic-portrait.jpg) ·
+[portrait edge](qa/2026-10-01-p9/clinic-portrait-edge.jpg) ·
+[edge reduced motion/focus](qa/2026-10-01-p9/clinic-edge-reduced.jpg) ·
+[landscape](qa/2026-10-01-p9/clinic-landscape.jpg) ·
+[docked Den](qa/2026-10-01-p9/den-docked.jpg).
+
+Limits: conservative shell envelope, not a general label/prop collision solver. Default-below
+markers retain earlier geometry. Absent fallback is pure-tested, not freshly replayed in
+browser; no exhaustive all-hotspot/hardware, physical iPhone, fullscreen, audio-by-ear,
+GPU/FPS or combat verification. No borrowed assets or canon additions. Normal motion,
+focus off and default viewport restored; disposable case remains near Lyra's Den terminal.
+Other origins/saves/settings untouched. Local checkpoint only; no push/merge/publication.
+
+Next P10: while checking the edge, a distant collected marker stayed dim under keyboard
+focus. The collected 0.35-opacity selector excludes near/hover but does not exclude
+focus-visible or selected destination. Confirm computed focus/selection states, then adjust
+that existing CSS rule while preserving quiet unselected records. Screenshot/source evidence
+and exact bounded scope are in the hourly plan. October 1 authorization still ends at 6 PM.

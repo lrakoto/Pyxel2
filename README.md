@@ -222,7 +222,9 @@ interior floors. Combat and sprint speeds are unchanged.
 ## September 26 — readable actions and rooms that remember
 
 Nearby evidence captions sit beside Gravity, while distant captions recede until focus mode,
-hover or keyboard focus. Paintings use a distinct considered-study pose; investigation and
+hover or keyboard focus. When a side caption would cover Lyra's drone, it lifts above
+Gravity's hair; the evidence marker stays on its object. Clearance follows the rendered
+drone position and adapts to stage size. Paintings use a distinct considered-study pose; investigation and
 dialogue gestures retrace their authored frames over a short return to rest. Movement takes
 over immediately, and reduced motion skips the return. The same action frames receive the
 room's broad light tint, preventing a lighting change when examining something.

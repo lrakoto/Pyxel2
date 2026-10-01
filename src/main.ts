@@ -9,7 +9,7 @@ import './archive.css';
 import './case-board.css';
 import './examination-crt.css';
 import { DialogueReader, nativeActivation } from './dialogue-reader.ts';
-import { labelPlacement } from './field-layout.ts';
+import { captionLift, labelPlacement } from './field-layout.ts';
 import { RenderProbe } from './render-probe.ts';
 import { AreaTransition } from './area-transition.ts';
 import { explorationCamera } from './exploration-camera.ts';
@@ -232,6 +232,7 @@ class Game {
   raf = 0;
   events = new AbortController();
   resizeObserver: ResizeObserver;
+  fieldScale = 1;
   get viewW() {
     return this.renderer.canvas.width;
   }
@@ -243,6 +244,7 @@ class Game {
     this.sync();
     this.resizeObserver = new ResizeObserver(() => {
       const r = $('stage').getBoundingClientRect();
+      this.fieldScale = r.height / H;
       this.renderDirty = true;
       this.renderer.resize(Math.round((H * r.width) / r.height));
       this.camera = this.explorationView();
@@ -1104,6 +1106,8 @@ class Game {
     this.syncHotspots();
   }
   syncHotspots() {
+    const orb = this.renderer.companionPosition(this.currentArea.id);
+    const companion = orb && { x: orb.x, y: orb.y, scale: this.fieldScale };
     for (const { element: b, hotspot: h } of this.hotspotNodes) {
       const x = ((h.x - this.camera) / this.viewW) * 100;
       const placement = labelPlacement(
@@ -1114,10 +1118,15 @@ class Game {
         this.currentArea.figureScale,
         this.camera,
         this.viewW,
+        companion,
       );
+      const lift =
+        placement === 'above'
+          ? captionLift(h.y, this.currentArea.ground, this.currentArea.figureScale, this.fieldScale)
+          : 0;
       const near = h === this.nearest,
         selected = h === this.pending;
-      const state = `${x.toFixed(2)}:${near}:${selected}:${placement}`;
+      const state = `${x.toFixed(2)}:${near}:${selected}:${placement}:${lift.toFixed(2)}`;
       if (this.cacheMarkers && this.markerCache.get(b) === state) continue;
       this.markerCache.set(b, state);
       b.style.left = x.toFixed(2) + '%';
@@ -1127,7 +1136,8 @@ class Game {
       b.classList.toggle('edge-left', x < 22);
       b.classList.toggle('edge-right', x > 78);
       b.dataset.labelSide = placement;
-      this.markerWrites += 7;
+      b.style.setProperty('--caption-lift', lift.toFixed(2) + 'px');
+      this.markerWrites += 8;
     }
   }
   goTo(h: Hotspot, route: string | null = null) {

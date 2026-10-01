@@ -133,6 +133,10 @@ These were settled through review with the user. Keep them unless the user chang
   arc is locked: she was watching Gravity before they met (see the story bible).
   Machine examinations use `examinationSocket` in `lyra-orb.ts`, sharing physical targets
   with ambient visits. Clue labels and Gravity's approach positions remain independent.
+  Near-body evidence captions in `field-layout.ts` lift above Gravity's hair when their side
+  envelope overlaps the rendered drone shell. `Renderer.companionPosition` exposes its
+  existing lagged position for clearance; marker coordinates and approach targets stay fixed.
+  CSS scale is sampled by the existing stage resize observer, not measured every frame.
 - **Case board:** completed cards are scoped to the displayed case. Records reused by a later
   case keep a cross-reference to the source file, without reopening the earlier case’s matches.
   Opening the notebook starts at the case tabs; returning from a record preserves its place.
@@ -248,7 +252,8 @@ Stop edits at that deadline; delayed runs must not implement anything. Start wit
 [docs/REPLACED_RESEARCH.md](docs/REPLACED_RESEARCH.md). Update queue status and the run log
 on every pass; research proposals are not implemented behavior or new canon. Preserve all
 settled decisions above, especially combat ownership and the local-only delivery boundary.
-P6 machine targets are complete. Resume P8b's remaining interruption/reading checks and
-landscape scene clearance first. Later passes must address demonstrated visual or
+P6 machine targets, P8b/P8c's bounded interruption/reader checks and P9's companion/caption
+clearance are complete. Next P10 confirms and fixes dim keyboard-selected revisit markers.
+Later passes must address demonstrated visual or
 investigation issues, with a recorded rationale. Keep ordinary successful passes quiet;
 maintain a consolidated 6 PM review and close the schedule on its last possible run.
