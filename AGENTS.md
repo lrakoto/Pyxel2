@@ -231,11 +231,16 @@ These were settled through review with the user. Keep them unless the user chang
   alpha layer.
 - `main.ts` should be split into input, panels and transitions as content grows.
 
-## September 28–29 autonomous improvement queue
+## Autonomous improvement queue
 
-The user renewed hourly work through **September 29, 2026 at 8 PM America/Los_Angeles**.
+The user renewed hourly work for **October 1, 2026 through 6 PM America/Los_Angeles**
+(October 2, 01:00 UTC). This supersedes the expired September 29 session for today only.
 Stop edits at that deadline; delayed runs must not implement anything. Start with
 [docs/HOURLY_PASSES.md](docs/HOURLY_PASSES.md) and the evidence-backed
 [docs/REPLACED_RESEARCH.md](docs/REPLACED_RESEARCH.md). Update queue status and the run log
 on every pass; research proposals are not implemented behavior or new canon. Preserve all
 settled decisions above, especially combat ownership and the local-only delivery boundary.
+P6 machine targets are complete. Resume P8b's remaining interruption/reading checks and
+landscape scene clearance first. Later passes must address demonstrated visual or
+investigation issues, with a recorded rationale. Keep ordinary successful passes quiet;
+maintain a consolidated 6 PM review and close the schedule on its last possible run.

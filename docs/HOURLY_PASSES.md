@@ -1,4 +1,4 @@
-# Hourly improvement passes — September 28–29, 2026
+# Hourly improvement passes — September 28–October 1, 2026
 
 ## Mission and current checkpoint
 
@@ -14,8 +14,9 @@ live interruption/landscape checks are listed below, not treated as complete.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
-Schedule: hourly in this chat, renewed by the user through **September 29 at 8 PM
-America/Los_Angeles** (September 30, 03:00 UTC). This supersedes the September 28 limit.
+Schedule: hourly in this chat, renewed by the user for **October 1 through 6 PM
+America/Los_Angeles** (October 2, 01:00 UTC). The September 28–29 sessions are closed;
+today's finite renewal supersedes their deadlines only for this new session.
 Automation ID: `gravity-hourly-improvement-passes`. Stop all edits at the deadline;
 delayed runs after it must not make edits. This is finite work, not an indefinite mandate.
 Local execution requires the computer to be awake and the desktop app running.
@@ -138,6 +139,15 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   restoration. P8b remains: live walking/conversation interruption during Lyra's hop, continuous
   return observation, explicit rapid Reveal/E inputs and better landscape scene clearance.
 
+### October 1 follow-up passes — QUEUED
+
+Finish P8b first. After that, review the actual scenes and choose a demonstrated issue in
+composition, character contact/continuity, foreground clearance, restrained lighting or
+evidence readability. Add a named, bounded follow-up to this queue before implementation;
+record the affected shot/player action and verification conditions. Don't add effects,
+new cases or systems merely to fill the hourly schedule. Keep the approved story and art,
+combat ownership and save compatibility fixed.
+
 ## End-of-day review route
 
 Studio entrance → painting study → receiver contact → street/Mei → Memory Den archive →
@@ -148,7 +158,7 @@ hardware behavior, and whether anything was published (currently: nothing).
 ## Consolidated status
 
 - Research: complete; direct developer accounts plus official visual reference study recorded.
-- Scheduling: renewed hourly through September 29 at 8 PM Pacific, in this conversation.
+- Scheduling: renewed hourly for October 1 through 6 PM Pacific, in this conversation.
 - P1: complete across street, studio, Den and clinic. Desktop/portrait comparisons, reduced
   motion and routes checked; screenshots and explicit hardware limits recorded below.
 - P2: Den complete — clearer archive housing/glass, smaller flare, low steady condensation.
@@ -171,6 +181,8 @@ hardware behavior, and whether anything was published (currently: nothing).
   recorded; no speculative caching or FPS claim. P8b live hop interruptions and landscape
   clearance remain open. See the latest run record and QA for conditions.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
+- The previous batch through `3f0fa2a` was subsequently pushed to the development branch
+  at the user's request. Today's new passes remain local until another push request.
 - Physical iPhone, audio by ear and combat feel remain user playtest items.
 
 ### September 29, 8 PM review handoff
@@ -190,6 +202,20 @@ Public saves/settings are untouched. The remaining P8b checks are useful next wo
 user renews authorization; no work is assumed after tonight's 8 PM cutoff.
 
 ## Run log
+
+### October 1, 11:20 AM Pacific — Renew the finite hourly schedule
+
+Started from clean, synchronized `3f0fa2a` on `feat/intro-cinematic`. Recreated the deleted
+thread heartbeat `gravity-hourly-improvement-passes`, confirmed ACTIVE with an hourly
+recurrence ending at today's 6 PM Pacific cutoff. Start with P8b, not the already complete
+P6 target pass. Updated the guide and queue so future runs have the current authorization.
+Routine passes stay quiet; the final possible run closes the schedule and provides the
+consolidated review. Local commits only; no new push/deployment authorization inferred.
+
+This is a schedule/documentation checkpoint, not a new gameplay pass. No product files,
+assets, saves or settings changed. Diff check passed; previous 181-test/build verification
+belongs to `3f0fa2a`, not a new test run. Next: live Lyra return/interruption and rapid reader
+inputs on the isolated preview, then a bounded landscape CRT clearance improvement.
 
 ### Research/setup — September 28 morning
 

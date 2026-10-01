@@ -1237,3 +1237,17 @@ signal interruption/reading logic but are not these browser checks. No full fres
 replay, ending conversation, physical iPhone/touch, audio by ear or combat playtest.
 README/AGENTS updated. Local checkpoint only; nothing pushed, merged or published.
 All edits remain bounded by September 29's 8 PM Pacific cutoff.
+
+## October 1 — Hourly schedule renewal
+
+Clean baseline `3f0fa2a`; working development branch synchronized with origin. Recreated
+the thread heartbeat `gravity-hourly-improvement-passes` and confirmed ACTIVE, hourly
+through October 1 at 6 PM America/Los_Angeles (October 2, 01:00 UTC). Updated AGENTS and
+HOURLY_PASSES with this finite authorization, P8b first, local checkpoints and quiet routine
+runs. The last possible session must close the schedule and produce the review handoff.
+
+Documentation/schedule only: no gameplay, art, saves or settings changed; no browser
+playtest or new product test/build claimed. Diff check passed. Earlier 181-test/build
+evidence remains attached to `3f0fa2a`. Today's first implementation pass should verify
+live hop interruptions/return and rapid reader inputs, then landscape scene clearance.
+No new push, merge or public deployment performed.
