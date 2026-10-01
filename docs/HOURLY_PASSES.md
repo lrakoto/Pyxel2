@@ -169,7 +169,7 @@ near stage edges. Marker anchors and picking stay unchanged. Both clinic facings
 edge/reduced-motion layout, landscape and Den docking reviewed. Three new pure tests;
 186 total pass. Full conditions and limits are in Pass 14 below.
 
-### P10 — Keyboard-selected revisit readability · QUEUED
+### P10 — Keyboard-selected revisit readability · COMPLETE
 
 P9's portrait edge check exposed a remaining, separate readability issue: a collected Cold
 storage marker stays dim when keyboard-focused outside proximity. See
@@ -180,6 +180,24 @@ styles through real inputs, then retain quiet unselected records while making ke
 and an explicit walking destination readable. Preserve collected ticks, REVISIT hints,
 marker targets and the new actor clearance. Check selected/ordinary states, keyboard/native
 activation and portrait bounds; this is a small existing-CSS fix, not a new navigation system.
+
+Confirmed real keyboard focus and Enter-selected destinations were both held at 0.35 opacity.
+The existing collected rule now excludes focus-visible and destination-selected; both states
+resolve to full opacity while ordinary collected evidence stays quiet. Desktop/portrait,
+native Tab/Enter/Space, reduced motion and companion clearance checked. All 186 tests and
+required format/build/diff checks pass. P11 records a separate pre-existing portrait clip.
+
+### P11 — Keep side captions inside portrait stages · QUEUED
+
+P10's newly readable keyboard-focused Intake ledger at the clinic entrance exposes an
+existing clipping issue: at 390×844, its right-side caption ends at x429.85 while the stage
+ends at x378. The authored marker sits at x273.26 and the current 0.74 side cutoff does not
+reserve the caption's actual CSS width. Evidence:
+[portrait ledger](qa/2026-10-01-p10/clinic-revisit-portrait.jpg), with measured bounds in
+Pass 15. Extend the existing field-layout rule to choose a fitting side using stage scale
+and the existing bounded caption width, preserving marker/picking and companion clearance.
+Verify portrait edges, long REVISIT/LOCKED labels, both actor facings and normal/reduced
+motion. Avoid new HUD or input logic. Keep the new selected-marker brightness.
 
 ### October 1 follow-up passes — QUEUED
 
@@ -231,7 +249,10 @@ hardware behavior, and whether anything was published (currently: nothing).
   phase limits and all tool/setup failures are recorded below.
 - P9: complete — captions clear the rendered companion shell and Gravity's hair while their
   marker stays fixed. Both clinic facings, portrait edge/reduced motion, landscape and docked
-  Den checks recorded; 186 tests pass. P10 queues the demonstrated dim keyboard revisit label.
+  Den checks recorded; 186 tests pass.
+- P10: complete — collected keyboard focus and walking destinations now stay readable.
+  Real computed styles, desktop/portrait and native activation checks recorded; 186 tests pass.
+  P11 queues the measured portrait side-caption clip rather than expanding this CSS-only pass.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - The previous batch through `3f0fa2a` was subsequently pushed to the development branch
   at the user's request. Today's new passes remain local until another push request.
@@ -1105,3 +1126,64 @@ keyboard-focused; source shows the collected opacity rule overrides focus/select
 Queued P10 to confirm and fix that narrow CSS issue. Local checkpoint only, no push, merge
 or publication; other saves/settings untouched. Next hourly pass remains authorized until
 October 1, 6 PM Pacific; schedule stays active for now.
+
+### Pass 15 — October 1, 3:25 PM Pacific · P10 readable revisit targets
+
+Started from clean `5ace34a`; read guide, canonical protagonist/Lyra, research, queue and
+recent commits. P8's bounded work was already complete, so resumed queued P10. Before
+editing, used the real Den's collected audio marker from a distant position: ArrowUp focus
+reported focus-visible=true, hover=false, whole-button opacity=0.35. After its caption
+transition settled, caption opacity was 1 but inherited the dim parent. Native Enter added
+destination-selected and still left parent opacity=0.35. This confirms the existing collected
+rule's specificity defeats both intended focus and destination brightness.
+
+One product change: the existing collected opacity selector in style.css now excludes
+:focus-visible and .destination-selected. Unselected, distant collected markers retain
+0.35 opacity; near/hover behavior, tick/REVISIT text, layouts, authored anchors and interaction
+logic stay fixed. No new CSS system, TypeScript, motion, art, saves, lore or combat change.
+README and guide document the exception. No mirror-implementation CSS unit test was added;
+the meaningful verification is real rendered pseudo-class/state behavior.
+
+Checks: **186 existing tests passed**, format, strict TypeScript/Vite build and diff checks
+passed. Main JS remains 238.07 / 79.71 kB gzip; CSS 94.28 / 22.21; shared orb 6.20 / 2.85.
+No FPS/performance claim. A documentation patch initially failed on nonmatching context;
+re-read its exact lines and applied it without affecting product files.
+
+Browser used only DISPOSABLE QA Oct 1 on 4198, through existing controls, with no runtime
+state/clock injection. Den comparison retained the same scene/view; screenshot actor poses
+are not synchronized. After the fix, settled keyboard focus gives parent/caption opacity
+1/1. Ordinary blur returns parent 0.35 and caption 0. Native Space selected the marker; moved
+focus to the sound control with ArrowUp (did not toggle sound), and destination-selected
+remained 1/1 without focus/hover. Both Enter and Space reached the expected Archive Audio
+01/01 CRT. No double-open/advance was observed.
+
+Map/train route reached clinic. The portrait intake ledger's ! and REVISIT cue survived with
+full opacity, but its right-side caption was clipped: (297.26,454.44)–(429.85,476.94) extends
+beyond stage (12,213)–(378,643); marker centre x273.26. This is an existing placement limit,
+not fixed by P10's opacity exception. Added P11 as the next narrowly scoped item.
+
+At the cabinet on 390×844, ordinary collected opacity stayed 0.35 and focused opacity settled
+to 1/1 (an early sample caught the existing transition around 0.97). Side caption bounds
+(287.94,410.46)–(367.36,432.96) fit the stage. A second stop plus reduced motion triggered
+P9's above/edge-right layout: caption (217.96,344.20)–(297.38,366.70), full opacity and a
+clear drone eye. Native Tab from objective reached Donor recliners, next Tab reached Cold
+storage, and Enter opened its correct Neural Cargo 01/01 CRT. No console errors. Restored
+normal motion, focus off and default viewport; case remains at the clinic cabinet for P11.
+
+Evidence: [focus before](qa/2026-10-01-p10/den-focus-before.jpg) /
+[after](qa/2026-10-01-p10/den-focus-after.jpg),
+[destination before](qa/2026-10-01-p10/den-selected-before.jpg) /
+[after with focus elsewhere](qa/2026-10-01-p10/den-selected-after.jpg),
+[portrait focus](qa/2026-10-01-p10/clinic-edge-focus-after.jpg),
+[raised edge reduced motion](qa/2026-10-01-p10/clinic-raised-edge-reduced.jpg),
+[native Enter CRT](qa/2026-10-01-p10/clinic-native-enter.jpg),
+[ledger clipping](qa/2026-10-01-p10/clinic-revisit-portrait.jpg),
+[measured state/bounds](qa/2026-10-01-p10/layout-checks.json). First two JSON rows transcribe
+the settled baseline reads; later rows come from read-only DOM observations.
+
+Limits: no physical iPhone/coarse-pointer, fullscreen, audio-by-ear, GPU/FPS, full fresh-case
+or combat checks. No landscape layout claim this pass; P8b/P9 retain their prior coverage.
+No save schema/logic change or public storage touched. Local checkpoint only; nothing pushed,
+merged or published. Next P11: reserve the actual CSS caption envelope when selecting a side
+on portrait stages, preserving companion clearance and picking. Hourly schedule remains
+active through today's 6 PM Pacific cutoff; final possible pass closes it and reports.

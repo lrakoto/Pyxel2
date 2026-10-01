@@ -398,7 +398,7 @@ button {
   border-color: #698f8180;
   font-size: 11px;
 }
-.hotspot.collected:not(.near):not(:hover) {
+.hotspot.collected:not(.near):not(:hover):not(:focus-visible):not(.destination-selected) {
   opacity: 0.35;
 }
 .inactive {

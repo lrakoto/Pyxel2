@@ -368,3 +368,10 @@ existing light arc, while the dialogue begins immediately. If she is still depar
 finishes that short leap and returns. Walking keeps the occupied machine fixed and brings
 her home to the moving shell. Reduced motion and covered area changes keep their immediate
 reset behavior; this transient visit is never stored in the case file.
+
+### October 1 — readable revisit targets
+
+Collected evidence stays quiet until you approach it, hover, focus it with the keyboard or
+choose it as your walking destination. Keyboard focus and a selected destination now keep
+their caption and marker at full contrast, including before Gravity reaches the object.
+Collected ticks, new-perspective hints and the existing companion clearance are preserved.

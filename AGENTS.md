@@ -168,8 +168,10 @@ These were settled through review with the user. Keep them unless the user chang
   it has no point flare obscuring the middle shelf. Keep its glass, cartridge colors and
   existing low mist legible. Ceiling tubes, intake lamp and Lyra retain their own light.
 - **Interaction polish:** `field-layout.ts` places captions beside nearby actors; marker DOM
-  updates are cached by position/state. Focus mode still reveals labels. `PoseRecovery` in
-  `gravity-acting.ts` reverses authored action frames for 0.3 s, cancelled by movement/reduced
+  updates are cached by position/state. Focus mode still reveals labels.
+  Collected markers stay quiet until nearby, hovered, keyboard-focused or explicitly selected
+  as a walking destination. Keep focus/selection out of the collected opacity rule.
+  `PoseRecovery` in `gravity-acting.ts` reverses authored action frames for 0.3 s, cancelled by movement/reduced
   motion and reset on room entry. Paintings use `study`, shared with the character lab.
   Broad lighting includes these action tags, while combat retains its existing lighting.
   The clinic's outbound terminal uses `terminal-high`, a raised forearm variant aligned with
@@ -253,7 +255,8 @@ Stop edits at that deadline; delayed runs must not implement anything. Start wit
 on every pass; research proposals are not implemented behavior or new canon. Preserve all
 settled decisions above, especially combat ownership and the local-only delivery boundary.
 P6 machine targets, P8b/P8c's bounded interruption/reader checks and P9's companion/caption
-clearance are complete. Next P10 confirms and fixes dim keyboard-selected revisit markers.
+clearance are complete. P10 keeps keyboard-selected revisit markers readable. Next P11
+addresses the measured portrait side-caption clipping at the clinic intake ledger.
 Later passes must address demonstrated visual or
 investigation issues, with a recorded rationale. Keep ordinary successful passes quiet;
 maintain a consolidated 6 PM review and close the schedule on its last possible run.

@@ -1400,3 +1400,47 @@ focus. The collected 0.35-opacity selector excludes near/hover but does not excl
 focus-visible or selected destination. Confirm computed focus/selection states, then adjust
 that existing CSS rule while preserving quiet unselected records. Screenshot/source evidence
 and exact bounded scope are in the hourly plan. October 1 authorization still ends at 6 PM.
+
+## October 1 — P10 collected-marker focus and destination brightness
+
+Baseline clean `5ace34a`. Real Den collected audio marker: keyboard focus-visible and
+Enter destination-selected both computed whole-button opacity 0.35, even with caption
+opacity 1. Fixed one existing style.css selector by excluding those two active states from
+collected dimming. Ordinary distant collected opacity remains 0.35; ticks, REVISIT hints,
+marker coordinates, actor clearance and interaction inputs are unchanged.
+
+**186 existing tests passed**, format, TypeScript/Vite build and diff checks passed. No new
+CSS-mirroring unit test: live rendered state is the meaningful check here. JS **238.07 /
+79.71 kB gzip**, CSS **94.28 / 22.21**, orb **6.20 / 2.85**. Documentation context mismatch
+was resolved by reading exact lines; no product change was lost or overwritten.
+
+On named DISPOSABLE QA Oct 1 at **127.0.0.1:4198**, after-state focus settled to parent/caption
+1/1; blur returned 0.35/0. Native Space selected the Den marker, moving keyboard focus to
+sound with ArrowUp left destination 1/1 without changing mute. Enter/Space each reached the
+correct Archive Audio 01/01 reader. Same scene/view for desktop before/after, not matched
+animation time. Portrait collected cabinet side and above/edge-right captions stay in stage;
+focused opacity settles to 1 (one early sample records the existing fade in progress).
+Reduced motion gives immediate 1/1 and keeps P9's drone clearance. Native Tab from objective
+→ Donor recliners → Cold storage, then Enter, reached Neural Cargo 01/01. No console errors.
+
+Unresolved demonstrated issue **P11**: at clinic entry, the newly legible portrait ledger
+caption extends to x429.85 beyond stage right x378. Its marker centre is x273.26; current
+side cutoff doesn't reserve label width. Full !/REVISIT text remains in DOM, but is visibly
+clipped. Recorded this separate existing placement problem for the next focused pass.
+
+[Before focus](qa/2026-10-01-p10/den-focus-before.jpg) ·
+[after focus](qa/2026-10-01-p10/den-focus-after.jpg) ·
+[before destination](qa/2026-10-01-p10/den-selected-before.jpg) ·
+[after destination](qa/2026-10-01-p10/den-selected-after.jpg) ·
+[portrait](qa/2026-10-01-p10/clinic-edge-focus-after.jpg) ·
+[reduced raised edge](qa/2026-10-01-p10/clinic-raised-edge-reduced.jpg) ·
+[native Enter](qa/2026-10-01-p10/clinic-native-enter.jpg) ·
+[ledger clip](qa/2026-10-01-p10/clinic-revisit-portrait.jpg) ·
+[state/geometry reads](qa/2026-10-01-p10/layout-checks.json). Baseline JSON rows transcribe
+settled observations; after rows were captured via read-only DOM evaluation.
+
+Normal motion, focus off/default viewport restored; disposable case near cabinet. Existing
+and public saves/settings untouched. No physical iPhone, coarse-pointer hardware, fullscreen,
+audio-by-ear, landscape recheck, fresh-story replay, performance or combat claim. Local-only
+checkpoint; no push/merge/publication. P11 is next; today's finite hourly schedule still ends
+6 PM Pacific. Full pass conditions in the hourly log.
