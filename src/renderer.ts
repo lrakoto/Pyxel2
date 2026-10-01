@@ -210,8 +210,9 @@ export class Renderer {
       area,
       v.time,
       v.player.x,
-      !!orb && !signal?.state && presence.kind === 'follow' && quiet && !v.reducedMotion,
+      !!orb && !signal?.state && presence.kind === 'follow' && !v.reducedMotion,
       Math.abs(v.player.vx) < 1,
+      !quiet,
     );
     if (orb && visit) signal = lyraSignal(visit, v.time, orb, false);
     const lyraLight: SignLight | null = orb

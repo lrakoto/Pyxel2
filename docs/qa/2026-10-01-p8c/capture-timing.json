@@ -1,0 +1,93 @@
+{
+  "source": "Actual disposable 4198 browser screenshots. Completion times in milliseconds, not simulation timestamps or FPS. Clips crop screen x610-1160/y300-555 and repeat once; fixed GIF palette for motion review. Full JPEG stills retain context and captured color.",
+  "sequences": [
+    {
+      "name": "ambient",
+      "times": [
+        16473,
+        16573,
+        16673,
+        16775,
+        16877,
+        16979,
+        17081,
+        17188,
+        17288,
+        17389,
+        17491,
+        17595,
+        17694,
+        17794,
+        17897,
+        17998,
+        18101,
+        18203,
+        18309,
+        18408,
+        18510,
+        18610,
+        18711,
+        18814,
+        18916,
+        19019,
+        19121,
+        19223,
+        19325,
+        19425,
+        19527,
+        19628,
+        19728,
+        19832
+      ],
+      "frames": 34
+    },
+    {
+      "name": "recall",
+      "times": [
+        62,
+        159,
+        262,
+        392,
+        467,
+        566,
+        669,
+        769,
+        870
+      ],
+      "frames": 9
+    },
+    {
+      "name": "walking",
+      "times": [
+        121,
+        223,
+        324,
+        429,
+        530,
+        634,
+        735,
+        835,
+        937,
+        1039,
+        1105,
+        1245,
+        1344,
+        1447,
+        1547,
+        1651,
+        1805,
+        1952,
+        2052,
+        2159,
+        2261,
+        2360,
+        2464,
+        2563,
+        2666,
+        2730,
+        2766
+      ],
+      "frames": 27
+    }
+  ]
+}

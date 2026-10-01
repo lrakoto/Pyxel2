@@ -86,7 +86,11 @@ test('ambient visits do not begin mid-hop, while moving, or after an interruptio
   assert.equal(visit.sample('street', 54, 600, true, false), null, 'moving at scheduled start');
   assert.equal(visit.sample('street', 54.1, 600, true, true), null);
   assert.ok(visit.sample('street', 88, 600, true, true));
-  assert.equal(visit.sample('street', 88.1, 600, false, true), null, 'dialogue or reduced motion');
+  assert.equal(
+    visit.sample('street', 88.1, 600, false, true),
+    null,
+    'hard disable or reduced motion',
+  );
   assert.equal(
     visit.sample('street', 88.2, 600, true, true),
     null,
@@ -95,6 +99,55 @@ test('ambient visits do not begin mid-hop, while moving, or after an interruptio
   assert.equal(visit.sample('clinic', 89, 930, true, true), null, 'area reset');
   assert.equal(visit.sample('street', 0, 600, true, true), null, 'clock reset');
   assert.ok(visit.sample('street', 20, 600, true, true));
+});
+
+test('a conversation returns an occupied ambient signal without delaying dialogue or restarting', () => {
+  const visit = new AmbientHopSession();
+  const shell = { x: 560, y: 300 };
+  const hop = visit.sample('street', 20, 600, true, true)!;
+  assert.equal(lyraSignal(hop, 20.6, shell, false).state?.phase, 'inside');
+  const recalled = visit.sample('street', 21, 600, true, true, true)!;
+  assert.equal(recalled, hop, 'retain the occupied machine');
+  assert.equal(recalled.end, 21);
+  assert.deepEqual(lyraSignal(recalled, 21, shell, false).light, hop.to);
+  const returning = visit.sample('street', 21.2, 900, true, false, true)!;
+  assert.equal(returning.end, 21, 'repeated speaking frames cannot prolong the return');
+  const signal = lyraSignal(returning, 21.2, { x: 860, y: 300 }, false);
+  assert.equal(signal.state?.phase, 'back');
+  assert.deepEqual(signal.light, signal.state?.spark);
+  assert.notDeepEqual(signal.light, shell, 'no teleport into the shell');
+  assert.equal(visit.sample('street', 21.5, 900, true, true, true), null);
+  assert.equal(visit.sample('street', 21.6, 900, true, true), null, 'no restart after speaking');
+  assert.ok(visit.sample('street', 54, 900, true, true), 'next scheduled window still works');
+});
+
+test('interruption during departure reaches the socket before retracing and hard resets clear it', () => {
+  const visit = new AmbientHopSession();
+  const shell = { x: 560, y: 300 };
+  const hop = visit.sample('street', 20, 600, true, true)!;
+  const before = lyraSignal(hop, 20.1, shell, false);
+  const recalled = visit.sample('street', 20.1, 600, true, true, true)!;
+  assert.equal(recalled.end, 20 + HOP_TRAVEL);
+  assert.deepEqual(lyraSignal(recalled, 20.1, shell, false), before, 'no mid-arc jump');
+  const atSocket = lyraSignal(recalled, 20 + HOP_TRAVEL, shell, false);
+  assert.deepEqual(atSocket.light, hop.to, 'continuous turn at the socket');
+  assert.equal(lyraSignal(recalled, 20 + HOP_TRAVEL + 1e-6, shell, false).state?.phase, 'back');
+  assert.equal(visit.sample('street', 20.1, 600, true, true, true), recalled, 'paused redraw');
+  assert.equal(recalled.end, 20 + HOP_TRAVEL, 'a paused redraw cannot postpone return');
+  assert.equal(
+    visit.sample('street', 20.3, 600, false, true),
+    null,
+    'reduced motion or explicit hop',
+  );
+  assert.equal(visit.sample('street', 20.4, 600, true, true), null);
+  assert.ok(visit.sample('street', 54, 600, true, true));
+  assert.equal(visit.sample('clinic', 54.1, 930, true, true, true), null, 'area transition');
+  assert.equal(visit.sample('street', 0, 600, true, true), null, 'clock reset');
+  assert.equal(
+    visit.sample('street', 20, 600, true, true, true),
+    null,
+    'speaking at scheduled start',
+  );
 });
 
 test('the shell is a round, outlined casing with one eye', () => {

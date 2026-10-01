@@ -1301,3 +1301,51 @@ height; their long content already exceeded that minimum, so geometry is unchang
 No physical iPhone/coarse-pointer hardware, fullscreen, audio, fresh-story, GPU/FPS or
 combat playtest claimed. Next: continuous ambient-hop interruption/return, including
 conversation/area cancellation, on the disposable origin. P8 remains partial.
+
+
+## October 1 — P8c consecutive live hops and conversation recall
+
+Baseline clean `0f1327a`. Source/baseline pure reproduction showed conversation immediately
+cleared the ambient signal: machine (420,345) → shell (560,300), no return phase. Fixed the
+existing AmbientHopSession/renderer wiring to shorten a conversation-interrupted stay and
+finish its existing return. Departing signals reach the socket first; repeated interruptions
+cannot extend it. Hard disable/area/clock reset and reduced-motion clearing remain unchanged.
+No new animation art, movement, combat, save data or lore.
+
+A later test-label edit failed format check; Prettier fixed it and the final check passed.
+**183 tests passed** (two new regressions), format, TypeScript/build and diff check passed.
+An initial exact-phase boundary test failed from floating-point subtraction; continuity at
+the socket passed. Moved only that phase assertion 1 μs after the edge. Main JS 237.48/ 79.43
+kB gzip; CSS 93.88/ 22.14; shared orb 6.20/ 2.85. No performance claim.
+
+Browser: actual named disposable file on **4198**, normal motion/default1280×720. No hidden
+state or forced clock; image analysis only examined captured screenshots. Observed ordinary
+ambient departure/hold/return in a 260-frame 25.44 s sample. Opened companion topics during a
+visible occupied outbound terminal; topic selection started text immediately and a 9-frame
+62–870 ms capture showed the return spark progressing home, then socket clearing. Another
+27-frame 2.77 s capture shows leftward movement while terminal occupancy stays fixed, followed
+by return to the moving shell. Map opened during occupancy, route reached Den with docked
+eye; the return finished during the walk to exit, so mid-hop room-swap visual cancellation
+is a pure-test result, not this browser result. No console errors.
+
+[Idle clip](qa/2026-10-01-p8c/ambient.gif) ·
+[conversation clip](qa/2026-10-01-p8c/recall.gif) ·
+[walking clip](qa/2026-10-01-p8c/walking.gif) ·
+[capture metadata](qa/2026-10-01-p8c/capture-timing.json). Clips are cropped, fixed-palette,
+roughly 10 screenshot samples/sec and repeat once; timing is capture completion, not game
+clock or full-rate video. Full-context JPEG stills/conditions are listed in
+[Pass13](HOURLY_PASSES.md#pass-13--october-1-123-pm-pacific--p8c-lyra-returns-when-called).
+
+QA setup failures were not product failures: browser runtime imports (Sharp/PNG), unavailable
+DOM canvas getContext, PNG parser faced actual JPEG captures, Node fs.watch EMFILE, ambiguous
+Continue locator. Resolved with installed Sharp processing screenshot files in a temporary
+file-poll worker and scoped archive button; no browser automation outside CUA. Cropped GIFs
+replaced overly large full-frame experiments. Temporary processing files/worker cleaned. Process-list access blocked pkill; stopped the
+exact tool session with Ctrl-C (exit130), after a brief missing-temp-files log.
+
+Normal motion/default viewport retained; disposable tab in Den for follow-up. No physical
+iPhone/coarse-pointer, fullscreen, audio by ear, combat or fresh-story replay claimed. Early
+departure interruption is regression-tested, not separately triggered live. P8 complete for
+these bounded checks; no exhaustive all-phase hardware claim. Next P9: the existing caption
+hides Lyra during the clinic left-facing stop; [actual overlap](qa/2026-10-01-p8c/caption-occlusion.jpg).
+Local checkpoint only; nothing pushed, merged or published; existing/public saves untouched.

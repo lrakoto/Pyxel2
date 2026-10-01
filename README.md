@@ -357,3 +357,12 @@ The speaker and 44 px reading controls share a row; the observation scrolls bene
 This leaves Gravity's lower silhouette and floor contact visible in the checked phone views.
 Long observations need more scrolling at these heights; the notebook retains the larger
 evidence illustration. Portrait and desktop reading layouts keep their existing arrangement.
+
+
+### October 1 — Lyra comes home when called
+
+Starting a conversation while Lyra occupies a nearby machine now calls her back along her
+existing light arc, while the dialogue begins immediately. If she is still departing, she
+finishes that short leap and returns. Walking keeps the occupied machine fixed and brings
+her home to the moving shell. Reduced motion and covered area changes keep their immediate
+reset behavior; this transient visit is never stored in the case file.

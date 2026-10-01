@@ -253,14 +253,21 @@ export function ambientHop(area: AreaId, time: number, playerX: number): LyraHop
   return { to: pick, start, end: start + HOP_TRAVEL + AMBIENT_STAY };
 }
 
-/** Lock a machine for the duration of a visit; movement must not retarget a live signal. */
+/** Lock the socket while moving; conversation recalls the visit, disabling it clears it. */
 export class AmbientHopSession {
   private area: AreaId | null = null;
   private time = -Infinity;
   private window = -1;
   private active: LyraHop | null = null;
 
-  sample(area: AreaId, time: number, playerX: number, enabled: boolean, stationary: boolean) {
+  sample(
+    area: AreaId,
+    time: number,
+    playerX: number,
+    enabled: boolean,
+    stationary: boolean,
+    interrupted = false,
+  ) {
     if (area !== this.area || time < this.time) {
       this.active = null;
       this.window = -1;
@@ -268,13 +275,17 @@ export class AmbientHopSession {
     this.area = area;
     this.time = time;
     if (!enabled) this.active = null;
+    // Conversation calls her home without snapping the occupied eye into the shell.
+    // If she is still departing, reach the socket before retracing the existing arc.
+    if (interrupted && this.active)
+      this.active.end = Math.min(this.active.end!, Math.max(time, this.active.start + HOP_TRAVEL));
     if (this.active && time >= this.active.end! + HOP_TRAVEL) this.active = null;
     const window = Math.floor(time / AMBIENT_WINDOW);
     const start = window * AMBIENT_WINDOW + AMBIENT_OFFSET;
     if (time >= start && this.window !== window) {
       this.window = window;
       // Starting mid-arc after a restore, interruption or arriving in a room reads as a teleport.
-      if (enabled && stationary && time - start < 0.25) {
+      if (enabled && stationary && !interrupted && time - start < 0.25) {
         const candidate = ambientHop(area, time, playerX);
         if (candidate)
           this.active = { to: candidate.to, start: time, end: time + HOP_TRAVEL + AMBIENT_STAY };

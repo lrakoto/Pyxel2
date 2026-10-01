@@ -123,7 +123,11 @@ These were settled through review with the user. Keep them unless the user chang
   resolved signal position drives her sprite effects, room light, wet rim and reflection.
   Occupied machines show a small cyan eye; reduced motion holds the light steady. Ambient
   visits start at rest and keep their destination through movement (`AmbientHopSession`);
-  its transient target resets on area/clock changes and is never saved. Before she
+  its transient target resets on area/clock changes and is never saved. Conversation recalls
+  an ambient visit through its existing return arc without delaying text; a departing signal
+  reaches its socket before returning. Repeated speaking frames cannot extend that return.
+  Reduced motion, explicit examination and absent/docked companion clear ambient occupancy
+  immediately. Before she
   joins Gravity she keeps a post (the street outside the Den, her terminal inside it). As a
   companion she follows Gravity's shoulder everywhere, docking at her terminal in the Den. Her
   arc is locked: she was watching Gravity before they met (see the story bible).

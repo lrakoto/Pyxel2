@@ -8,9 +8,9 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P8b landscape CRT clearance and rapid reader checks; 181 passing tests.
-P1–P7 bounded passes are complete. P8 has a verified integration checkpoint; the remaining
-continuous live hop-interruption checks are listed below, not treated as complete.
+Latest completed product pass: P8c continuous Lyra return on conversation; 183 passing tests.
+P1–P8 bounded passes are complete. Live normal-motion hop, walking and conversation
+return were sampled consecutively; phase/hardware limits remain explicit below.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
@@ -127,7 +127,7 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
 - Completed one original close-up: the clinic's existing signed consent. Folded/handled
   paper and declining pen fluency reinforce its existing observation; no new narrative gate.
 
-### P8 — Measured performance and integration · PARTIAL
+### P8 — Measured performance and integration · COMPLETE (bounded checks)
 
 - Profile the most affected scenes with the existing development probe. Inspect real costs;
   don't claim FPS improvement from fewer update calls alone. Cache static work only where
@@ -140,12 +140,32 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   four-area travel/CPU samples, fresh and repeated clue, two new board links, reload and folder
   restoration. P8b landscape clearance and rapid Reveal/E/native transport checks are complete.
   Machine hold, reduced-motion release, normal release and a subsequent walk retarget are
-  sampled in the real game. Continuous capture of interruption during an ambient hop and
-  its return remains unverified; do not infer it from settled stills or pure tests.
+  sampled in the real game. P8c adds consecutive live departure/hold/return captures, walking
+  during occupancy, conversation recall, and a map route begun while occupied. Pure tests
+  cover interruption during departure and immediate area/clock/explicit/reduced resets.
+  No physical hardware or exhaustive full-rate animation verification is implied.
+
+### P8c — Interrupted ambient signal return · COMPLETE
+
+P8c began with a complete sampled idle departure/occupied cabinet/return. Source inspection
+and a baseline pure reproduction found that conversation immediately removes an ambient visit:
+`quiet` was folded into `enabled`, snapping its signal home. Interrupted visits now finish
+through the existing return arc without delaying dialogue. Immediate reset remains for reduced
+motion, absent/docked companion, explicit examination and area/clock changes. The machine
+stays locked while walking; departure/occupancy interruption, pause and no-restart have tests.
+
+### P9 — Companion-aware caption clearance · QUEUED
+
+During P8c's leftward clinic walk, the nearby Cold storage caption obscured the returning
+drone eye once Gravity stopped beside the cabinet. Screenshot: [caption overlap](qa/2026-10-01-p8c/caption-occlusion.jpg).
+Use the existing field-layout caption placement to clear the companion as well as Gravity;
+keep marker anchors/picking unchanged, captions readable and static layout deterministic.
+Verify both facings at this cabinet, caption boundaries on phone widths, and docked/absent
+Lyra. Add pure placement tests if the clearance logic changes. Do not solve it with a new HUD.
 
 ### October 1 follow-up passes — QUEUED
 
-Finish P8b first. After that, review the actual scenes and choose a demonstrated issue in
+P8b/P8c bounded checks are complete. Next, review the actual scenes and choose a demonstrated issue in
 composition, character contact/continuity, foreground clearance, restrained lighting or
 evidence readability. Add a named, bounded follow-up to this queue before implementation;
 record the affected shot/player action and verification conditions. Don't add effects,
@@ -185,8 +205,12 @@ hardware behavior, and whether anything was published (currently: nothing).
   recorded; no speculative caching or FPS claim.
 - P8b landscape/reader pass: complete — top-mounted compact screens, native 44 px controls,
   long-text scrolling and rapid Reveal/E verified on a disposable real-game case. Lyra machine
-  hold/release, reduced motion and subsequent walking were sampled. Continuous ambient-hop
-  interruption/return remains open. See the latest run record and QA for conditions.
+  hold/release, reduced motion and subsequent walking were sampled.
+- P8c: complete — conversation recalls ambient occupancy through the existing arc; 183 tests
+  pass. Consecutive screenshot clips show normal idle departure/hold/return, moving-shell
+  return and conversation recall. A route begun during occupancy reaches the Den correctly.
+  Departure interruption and hard-reset edges have pure regression tests. Capture timing,
+  phase limits and all tool/setup failures are recorded below.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - The previous batch through `3f0fa2a` was subsequently pushed to the development branch
   at the user's request. Today's new passes remain local until another push request.
@@ -915,3 +939,87 @@ The held examination intentionally pauses movement, so walking through an open r
 not a missing control. If continuous capture is unavailable, record that limit and choose a
 demonstrated scene issue without labelling P8 complete. No physical iPhone, touch hardware,
 fullscreen, audio-by-ear, full fresh-story replay, GPU profile or combat claim this run.
+
+
+### Pass 13 — October 1, 1:23 PM Pacific · P8c Lyra returns when called
+
+Started from clean `0f1327a`, read guide, canon, research, queue and commits. Prior pass had
+completed landscape and rapid reader checks; picked the remaining live hop continuity work.
+A bounded 260-frame consecutive browser screenshot sample captured an ordinary clinic visit
+through departure, occupied cabinet and return. Inspected the actual interruption wiring:
+conversation's `quiet=false` disabled/cleared `AmbientHopSession`, snapping the signal to the
+shell. A pure reproduction using HEAD's unchanged module confirmed occupied machine light
+(420,345) instantly became shell light (560,300); this is a code/logic reproduction, not a
+matched before/after conversation movie. Added P8c's named rationale before implementation.
+
+Changed only the existing session and its renderer call: hard availability stays separate
+from conversation interruption. Speaking shortens the existing stay and starts the 0.45 s
+return. An interrupted departure first reaches its socket and retraces that arc, avoiding
+a mid-flight jump. Repeated speaking frames cannot postpone return; it cannot restart in the
+same scheduled window. Walking keeps the original destination and returns to the current
+shell. Explicit machine examination, reduced motion, absent/docked companion and area/clock
+changes keep immediate clearing. No dialogue delay, new state system, pixels, motion rate,
+speed, audio, save field, story gate or combat change. README/AGENTS updated.
+
+Two new pure regressions cover occupied recall, shared light position, moved-shell return,
+repeated interruption, pause sampling, next-window restart, departure continuity and hard
+resets. Initial boundary assertion classified `20.45 - 20` as just under 0.45 due to floating
+precision; exact socket continuity already passed. Tested the back phase one microsecond
+after the boundary instead of changing production timing. A later test-label edit failed format check; Prettier fixed it and the final check passed.
+Final **183 tests passed**,
+format, strict TypeScript/Vite build and diff checks passed. Main JS 237.48 kB / 79.43 kB gzip,
+CSS 93.88 / 22.14; shared orb chunk 6.20 / 2.85. No FPS/performance claim.
+
+Live browser used only the existing **DISPOSABLE QA Oct 1** at 4198. No runtime injection,
+game-state reads/writes, forced clock or public settings. Image scoring looked only at
+captured visible eye pixels; it selected an already occupied visit before activating UI.
+
+- Consecutive idle sample: 260 captured screenshots over 25.44 s. Selected 34 frames cover the
+  whole ambient visit, including a visible outgoing spark, occupied cabinet and returning eye.
+- Opened companion topics during occupied outbound-terminal visit. Modal pauses the room.
+  Selected the existing Marlon topic: normal text began immediately while the signal arced
+  back. Nine consecutive screenshots finished 62–870 ms after action completion; spark moves
+  through three visible positions, then socket clears and shell is active. Timing is browser
+  capture completion, not simulation timestamps. Closing later did not restart occupancy.
+- In another occupied outbound visit, clicked ground left. Twenty-seven successive images
+  over 2.77 s show walking/facing change, the same fixed terminal eye, then spark returning
+  to the moving shell. Walking intentionally does not abort an ambient visit.
+- Opened map during a third occupied visit and selected Memory Den. The existing walk/train
+  route reached the Den with its docked eye, correct scene and no old clinic occupancy.
+  Return completed during the approach; this does not prove a room swap at the exact
+  mid-hop instant. Hard area/clock reset is separately tested.
+- No console errors. Default viewport and normal motion retained; disposable tab left in
+  Den for the next run. Physical iPhone, fullscreen, audio-by-ear, combat and every possible
+  interrupted animation phase remain outside these bounded checks. Prior P8a/P8b cover
+  portrait/landscape, reduced-motion examination, four-area travel and save/board restoration.
+
+Setup limits: browser runtime could not load Sharp/PNG CommonJS dependencies; exposed DOM
+canvas has no getContext. A small PNG scoring attempt failed because screenshot bytes are
+JPEG. Switched to the installed Sharp in a temporary Node image-only worker reading captured
+files; fs.watch hit EMFILE, so a bounded file-poll worker handled them. No browser actions
+ran outside CUA. Duplicate Continue buttons were scoped to #panel. Full-frame GIFs were too
+large; retained cropped fixed-palette motion clips plus full-color/context JPEG stills and
+[capture timestamps](qa/2026-10-01-p8c/capture-timing.json). Clips repeat once, sample roughly
+10 screenshots/sec and are not full-rate video; use the stills for color/lighting judgments.
+Temporary processing worker/files cleaned up after evidence was saved. Process-list access
+  rejected pkill; stopped the exact tool session with Ctrl-C (exit130). The worker briefly
+  logged missing screenshot files during cleanup; no product process was stopped.
+
+Evidence: [idle visit clip](qa/2026-10-01-p8c/ambient.gif),
+[conversation return clip](qa/2026-10-01-p8c/recall.gif),
+[walking return clip](qa/2026-10-01-p8c/walking.gif),
+[departure](qa/2026-10-01-p8c/ambient-departure.jpg) /
+[occupied](qa/2026-10-01-p8c/ambient-occupied.jpg),
+[conversation held](qa/2026-10-01-p8c/conversation-held.jpg) /
+[returning](qa/2026-10-01-p8c/conversation-returning.jpg) /
+[home](qa/2026-10-01-p8c/conversation-home.jpg),
+[walk occupancy](qa/2026-10-01-p8c/walk-occupied.jpg) /
+[return](qa/2026-10-01-p8c/walk-returning.jpg),
+[map begun while occupied](qa/2026-10-01-p8c/map-held.jpg) /
+[arrived Den](qa/2026-10-01-p8c/den-after-route.jpg).
+
+P8's bounded integration pass is complete with the explicit limits above. Next **P9** is a
+demonstrated visual issue: the Cold storage caption hides Lyra's eye beside a left-facing
+Gravity after the walk ([overlap](qa/2026-10-01-p8c/caption-occlusion.jpg)). Extend existing
+caption clearance rather than changing the approved companion design. All changes remain
+local; nothing pushed, merged or published. October 1 hourly authorization still ends 6 PM.
