@@ -348,3 +348,12 @@ Previous, Reveal/Continue and Close remain visible when a long observation excee
 screen. The text region supports keyboard scrolling and uses the full line for its accessible
 description. Each new or reviewed line starts at the top; normal letter reveal preserves the
 reading position. Portrait context labels use one compact line.
+
+
+### October 1 — Landscape reading leaves room for the scene
+
+Short landscape screens now place the CRT and evidence monitor near the top of the scene.
+The speaker and 44 px reading controls share a row; the observation scrolls beneath them.
+This leaves Gravity's lower silhouette and floor contact visible in the checked phone views.
+Long observations need more scrolling at these heights; the notebook retains the larger
+evidence illustration. Portrait and desktop reading layouts keep their existing arrangement.

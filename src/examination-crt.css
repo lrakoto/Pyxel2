@@ -336,37 +336,6 @@
   }
 }
 
-@media (orientation: landscape) and (max-height: 600px) and (min-width: 651px) {
-  #stage #dialogue {
-    padding: 10px 13px;
-  }
-
-  #stage #dialogue .portrait-mark {
-    display: none;
-  }
-
-  #stage #dialogue #dialogue-text {
-    min-height: 3.3em;
-    margin-block: 8px;
-    font-size: 12px;
-    line-height: 1.55;
-  }
-
-  #stage.examining-clue #evidence-closeup {
-    top: 12%;
-    padding: 6px 6px 9px;
-  }
-
-  #stage.examining-clue #evidence-closeup > span {
-    display: none;
-  }
-
-  #stage.examining-clue #evidence-closeup > strong {
-    margin-top: 7px;
-    font-size: 10px;
-  }
-}
-
 @media (pointer: coarse), (max-width: 600px) {
   #stage #dialogue .dialogue-bottom button {
     min-height: 44px;
@@ -473,5 +442,93 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+/* Keep the actor below a compact two-screen landscape reading channel. */
+@media (orientation: landscape) and (max-height: 600px) and (min-width: 651px) {
+  #stage.in-dialogue .location {
+    visibility: hidden;
+  }
+
+  #stage #dialogue {
+    top: 3%;
+    bottom: auto;
+    max-height: 55%;
+    padding: 6px 13px;
+  }
+
+  #stage #dialogue .portrait-mark {
+    display: none;
+  }
+
+  #stage #dialogue #dialogue-text {
+    margin-block: 4px;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  #stage.examining-clue #evidence-closeup {
+    top: 3%;
+    height: 55%;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 6px 7px;
+  }
+
+  #stage.examining-clue #evidence-closeup > svg {
+    flex: 1 1 0;
+    min-height: 0;
+    height: 0;
+    object-fit: contain;
+  }
+
+  #stage #dialogue .dialogue-top {
+    grid-column: 1;
+    grid-row: 1;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  #stage #dialogue .dialogue-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 2px 12px;
+  }
+
+  #stage #dialogue .dialogue-body {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  #stage #dialogue .dialogue-bottom {
+    display: contents;
+  }
+
+  #stage #dialogue .dialogue-controls {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  #stage #dialogue .dialogue-bottom > span {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #stage #dialogue .dialogue-bottom button {
+    min-height: 44px;
+  }
+
+  #stage.examining-clue #evidence-closeup > span {
+    display: none;
+  }
+
+  #stage.examining-clue #evidence-closeup > strong {
+    margin-top: 4px;
+    font-size: 10px;
   }
 }

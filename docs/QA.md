@@ -1251,3 +1251,53 @@ playtest or new product test/build claimed. Diff check passed. Earlier 181-test/
 evidence remains attached to `3f0fa2a`. Today's first implementation pass should verify
 live hop interruptions/return and rapid reader inputs, then landscape scene clearance.
 No new push, merge or public deployment performed.
+
+
+## October 1 — P8b compact landscape CRT and rapid reader transport
+
+Product change: only `src/examination-crt.css`, plus guide/README/pass-log documentation.
+Top-mounted 55% landscape screens share a speaker/44 px transport row and scroll the
+spoken text beneath; location heading hides during short-landscape reading. Existing
+reader logic, story/save gates, animation, movement and combat are unchanged.
+
+Real-game isolated QA at **4198**, imported synthetic “DISPOSABLE QA Oct 1” into a visibly
+empty archive folder through the UI (validated 19 records/10 links/active companion).
+The existing 4197 case and public Pages were not changed. Automatic approval review
+rejected the initial 4197 examination because it could persist to a non-disposable case;
+resolved by the new origin and explicit disposable fixture, not by overriding that block.
+Node strip-types fixture setup failed; transform-types succeeded. Import picker took
+several minutes to return; no product issue or added blocking sleep.
+
+- **844×390 consent**: old CRT y134–301, height167; revised y95–218, height123, text
+  viewport36. Cabinet/art height matches left panel. Close44. End reaches final words
+  (scrollTop27.5, maximum28) without moving controls; lower character/floor visible.
+- **667×375 machine clue**: screens y94–209, height115. Body28, content82, End54.5.
+  Buttons44 and speaker/count fit without overlap. Small art is a preview; use notebook
+  for details. Only about one to two lines fit, an explicit scene-clearance tradeoff.
+- **Short 667×375 reply after final CSS correction**: body client/scroll27/27, End0,
+  “Then we keep looking.” stays visible. Removed the old artificial min-height.
+- **390×844 conversation**: text viewport116, no overflow for this long line; Close44
+  at y565–609 remains within CRT y396–626. Portrait arrangement unchanged.
+- **Normal rapid input**: immediate topic click showed “He used t”, Reveal line and
+  01/02. E revealed all text and changed Continue while remaining 01/02. Native Enter
+  began “Th” on 02/02 with Reveal; no double advance. Previous restored completed 01/02.
+  Reduced-motion E/native Enter each advanced once, and Close E dismissed.
+- **Lyra**: normal cold-storage hold darkened shell and lit physical cabinet controls.
+  Pause/reduced-motion/resume kept reading and occupied socket. Escape cleared socket
+  and restored active shell. Normal release returned eye; ground-click walk relocated
+  companion beside Gravity. Stills prove sampled states, not continuous trajectory or
+  interruption during an ambient visit. Existing pure signal tests cover those timings.
+- Console errors: none. Normal motion/default viewport restored; tab at 4198 retained
+  for next run. All edits are local; no push/merge/publication.
+
+A 64% trial still obstructed the head; kept 55%. No new mirror-CSS tests. `npm test`: 181
+passed. Format and strict TypeScript/Vite build passed, repeated after the final CSS
+correction. Final `git diff --check` passed. JS 237.48 kB / 79.43 kB gzip; CSS 93.88 kB /
+22.14 kB gzip. No performance improvement claim.
+
+Screenshots and exact follow-up are in [Pass12](HOURLY_PASSES.md#pass-12--october-1-1222-pm-pacific--p8b-landscape-crt-clearance).
+The final illustrated small screenshots precede only removal of the redundant text minimum
+height; their long content already exceeded that minimum, so geometry is unchanged.
+No physical iPhone/coarse-pointer hardware, fullscreen, audio, fresh-story, GPU/FPS or
+combat playtest claimed. Next: continuous ambient-hop interruption/return, including
+conversation/area cancellation, on the disposable origin. P8 remains partial.

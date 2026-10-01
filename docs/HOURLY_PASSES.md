@@ -8,9 +8,9 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P8a reachable CRT transport; 181 passing tests.
+Latest completed product pass: P8b landscape CRT clearance and rapid reader checks; 181 passing tests.
 P1–P7 bounded passes are complete. P8 has a verified integration checkpoint; the remaining
-live interruption/landscape checks are listed below, not treated as complete.
+continuous live hop-interruption checks are listed below, not treated as complete.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
@@ -34,7 +34,9 @@ Local execution requires the computer to be awake and the desktop app running.
    reduced motion, the approved character designs and existing story decisions.
 5. Test meaningful logic and run `npm test`, `npm run format:check`, `npm run build`, and
    `git diff --check`. Use the isolated origin `http://127.0.0.1:4197/` for browser checks;
-   start Vite there if needed. Do not modify public Pages progress/settings. Don't require
+   start Vite there if needed. Use a fresh origin (current disposable QA: 4198) and an explicitly
+   disposable case if an existing local folder is not clearly disposable. Do not modify public
+   Pages progress/settings or other existing files. Don't require
    browser availability to do independent pure-logic work; keep unverified visuals explicit.
 6. Review the change and save a local checkpoint commit of only this pass's work. Update
    QA and relevant project docs. Do not push, merge or publish; those still need a user request.
@@ -136,8 +138,10 @@ Sequence is a priority order, not a promise that each item fits exactly one hour
   clean, reviewable checkpoint; use spare sessions for demonstrated regressions, not scope creep.
 - P8a complete: fixed CRT transport, real portrait/landscape and reduced-motion reading,
   four-area travel/CPU samples, fresh and repeated clue, two new board links, reload and folder
-  restoration. P8b remains: live walking/conversation interruption during Lyra's hop, continuous
-  return observation, explicit rapid Reveal/E inputs and better landscape scene clearance.
+  restoration. P8b landscape clearance and rapid Reveal/E/native transport checks are complete.
+  Machine hold, reduced-motion release, normal release and a subsequent walk retarget are
+  sampled in the real game. Continuous capture of interruption during an ambient hop and
+  its return remains unverified; do not infer it from settled stills or pure tests.
 
 ### October 1 follow-up passes — QUEUED
 
@@ -178,8 +182,11 @@ hardware behavior, and whether anything was published (currently: nothing).
 - P8a: complete — long spoken text now scrolls inside a fixed CRT header/transport. Real
   portrait Close is fully visible; previous-line, pause/reduced-motion, travel, fresh clue,
   board matching, reload and folder restoration checked. Four ordinary idle CPU samples
-  recorded; no speculative caching or FPS claim. P8b live hop interruptions and landscape
-  clearance remain open. See the latest run record and QA for conditions.
+  recorded; no speculative caching or FPS claim.
+- P8b landscape/reader pass: complete — top-mounted compact screens, native 44 px controls,
+  long-text scrolling and rapid Reveal/E verified on a disposable real-game case. Lyra machine
+  hold/release, reduced motion and subsequent walking were sampled. Continuous ambient-hop
+  interruption/return remains open. See the latest run record and QA for conditions.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - The previous batch through `3f0fa2a` was subsequently pushed to the development branch
   at the user's request. Today's new passes remain local until another push request.
@@ -840,3 +847,71 @@ signal interruption/reading logic but are not these browser checks. No full fres
 replay, ending conversation, physical iPhone/touch, audio by ear or combat playtest.
 README/AGENTS updated. Local checkpoint only; nothing pushed, merged or published.
 All edits remain bounded by September 29's 8 PM Pacific cutoff.
+
+
+### Pass 12 — October 1, 12:22 PM Pacific · P8b landscape CRT clearance
+
+Started from clean `2c8b4c2`; read guide, canon, research, queue and history. Reproduced the
+remaining landscape scene obstruction in the actual game at 844×390: the illustrated CRT
+covered Gravity down to her feet. Kept the existing reader and original screens, moved the
+short-landscape pair to the upper 55% of the stage and put native transport beside the
+speaker/count. The compact context sits below a separately scrolling text region. Close
+stays 44 px tall even on the desktop browser's fine-pointer phone-size preview. Location
+heading hides only while this short-landscape reader is open. Portrait/desktop CSS is intact.
+
+Measured at 844×390, the left monitor changed from y134–301 (167 px high) to y95–218
+(123 px). Gravity's silhouette and grounded boots now remain visible below it in the sampled
+consent scene. At 667×375, both illustrated screens fit y94–209 (115 px); controls are
+44 px and the 28 px text region scrolls to the final words. Tradeoff: only about one to two
+lines fit on the shortest view, requiring more scrolling. Large art remains in the notebook.
+A trial 64% height still covered the actor's head; retained 55%. Removed the old text minimum
+height after checking the cascade: short replies must not scroll into empty space. Real
+667×375 short reply has client/scroll height 27/27 and End keeps scrollTop zero.
+
+Actual game QA used a new origin `http://127.0.0.1:4198/` with visibly empty archive folders.
+Imported a validated synthetic portable file named “DISPOSABLE QA Oct 1” through the real
+archive UI (19 records/10 connections, companion active, clinic). This is test setup, not a
+claim of earning the story route. Initial attempt to examine the existing 4197 file was
+rejected by automatic approval review because it could write progress to a non-disposable
+case. No examination was performed there; chose the fresh origin and explicit disposable
+file. A Node strip-types setup command failed on a parameter property; transform-types
+resolved it. File-picker completion was unusually slow; no deliberate long wait was added.
+
+Verified normal-motion rapid E changes Reveal → Continue on 01/02, with full text and no
+advance. Native Enter then starts 02/02 exactly once. Previous restores completed 01/02;
+reduced-motion E and native Enter each advance one line, and Close E dismisses. Portrait
+390×844 still keeps speaker, full text and 44 px controls inside the CRT. End scrolls long
+landscape text without moving controls. Normal cold-storage examination shows a dark drone
+shell and active cabinet eye; pause → reduced motion → return retains the same reading/hold.
+Escape restores the cyan shell and clears the cabinet eye. Normal release also returns home;
+subsequent ground-click walking retargets the companion correctly. These are sampled states,
+not continuous footage or proof of interruption at every ambient-hop phase.
+
+**181 tests passed**, format, strict TypeScript/production build and diff checks passed.
+No new test mirrors decorative CSS; real geometry/scroll/input checks above cover this pass.
+Game JS unchanged at 237.48 kB / 79.43 kB gzip; final CSS 93.88 kB / 22.14 kB gzip.
+Format/build/diff checks repeated after the minimum-height correction. No console errors.
+Normal motion/default viewport restored; disposable preview retained for the next run.
+No save schema, canon, assets, movement or combat changes. Public and prior local files
+untouched. Local checkpoint only; nothing pushed, merged or published.
+
+Evidence: [landscape before](qa/2026-10-01-p8b/landscape-before.png) /
+[after](qa/2026-10-01-p8b/landscape-after.png),
+[scrolled](qa/2026-10-01-p8b/landscape-scrolled.png),
+[small illustrated](qa/2026-10-01-p8b/landscape-small-evidence.png) /
+[final words](qa/2026-10-01-p8b/landscape-small-scrolled.png),
+[short reply](qa/2026-10-01-p8b/landscape-short-reply.png),
+[portrait](qa/2026-10-01-p8b/portrait-conversation.png),
+[held cabinet](qa/2026-10-01-p8b/storage-held.png),
+[reduced hold](qa/2026-10-01-p8b/landscape-reduced-storage.png) /
+[return](qa/2026-10-01-p8b/storage-reduced-return.png),
+[normal return](qa/2026-10-01-p8b/storage-normal-return.png) /
+[walking retarget](qa/2026-10-01-p8b/return-walk-retarget.png).
+Before/after share clue and viewport, not identical animation time.
+
+Next: complete a bounded continuous ambient-hop interruption/return observation using this
+disposable case; exercise immediate walking/conversation and area-change cancellation.
+The held examination intentionally pauses movement, so walking through an open reader is
+not a missing control. If continuous capture is unavailable, record that limit and choose a
+demonstrated scene issue without labelling P8 complete. No physical iPhone, touch hardware,
+fullscreen, audio-by-ear, full fresh-story replay, GPU profile or combat claim this run.

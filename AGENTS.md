@@ -179,6 +179,10 @@ These were settled through review with the user. Keep them unless the user chang
   The CRT header/transport remain fixed while `#dialogue-body` scrolls. It is keyboard
   focusable and described by the full spoken-line announcement. A new/reviewed line resets
   its scroll position; typewriter updates do not. Keep Close reachable at narrow heights.
+  Short landscape viewports (width >650 px, height <=600 px) put the CRT screens in the
+  upper 55% of the scene, with 44 px transport keys beside the speaker/count. Spoken text
+  scrolls beneath; context stays compact. Do not restore an artificial text minimum height
+  that would let End scroll a short reply into blank space.
   `evidence-art.ts` shares original vector close-ups across the CRT, board and record reader.
   The signed consent form has worn folds, a lifted corner and progressively less fluent ink;
   this illustrates the existing observation without adding a victim name or new clue.
