@@ -1444,3 +1444,57 @@ and public saves/settings untouched. No physical iPhone, coarse-pointer hardware
 audio-by-ear, landscape recheck, fresh-story replay, performance or combat claim. Local-only
 checkpoint; no push/merge/publication. P11 is next; today's finite hourly schedule still ends
 6 PM Pacific. Full pass conditions in the hourly log.
+
+## October 1 — P11 portrait caption fit and final schedule closure
+
+Baseline clean `1ff04ba`. Existing side placement did not reserve the caption width:
+clinic ledger at 390×844 ended at x429.85 beyond stage right x378. The pure field-layout
+rule now reserves the existing width cap, gap and edge inset, preserves fitting sides,
+and uses the existing above-hair placement when the fitting side would cover Gravity.
+Companion clearance shares that width. Main caches CSS caps on resize. A focused note
+now paints above passive neighbors, with selected destinations below focused notes;
+the opposite-facing browser check demonstrated that overlap before this stacking fix.
+Marker positions/picking, inputs, ellipsis, movement, art, canon, saves and combat are fixed.
+
+Automated: **189 tests passed** (three new width/actor/viewport regression tests), format
+check, strict TypeScript/Vite build and diff check passed. JS **238.56 / 79.91 kB gzip**,
+CSS **94.32 / 22.22**, orb **6.20 / 2.85**. No FPS/CPU improvement claim.
+
+Live: old retained tab 5 failed native and DOM reads despite rebinding; a fresh tab 6
+on **127.0.0.1:4198**, in the same browser, recovered access. All checks used the existing
+named **DISPOSABLE QA Oct 1** case, native controls and read-only DOM geometry. No injected
+runtime or forced clock. User/public saves and preferences remain untouched.
+
+- Portrait entrance: marker dot centre x273.26 matches the earlier anchor. Caption now
+  above at (206.96,343.57)–(339.55,366.07), inside stage (12,213)–(378,643).
+- Right-facing new-perspective caption: (174.06,343.57)–(306.66,366.07); parent opacity 1,
+  focused stacking 2. Reduced motion preserves clearance and contrast. Full DOM/accessible
+  REVISIT semantics survive; visible long text retains the existing ellipsis.
+- Native Enter reaches the correct Intake ledger CRT, **The night intake**, GRAVITY 01/01
+  and **An order being filled** re-examination. Only the disposable case received that note.
+- Collected after reading: tick retained, caption fits at x180.02–265.06 right-facing and
+  x230.73–315.78 left-facing. Marker centre returns to x273.26 at the original entrance view.
+- Landscape 844×390: right caption x259.20–360.07. Desktop 1200×800: x406.43–507.30,
+  stage x44.20–1155.80. Neither covers the characters. Console error capture empty.
+
+Images: [entrance](qa/2026-10-01-p11/ledger-portrait.jpg),
+[right facing](qa/2026-10-01-p11/ledger-portrait-right.jpg),
+[reduced](qa/2026-10-01-p11/ledger-portrait-reduced.jpg),
+[native Enter](qa/2026-10-01-p11/ledger-native-enter.jpg),
+[landscape](qa/2026-10-01-p11/ledger-landscape.jpg),
+[desktop](qa/2026-10-01-p11/ledger-desktop.jpg),
+[collected portrait](qa/2026-10-01-p11/ledger-collected-portrait.jpg),
+[collected left](qa/2026-10-01-p11/ledger-collected-left.jpg).
+Geometry is transcribed from read-only DOM observations; images are not animation-synchronized.
+
+Restored ordinary motion, focus off and default viewport; isolated tab retained for review.
+No physical iPhone/coarse-pointer, fullscreen, audio-by-ear, performance, combat or full
+fresh-story claim. A live LOCKED label/gate was not replayed; it remains a verification
+item. Passive crowded notes may still share space, but focused annotations win draw order.
+Next useful review is physical iPhone/audio plus long locked gates and a full fresh-case run.
+
+The app confirmed `deleteStatus: deleted` for the existing hourly automation on the final
+possible run. The finite October 1 session is complete, with no further automatic work
+scheduled. README/AGENTS and the consolidated review in HOURLY_PASSES are current. This
+P11 verified checkpoint remains local on `feat/intro-cinematic`; nothing pushed, merged
+or published. All work stopped before 6 PM Pacific.

@@ -8,18 +8,18 @@ sessions, with no routine design check-ins. The existing local AGENTS and canoni
 bible remain authoritative for this repository.
 
 Baseline: `0357d4a` on `feat/intro-cinematic`; 167 passing tests and a clean production build.
-Latest completed product pass: P8c continuous Lyra return on conversation; 183 passing tests.
-P1–P8 bounded passes are complete. Live normal-motion hop, walking and conversation
+Latest completed product pass: P11 caption width/actor clearance; 189 passing tests.
+P1–P11 bounded implementations are complete, with the verification limits below.
+Live normal-motion hop, walking and conversation
 return were sampled consecutively; phase/hardware limits remain explicit below.
 The REPLACED study is complete. Only changes explicitly recorded below are implemented;
 the remaining environmental-storytelling, machine-presence and evidence proposals are queued.
 
-Schedule: hourly in this chat, renewed by the user for **October 1 through 6 PM
-America/Los_Angeles** (October 2, 01:00 UTC). The September 28–29 sessions are closed;
-today's finite renewal supersedes their deadlines only for this new session.
-Automation ID: `gravity-hourly-improvement-passes`. Stop all edits at the deadline;
-delayed runs after it must not make edits. This is finite work, not an indefinite mandate.
-Local execution requires the computer to be awake and the desktop app running.
+Schedule: **COMPLETE**. The user renewed hourly work through October 1, 6 PM
+America/Los_Angeles (October 2, 01:00 UTC). On the final possible run, the app confirmed
+deletion of `gravity-hourly-improvement-passes`. The September 28–29 sessions are also closed.
+No automatic work remains scheduled or authorized after this finite session. Further work
+needs a new user request; no push, merge or publication occurred in today's passes.
 
 ## Session protocol
 
@@ -187,7 +187,7 @@ resolve to full opacity while ordinary collected evidence stays quiet. Desktop/p
 native Tab/Enter/Space, reduced motion and companion clearance checked. All 186 tests and
 required format/build/diff checks pass. P11 records a separate pre-existing portrait clip.
 
-### P11 — Keep side captions inside portrait stages · QUEUED
+### P11 — Keep side captions inside portrait stages · COMPLETE
 
 P10's newly readable keyboard-focused Intake ledger at the clinic entrance exposes an
 existing clipping issue: at 390×844, its right-side caption ends at x429.85 while the stage
@@ -199,7 +199,16 @@ and the existing bounded caption width, preserving marker/picking and companion 
 Verify portrait edges, long REVISIT/LOCKED labels, both actor facings and normal/reduced
 motion. Avoid new HUD or input logic. Keep the new selected-marker brightness.
 
-### October 1 follow-up passes — QUEUED
+Implemented the bounded width/actor rule, retaining the old side preference when it fits.
+The original clinic ledger caption now ends at x339.55 inside stage right x378, with its
+marker still centered at x273.26. Three new geometry regressions bring the suite to 189.
+Both facings, reduced motion, collected/new-perspective labels, native Enter, desktop and
+landscape were checked in the isolated real game. Focused notes also draw above passive
+neighbors after that overlap appeared during the right-facing check. Long text still uses
+the existing ellipsis; full names remain accessible. No live LOCKED gate was replayed in
+this pass. It is a follow-up verification item, not a claim of new gate logic coverage.
+
+### Follow-up review — DEFERRED UNTIL NEW AUTHORIZATION
 
 P8b/P8c bounded checks are complete. Next, review the actual scenes and choose a demonstrated issue in
 composition, character contact/continuity, foreground clearance, restrained lighting or
@@ -218,7 +227,7 @@ hardware behavior, and whether anything was published (currently: nothing).
 ## Consolidated status
 
 - Research: complete; direct developer accounts plus official visual reference study recorded.
-- Scheduling: renewed hourly for October 1 through 6 PM Pacific, in this conversation.
+- Scheduling: October 1 finite session complete; automation deleted on its final possible run.
 - P1: complete across street, studio, Den and clinic. Desktop/portrait comparisons, reduced
   motion and routes checked; screenshots and explicit hardware limits recorded below.
 - P2: Den complete — clearer archive housing/glass, smaller flare, low steady condensation.
@@ -252,7 +261,10 @@ hardware behavior, and whether anything was published (currently: nothing).
   Den checks recorded; 186 tests pass.
 - P10: complete — collected keyboard focus and walking destinations now stay readable.
   Real computed styles, desktop/portrait and native activation checks recorded; 186 tests pass.
-  P11 queues the measured portrait side-caption clip rather than expanding this CSS-only pass.
+  P11 separately resolves the measured portrait side-caption clip.
+- P11: complete — width-aware side placement, above-hair fallback and focused-note draw order.
+  189 tests pass; portrait, both facings, reduced motion, native ledger activation, landscape
+  and desktop are recorded. Ellipsis remains intentional; live LOCKED-label testing is deferred.
 - Public deployment: unchanged. Local checkpoint is the delivery boundary.
 - The previous batch through `3f0fa2a` was subsequently pushed to the development branch
   at the user's request. Today's new passes remain local until another push request.
@@ -1187,3 +1199,90 @@ No save schema/logic change or public storage touched. Local checkpoint only; no
 merged or published. Next P11: reserve the actual CSS caption envelope when selecting a side
 on portrait stages, preserving companion clearance and picking. Hourly schedule remains
 active through today's 6 PM Pacific cutoff; final possible pass closes it and reports.
+
+### Pass 16 — October 1, 5:25 PM Pacific · P11 phone caption fit and final handoff
+
+Started from clean `1ff04ba`; read the local guide, canonical protagonist/Lyra, research,
+queue and recent history. The demonstrated item was the clinic ledger's portrait caption
+clipping recorded in Pass 15. Extended the existing pure field-layout rule to reserve the
+CSS width cap plus its 24 px gap and 4 px edge inset. The existing side remains preferred
+when it fits. Otherwise use a fitting side; if that side crosses Gravity's body, or neither
+fits, use the existing above-hair placement. Companion clearance uses the same width cap.
+Main caches the cap at stage resize (34vw on phones, min(190px,37vw) otherwise); no per-frame
+DOM measurement or new placement system. Authored marker anchors and interaction inputs
+are unchanged. During the opposite-facing check an adjacent passive note painted over the
+focused one: added explicit stacking for selected destinations (1) and keyboard focus (2)
+inside the existing hotspot layer. This leaves the deliberately focused caption in front.
+
+Three new pure regressions cover narrow stages/both edges, fitting sides/shifted camera,
+and companion/distant-marker preservation. **189 tests passed**, format check, strict
+TypeScript/Vite build and `git diff --check` passed. Build: main JS **238.56 / 79.91 kB
+gzip**, CSS **94.32 / 22.22**, shared orb **6.20 / 2.85**. No performance claim. Only own
+verified product, tests, documentation and QA images are in this checkpoint.
+
+Browser recovery: the previously retained tab 5 was listed but both native and DOM reads
+timed out. Rebinding it did not recover control. One fresh tab 6 in the same in-app browser,
+on the same isolated **127.0.0.1:4198** origin, worked. Used only the existing **DISPOSABLE
+QA Oct 1** case and native game controls; no runtime state/clock injection. The real archive
+resume preserved 19 records and 10 deductions. Public origins and the user's local 4197
+saves/settings were not touched.
+
+At 390×844, the original entrance marker's dot remains (263.26,453.69)–(283.26,473.69),
+centre **x273.26**, matching P10's anchor. Its new-perspective caption is now **above**:
+(206.96,343.57)–(339.55,366.07), inside stage (12,213)–(378,643). Previously the right-side
+caption extended to x429.85. It clears Gravity's hair and Lyra's eye. Ground walking turned
+Gravity right; the focused caption measured (174.06,343.57)–(306.66,366.07), opacity 1,
+stacking 2 after the overlap fix. Reduced motion retained the same above-hair rule and
+full contrast. Text/accessible name retain the ! and REVISIT semantics; long visible text
+still has the pre-existing ellipsis, rather than a new wrapping behavior.
+
+Native Enter on the ledger walked to its authored approach and opened **The night intake**,
+GRAVITY 01/01, with the earned **An order being filled** field note. This only updated the
+disposable case. After closing, the collected tick and plain Intake ledger caption stayed
+fully readable. At 844×390 its right-side caption measured x259.20–360.07; at 1200×800,
+x406.43–507.30 within stage x44.20–1155.80. A final portrait check of collected state
+measured x180.02–265.06 facing right, then x230.73–315.78 facing left, with dot centre
+back at x273.26. All clear the actors. No captured console errors. Normal motion, focus off
+and default viewport restored; tab 6 retained as a local review deliverable.
+
+Evidence: [original P10 clip](qa/2026-10-01-p10/clinic-revisit-portrait.jpg),
+[entrance corrected](qa/2026-10-01-p11/ledger-portrait.jpg),
+[opposite facing](qa/2026-10-01-p11/ledger-portrait-right.jpg),
+[reduced motion](qa/2026-10-01-p11/ledger-portrait-reduced.jpg),
+[native Enter](qa/2026-10-01-p11/ledger-native-enter.jpg),
+[landscape](qa/2026-10-01-p11/ledger-landscape.jpg),
+[desktop](qa/2026-10-01-p11/ledger-desktop.jpg),
+[collected portrait](qa/2026-10-01-p11/ledger-collected-portrait.jpg),
+[collected opposite facing](qa/2026-10-01-p11/ledger-collected-left.jpg).
+These are native screenshots at actual UI states; animation times are not synchronized.
+
+Limits: no physical iPhone/coarse-pointer, fullscreen, audio-by-ear, GPU/FPS, combat or
+complete fresh-story replay. No live LOCKED gate was replayed; width reservation is tested
+independently of label wording. Crowded passive annotations may still share space; explicit
+focus now wins their draw order. No save-schema, movement, character art, combat or canon
+change. Further work should verify long locked gates on an early-story case and do a real
+iPhone/audio pass before adding more effects.
+
+The app confirmed deletion of `gravity-hourly-improvement-passes` during this final possible
+run. All edits and the checkpoint finished before 6 PM Pacific. No push, merge or publication.
+
+### October 1 — Consolidated final review
+
+Today's five verified product passes build on the existing game:
+
+- `0f1327a`: compact landscape CRTs leave the lower scene visible, with reachable transport
+  and scrolling long text; rapid Reveal/E checked in the actual game.
+- `e612ecc`: conversations recall Lyra from ambient machine occupancy through her existing
+  continuous return arc; live consecutive hops, moving return and a route were sampled.
+- `5ace34a`: captions clear the rendered drone shell and Gravity's hair without moving clues.
+- `1ff04ba`: collected keyboard-focused evidence and selected destinations retain full contrast.
+- This P11 checkpoint: side annotations fit phone stages, fall above the actors when needed,
+  and focused notes draw above passive neighbors. The final suite has **189 passing tests**.
+
+Latest verified work is this accompanying P11 local checkpoint on `feat/intro-cinematic`.
+The review log and screenshots distinguish browser sampling from hardware/playthrough gaps.
+The approved art, movement speeds, save compatibility and combat are preserved. The prior
+batch through `3f0fa2a` was pushed at the user's earlier request; none of today's product
+passes has been pushed or published. The hourly automation is deleted and the finite session
+is complete. Next work needs fresh authorization; next review priorities are a physical
+iPhone playtest, audio by ear, long locked captions and a full fresh-case investigation run.

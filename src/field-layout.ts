@@ -4,6 +4,11 @@ interface CompanionClearance {
   /** CSS pixels per world pixel, measured when the stage resizes. */
   scale: number;
 }
+interface CaptionBounds {
+  scale: number;
+  /** Existing CSS caption width cap, including padding. */
+  width: number;
+}
 
 /** Keep labels outside the figures while leaving the marker on its authored subject. */
 export function labelPlacement(
@@ -15,6 +20,7 @@ export function labelPlacement(
   camera: number,
   viewWidth: number,
   companion?: CompanionClearance | null,
+  bounds?: CaptionBounds,
 ) {
   const nearBody =
     Math.abs(subjectX - playerX) < 75 * figure &&
@@ -22,13 +28,27 @@ export function labelPlacement(
     subjectY < floor + 20;
   if (!nearBody) return 'below';
   const screen = (subjectX - camera) / viewWidth;
-  const side =
+  let side =
     screen < 0.26 ? 'right' : screen > 0.74 ? 'left' : subjectX >= playerX ? 'right' : 'left';
+  if (bounds && bounds.scale > 0) {
+    const required = bounds.width + 24 + 4;
+    const fitsLeft = (subjectX - camera) * bounds.scale >= required;
+    const fitsRight = (camera + viewWidth - subjectX) * bounds.scale >= required;
+    if (!(side === 'right' ? fitsRight : fitsLeft)) {
+      if (!(side === 'right' ? fitsLeft : fitsRight)) return 'above';
+      side = side === 'right' ? 'left' : 'right';
+    }
+    // Turning inward must not put a fitting caption across Gravity's body instead.
+    const gap = 24 / bounds.scale;
+    const width = bounds.width / bounds.scale;
+    const left = side === 'right' ? subjectX + gap : subjectX - gap - width;
+    if (playerX + 20 * figure > left && playerX - 20 * figure < left + width) return 'above';
+  }
   if (companion && companion.scale > 0) {
-    // Side captions are capped at 190 CSS pixels. Reserve their full envelope, including
+    // Reserve the CSS width cap (190 by default), including
     // wrapping and a little breathing room around the 17-pixel shell's idle motion.
     const gap = 24 / companion.scale;
-    const width = 190 / companion.scale;
+    const width = (bounds?.width ?? 190) / companion.scale;
     const halfHeight = 24 / companion.scale;
     const radius = 12 * figure;
     const left = side === 'right' ? subjectX + gap : subjectX - gap - width;

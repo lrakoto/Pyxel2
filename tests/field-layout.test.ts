@@ -47,3 +47,38 @@ test('lifted captions clear the hair at every stage scale without moving the mar
   }
   assert.equal(captionLift(50, 438, 2.85, 0.86), 24);
 });
+
+test('portrait captions reserve their full width before choosing a side', () => {
+  const bounds = { scale: 0.8, width: 132.6 };
+  // The old percentage cutoff put these labels beyond the stage; turning inward would
+  // cross the actor, so the label belongs above her while its marker stays on the clue.
+  assert.equal(labelPlacement(325, 310, 170, 438, 2.85, 0, 460), 'right');
+  assert.equal(labelPlacement(325, 310, 170, 438, 2.85, 0, 460, null, bounds), 'above');
+  assert.equal(labelPlacement(135, 310, 290, 438, 2.85, 0, 460, null, bounds), 'above');
+  assert.equal(labelPlacement(75, 310, 100, 438, 2.85, 0, 150, null, bounds), 'above');
+});
+
+test('fitting side captions keep their direction, including at a shifted camera', () => {
+  const bounds = { scale: 0.8, width: 132.6 };
+  assert.equal(labelPlacement(200, 310, 140, 438, 2.85, 0, 600, null, bounds), 'right');
+  assert.equal(labelPlacement(400, 310, 460, 438, 2.85, 0, 600, null, bounds), 'left');
+  assert.equal(labelPlacement(900, 310, 960, 438, 2.85, 500, 600, null, bounds), 'left');
+  assert.equal(
+    labelPlacement(400, 310, 190, 438, 2.85, 0, 460, null, { scale: 0.8, width: 60 }),
+    'left',
+  );
+});
+
+test('viewport fit retains companion clearance and existing distant marker layout', () => {
+  const bounds = { scale: 0.86, width: 132.6 };
+  assert.equal(
+    labelPlacement(520, 262, 480, 438, 2.85, 0, 1000, { x: 580, y: 262, scale: 0.86 }, bounds),
+    'above',
+  );
+  assert.equal(
+    labelPlacement(520, 262, 480, 438, 2.85, 0, 1000, { x: 750, y: 262, scale: 0.86 }, bounds),
+    'right',
+  );
+  assert.equal(labelPlacement(325, 50, 170, 438, 2.85, 0, 460, null, bounds), 'below');
+  assert.equal(labelPlacement(325, 310, 20, 438, 2.85, 0, 460, null, bounds), 'below');
+});

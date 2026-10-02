@@ -233,6 +233,7 @@ class Game {
   events = new AbortController();
   resizeObserver: ResizeObserver;
   fieldScale = 1;
+  fieldCaptionWidth = 190;
   get viewW() {
     return this.renderer.canvas.width;
   }
@@ -245,6 +246,11 @@ class Game {
     this.resizeObserver = new ResizeObserver(() => {
       const r = $('stage').getBoundingClientRect();
       this.fieldScale = r.height / H;
+      // Match the caption caps in field-feedback.css without measuring every frame.
+      this.fieldCaptionWidth =
+        window.innerWidth <= 600
+          ? window.innerWidth * 0.34
+          : Math.min(190, window.innerWidth * 0.37);
       this.renderDirty = true;
       this.renderer.resize(Math.round((H * r.width) / r.height));
       this.camera = this.explorationView();
@@ -1108,6 +1114,7 @@ class Game {
   syncHotspots() {
     const orb = this.renderer.companionPosition(this.currentArea.id);
     const companion = orb && { x: orb.x, y: orb.y, scale: this.fieldScale };
+    const bounds = { scale: this.fieldScale, width: this.fieldCaptionWidth };
     for (const { element: b, hotspot: h } of this.hotspotNodes) {
       const x = ((h.x - this.camera) / this.viewW) * 100;
       const placement = labelPlacement(
@@ -1119,6 +1126,7 @@ class Game {
         this.camera,
         this.viewW,
         companion,
+        bounds,
       );
       const lift =
         placement === 'above'

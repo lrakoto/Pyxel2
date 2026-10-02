@@ -255,8 +255,15 @@ Stop edits at that deadline; delayed runs must not implement anything. Start wit
 on every pass; research proposals are not implemented behavior or new canon. Preserve all
 settled decisions above, especially combat ownership and the local-only delivery boundary.
 P6 machine targets, P8b/P8c's bounded interruption/reader checks and P9's companion/caption
-clearance are complete. P10 keeps keyboard-selected revisit markers readable. Next P11
-addresses the measured portrait side-caption clipping at the clinic intake ledger.
+clearance are complete. P10 keeps keyboard-selected revisit markers readable. P11 reserves
+the existing CSS caption width on resize and fits side annotations inside the stage;
+if turning inward would cross Gravity, the existing above-hair layout is used. Companion
+clearance shares that width. Focused notes draw above passive neighbors, with walking
+destinations beneath focused notes. Markers and their picking stay on their authored objects.
 Later passes must address demonstrated visual or
 investigation issues, with a recorded rationale. Keep ordinary successful passes quiet;
-maintain a consolidated 6 PM review and close the schedule on its last possible run.
+maintain a consolidated review. **The October 1 session is now complete.** Its final run
+deleted `gravity-hourly-improvement-passes` through the app and recorded the review in
+docs/HOURLY_PASSES.md. No further automatic edits are authorized until the user renews work.
+Today's checkpoints remain local; publication requires a new request. Next useful checks:
+physical iPhone controls, audio by ear, and long LOCKED labels on an earned early-story file.

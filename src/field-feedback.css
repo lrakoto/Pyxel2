@@ -22,6 +22,11 @@
 }
 .hotspot.destination-selected {
   opacity: 1;
+  z-index: 1;
+}
+/* A deliberately focused note stays above adjacent passive annotations. */
+.hotspot:focus-visible {
+  z-index: 2;
 }
 .hotspot.destination-selected .hotspot-dot {
   outline: 1px dashed #d5c797;

@@ -375,3 +375,12 @@ Collected evidence stays quiet until you approach it, hover, focus it with the k
 choose it as your walking destination. Keyboard focus and a selected destination now keep
 their caption and marker at full contrast, including before Gravity reaches the object.
 Collected ticks, new-perspective hints and the existing companion clearance are preserved.
+
+### October 1 — Phone annotations stay in the scene
+
+Side captions reserve their existing width before choosing a direction. When an inward
+caption would cover Gravity, it uses the existing space above her hair; Lyra's shell stays
+clear too. Keyboard-focused notes draw above nearby passive annotations. The clue marker
+stays on its object, and native Enter still walks to and opens the record. Small-screen
+ellipsis and full accessible names are retained. Today's finite hourly sessions are complete;
+their checkpoints are local, with the [review and screenshots](docs/HOURLY_PASSES.md) retained.
