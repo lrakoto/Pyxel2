@@ -8,10 +8,13 @@ import {
   type AreaId,
   type ClueId,
   type Hotspot,
+  type IdentityChoice,
 } from './content.ts';
 import {
   CaseModel,
   SAVE_KEY,
+  LEGACY_SAVE_KEYS,
+  CHAPTER_TWO_CLUES,
   parseSave,
   freshSave,
   clamp,
@@ -39,7 +42,10 @@ const icon = (name: string) => {
 };
 let raw: string | null = null;
 try {
-  raw = localStorage.getItem(SAVE_KEY);
+  for (const key of [SAVE_KEY, ...LEGACY_SAVE_KEYS]) {
+    raw = localStorage.getItem(key);
+    if (raw !== null) break;
+  }
 } catch {
   /* Device storage can be unavailable. */
 }
@@ -507,7 +513,10 @@ class Game {
       this.say([
         {
           speaker: 'COLE',
-          text: 'Locked from inside. Whoever runs this place isn’t taking walk-ins. Marlon’s studio is my way into this.',
+          text:
+            h.requires === 'escaped'
+              ? 'The registry annex is sealed. Mara’s memory has to be safe before I go any further.'
+              : 'Locked from inside. Whoever runs this place isn’t taking walk-ins. Marlon’s studio is my way into this.',
         },
       ]);
       return;
@@ -532,6 +541,15 @@ class Game {
           if (clue.id === 'fragment') {
             this.toast('ARCHIVE 001 RECOVERED', 'Lyra is waiting beside the terminal.');
           } else if (
+            CHAPTER_TWO_CLUES.includes(clue.id) &&
+            CHAPTER_TWO_CLUES.every((id) => this.model.save.clues.includes(id)) &&
+            !this.model.identityDeduced
+          ) {
+            this.toast(
+              'MARA’S FILE IS COMPLETE',
+              'Open the case board [J] to connect her records.',
+            );
+          } else if (
             this.model.save.clues.filter((id) =>
               ['device', 'residue', 'painting', 'diary', 'writing', 'portrait'].includes(id),
             ).length === 6 &&
@@ -546,7 +564,8 @@ class Game {
         clue.category,
       );
     } else if (h.kind === 'talk') {
-      if (this.model.save.area === 'street')
+      if (this.model.save.area === 'registry') this.talkRegistry();
+      else if (this.model.save.area === 'street')
         this.say(LYRA_INTRO, () => {
           this.model.save.contact = true;
           this.persist();
@@ -563,7 +582,75 @@ class Game {
         ]);
       else if (!this.model.save.companion) this.say(LYRA_ARCHIVE, () => this.openCompanionChoice());
       else this.companionTalk();
+    } else if (h.id === 'identity-record') {
+      this.say([
+        {
+          speaker: 'COLE',
+          text:
+            this.model.save.identityChoice === 'restore'
+              ? 'MARA VENN. Civic archivist. Mother. The blank space has a name again.'
+              : 'The public entry is still blank. That was the point. Her name lives in the memory, not their index.',
+        },
+      ]);
     } else this.say([{ speaker: 'COLE', text: h.text! }]);
+  }
+  talkRegistry() {
+    if (this.model.save.identityChoice) {
+      this.say([
+        {
+          speaker: 'LYRA',
+          text:
+            this.model.save.identityChoice === 'restore'
+              ? 'Mara Venn. I kept saying I wanted to hear her name again. I didn’t know it would sound like an accusation and a homecoming at once.'
+              : 'No search engine can find her now. But when I remember that bird, she is exactly where she chose to be.',
+        },
+      ]);
+      return;
+    }
+    if (!this.model.identityDeduced) {
+      const lines = [
+        {
+          speaker: 'LYRA',
+          text: 'The annex indexed people by what the city valued. Look for what it tried to throw away.',
+        },
+      ];
+      if (this.model.save.deductions.includes('mother')) {
+        lines.push(
+          { speaker: 'COLE', text: 'Mara was your mother. The drawing and the census prove it.' },
+          {
+            speaker: 'LYRA',
+            text: 'Yes. But knowing who she was isn’t the same as knowing why I erased her.',
+          },
+        );
+      } else if (this.model.save.deductions.some((id) => ['archivist', 'sacrifice'].includes(id))) {
+        lines.push({
+          speaker: 'COLE',
+          text: 'The records keep pointing to Mara Venn. I need the rest before I understand what she asked of you.',
+        });
+      } else lines.push({ speaker: 'COLE', text: 'Then we start with what survived.' });
+      this.say(lines);
+      return;
+    }
+    this.say(
+      [
+        { speaker: 'LYRA', text: 'You know now.' },
+        {
+          speaker: 'COLE',
+          text: 'Mara Venn. Your mother. The architect of archive zero-zero-one.',
+        },
+        {
+          speaker: 'LYRA',
+          text: 'She taught me to draw. She taught me that a memory could outlive a record. When Veil came, I used my registry key to erase her.',
+        },
+        { speaker: 'COLE', text: 'Because she asked you to. It was her fail-safe.' },
+        {
+          speaker: 'LYRA',
+          text: 'I hid her so well that even I couldn’t say her name without feeling like a thief. You have the archive and the evidence. What happens to her name now?',
+        },
+      ],
+      () => this.openIdentityChoice(),
+      'MARA VENN · IDENTITY RECORD',
+    );
   }
   say(
     lines: { speaker: string; text: string }[],
@@ -623,7 +710,14 @@ class Game {
     await new Promise((r) => setTimeout(r, this.reducedMotion ? 40 : 350));
     const from = this.model.save.area;
     this.model.save.area = id;
-    this.player.x = id === 'street' ? (from === 'studio' ? 965 : 1465) : this.currentArea.spawn;
+    this.player.x =
+      id === 'street'
+        ? from === 'studio'
+          ? 965
+          : 1465
+        : id === 'den' && from === 'registry'
+          ? 1320
+          : this.currentArea.spawn;
     this.player.y = 438;
     this.player.vy = 0;
     this.player.grounded = true;
@@ -663,7 +757,7 @@ class Game {
     $('clue-count').textContent = String(this.model.save.clues.length).padStart(2, '0');
     $('objective-text').textContent = this.model.objective;
     $('chapter-label').innerHTML =
-      `<i>${this.model.save.contact ? '03' : this.model.deduced ? '02' : '01'}</i> ${this.model.chapter}`;
+      `<i>${String(this.model.chapterNumber).padStart(2, '0')}</i> ${this.model.chapter}`;
     $('companion').hidden = !this.model.save.companion || !!this.combat || !this.started;
     $('scene-hud').hidden = !!this.combat;
     $('combat-hud').hidden = !this.combat;
@@ -716,14 +810,19 @@ class Game {
         return `<button class="evidence-card ${selected ? 'selected' : ''} ${linked ? 'linked' : ''}" data-clue="${id}" aria-pressed="${selected}"><div class="evidence-art evidence-${id}"><span>${c.glyph}</span><small>${String(Object.keys(CLUES).indexOf(id) + 1).padStart(2, '0')}</small></div><span class="card-category">${c.category}${linked ? ' · LINKED' : ''}</span><h3>${c.title}</h3><p>${c.body}</p><span class="card-select">${selected ? 'SELECTED −' : linked ? 'READ / CONNECT +' : 'SELECT EVIDENCE +'}</span></button>`;
       })
       .join('');
-    const deductions = DEDUCTIONS.map((d, i) => {
-      const solved = this.model.save.deductions.includes(d.id);
-      return `<article class="deduction ${solved ? 'solved' : ''}"><span>${solved ? '✓' : String(i + 1).padStart(2, '0')}</span><div><h3>${solved ? d.title : ['What happened to Marlon?', 'What is inside the painting?', 'Who is the first one?'][i]}</h3><p>${solved ? d.conclusion : ['Compare the machine with what it left behind.', 'Look for a personal account of the faces.', 'His last words point to something he painted.'][i]}</p></div></article>`;
-    }).join('');
+    const visibleDeductions = DEDUCTIONS.filter((d) => d.chapter === 1 || this.model.save.escaped);
+    const deductions = visibleDeductions
+      .map((d, i) => {
+        const solved = this.model.save.deductions.includes(d.id);
+        return `<article class="deduction ${solved ? 'solved' : ''}"><span>${solved ? '✓' : String(i + 1).padStart(2, '0')}</span><div><h3>${solved ? d.title : d.question}</h3><p>${solved ? d.conclusion : d.hint}</p></div></article>`;
+      })
+      .join('');
     this.panel(
-      'The Graves case',
-      'CASE FILE 07–031 · MARLON GRAVES',
-      `<div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${this.model.save.deductions.length} OF 3 CONNECTIONS</span></div><div class="board-layout"><div><div class="section-label">COLLECTED EVIDENCE <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">WORKING THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
+      this.model.save.escaped ? 'The Graves / Venn case' : 'The Graves case',
+      this.model.save.escaped
+        ? 'CASE FILE 07–031 · CONNECTED INVESTIGATIONS'
+        : 'CASE FILE 07–031 · MARLON GRAVES',
+      `<div class="case-summary"><p>${this.model.objective}</p><span>${clues.length} RECORDS <b>/</b> ${this.model.save.deductions.length} OF ${visibleDeductions.length} CONNECTIONS</span></div><div class="board-layout"><div><div class="section-label">COLLECTED EVIDENCE <span>${String(clues.length).padStart(2, '0')}</span></div><div class="evidence-grid">${cards || '<div class="empty-evidence"><span>∅</span><h3>A blank file. A dead artist.</h3><p>Visit Marlon’s studio. Examine objects to record evidence here.</p><button class="text-button" data-action="close">Return to the street →</button></div>'}</div></div><aside class="deductions"><div class="section-label">WORKING THEORIES</div>${deductions}<div class="connection-box"><span class="eyebrow">MAKE A CONNECTION</span><div class="connection-pair"><span>${this.selected[0] ? CLUES[this.selected[0]].title : 'Evidence A'}</span><i>↔</i><span>${this.selected[1] ? CLUES[this.selected[1]].title : 'Evidence B'}</span></div><button class="primary" data-action="connect" ${this.selected.length !== 2 ? 'disabled' : ''}>Connect evidence ${icon('arrow')}</button><p class="connection-feedback" role="status">${message}</p></div></aside></div>`,
       'board',
     );
     if (this.selected.length) {
@@ -745,11 +844,19 @@ class Game {
       { x: 15, y: 57, label: 'Night shift', id: 'noodles', area: 'street' },
       { x: 37, y: 42, label: 'Graves’ studio', id: 'studio-door', area: 'studio' },
       { x: 76, y: 53, label: 'Memory Den', id: 'den-door', area: 'den' },
+      { x: 62, y: 20, label: 'Registry Annex', id: 'registry-door', area: 'registry' },
     ];
+    const status = (site: (typeof sites)[number]) => {
+      if (site.area === this.model.save.area) return 'CURRENT LOCATION';
+      if (site.id === 'den-door' && !this.model.save.contact) return 'CONTACT REQUIRED';
+      if (site.id === 'registry-door' && !this.model.save.escaped)
+        return 'COMPLETE THE FIRST INVESTIGATION';
+      return 'SET WALKING DESTINATION';
+    };
     this.panel(
       'Sector 07',
       'DISTRICT MAP · NEW ANGELES',
-      `<div class="map-canvas"><div class="map-grid"></div><div class="map-rail"></div><div class="map-road"><span>FREMONT AVENUE</span></div>${sites.map((site, i) => `<button class="map-place ${site.area === this.model.save.area ? 'current' : ''}" style="left:${site.x}%;top:${site.y}%" data-route="${site.id}"><i>${String(i + 1).padStart(2, '0')}</i><strong>${site.label}</strong><span>${site.area === this.model.save.area ? 'CURRENT LOCATION' : i === 2 && !this.model.save.contact ? 'CONTACT REQUIRED' : 'SET WALKING DESTINATION'}</span></button>`).join('')}<span class="map-north">N<br>↑</span><span class="map-caption">LOW DISTRICT<br>34°03′ N · 118°15′ W</span></div><div class="map-note"><span class="live-dot"></span><p>${this.model.objective}</p><span>Destinations guide Cole through connected rooms.</span></div>`,
+      `<div class="map-canvas"><div class="map-grid"></div><div class="map-rail"></div><div class="map-road"><span>FREMONT AVENUE</span></div>${sites.map((site, i) => `<button class="map-place ${site.area === this.model.save.area ? 'current' : ''}" style="left:${site.x}%;top:${site.y}%" data-route="${site.id}"><i>${String(i + 1).padStart(2, '0')}</i><strong>${site.label}</strong><span>${status(site)}</span></button>`).join('')}<span class="map-north">N<br>↑</span><span class="map-caption">LOW DISTRICT<br>34°03′ N · 118°15′ W</span></div><div class="map-note"><span class="live-dot"></span><p>${this.model.objective}</p><span>Destinations guide Cole through connected rooms.</span></div>`,
       'map',
     );
   }
@@ -757,7 +864,7 @@ class Game {
     this.panel(
       this.started ? 'A moment in the rain.' : 'Before you step outside.',
       'EVERYBODY / NOBODY',
-      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Case board / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. This chapter ends after the Memory Den.</p></div>`,
+      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Case board / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Both investigations allow continued exploration.</p></div>`,
       'pause',
     );
   }
@@ -767,6 +874,29 @@ class Game {
       'LYRA · PRIVATE CONNECTION',
       `<div class="story-choice"><span class="signal-large">◌</span><p>“If you let me, I can stay with you.”</p><small>Let Lyra accompany Cole through the city. Her presence will travel between areas.</small><button class="primary" data-action="accept-lyra">Open the channel ${icon('arrow')}</button><button class="text-button" data-action="close">I need a moment.</button></div>`,
       'companion',
+    );
+  }
+  openIdentityChoice() {
+    this.panel(
+      'What makes a person?',
+      'MARA VENN · THE LAST ENTRY',
+      `<div class="story-choice"><span class="signal-large">001</span><p>“Keep the memories. Let them take my name.”</p><small>Restore Mara’s name to the public registry, or preserve her anonymity and keep the memory beyond Veil’s reach. Either choice completes this investigation and changes Lyra’s response.</small><button class="primary" data-action="restore-name">Restore Mara’s name ${icon('arrow')}</button><button class="secondary" data-action="preserve-name">Keep her hidden →</button><button class="text-button" data-action="close">I need a moment.</button></div>`,
+      'identity',
+    );
+  }
+  finishIdentity(choice: IdentityChoice) {
+    if (!this.model.chooseIdentity(choice)) return;
+    this.closePanel();
+    this.audio.deduction();
+    this.persist();
+    this.sync();
+    this.refreshArea();
+    const restored = choice === 'restore';
+    this.panel(
+      restored ? 'A name, remembered.' : 'A memory, kept.',
+      'THE FIRST ONE · INVESTIGATION COMPLETE',
+      `<div class="ending"><span class="ending-number">${restored ? 'MARA' : '001'}</span><p>${restored ? 'The registry speaks her name again.' : 'The city finds nothing. Lyra remembers everything.'}</p><h3>${restored ? 'Mara Venn.<br>Archivist. Mother. Witness.' : 'No record. No index.<br>A person all the same.'}</h3><div class="ending-stats"><span><b>${this.model.save.clues.length}</b> EVIDENCE RECORDS</span><span><b>06</b> CONNECTIONS MADE</span><span><b>${restored ? 'NAMED' : 'HIDDEN'}</b> MARA’S RECORD</span></div><blockquote>“Keep the memories. Let them take my name.”</blockquote><button class="primary" data-action="close">Keep exploring ${icon('arrow')}</button><span class="small-note">End of the second investigation. Your choice is saved.</span></div>`,
+      'identity-ending',
     );
   }
   openAmbush() {
@@ -784,7 +914,7 @@ class Game {
     this.panel(
       'Someone remembers.',
       'ISSUE 01 · FRAGMENTS / CHAPTER COMPLETE',
-      `<div class="ending"><span class="ending-number">001</span><p>A woman. A child. A drawing of a bird.</p><h3>They took her name.<br>They didn’t take everything.</h3><div class="ending-stats"><span><b>${this.model.save.clues.length}</b> EVIDENCE RECORDS</span><span><b>03</b> CONNECTIONS MADE</span><span><b>LYRA</b> CHANNEL OPEN</span></div><blockquote>“Find the first one.”</blockquote><button class="primary" data-action="close">Keep exploring ${icon('arrow')}</button><span class="small-note">End of this playable chapter. Your case is saved.</span></div>`,
+      `<div class="ending"><span class="ending-number">001</span><p>A woman. A child. A drawing of a bird.</p><h3>They took her name.<br>They didn’t take everything.</h3><div class="ending-stats"><span><b>${this.model.save.clues.length}</b> EVIDENCE RECORDS</span><span><b>03</b> CONNECTIONS MADE</span><span><b>LYRA</b> CHANNEL OPEN</span></div><blockquote>“Find the first one.”</blockquote><button class="primary" data-action="close">Find Mara Venn ${icon('arrow')}</button><span class="small-note">The Civic Registry Annex is now open through the Memory Den.</span></div>`,
       'ending',
     );
   }
@@ -793,11 +923,17 @@ class Game {
     this.say([
       {
         speaker: 'LYRA',
-        text: this.model.save.escaped
-          ? 'I’m still here, Cole. Every name they erased left a space. We start with hers.'
-          : this.model.save.area === 'studio'
-            ? 'He thought if he painted enough of them, someone would understand. You did.'
-            : 'I kept their memories on machines too old for the city to notice. Sometimes being obsolete is how you survive.',
+        text: this.model.save.identityChoice
+          ? this.model.save.identityChoice === 'restore'
+            ? 'Her name is in the world again. Whatever Veil does next, they cannot make us forget how to say it.'
+            : 'I spent years trying to preserve her. You helped me understand that hiding her was not the same as losing her.'
+          : this.model.identityDeduced
+            ? 'You have the whole story now. Meet me in the registry when you’re ready to decide what happens to her name.'
+            : this.model.save.escaped
+              ? 'The Civic Registry kept the records Veil thought it had destroyed. The annex connects to my Den. Mara’s name is there.'
+              : this.model.save.area === 'studio'
+                ? 'He thought if he painted enough of them, someone would understand. You did.'
+                : 'I kept their memories on machines too old for the city to notice. Sometimes being obsolete is how you survive.',
       },
     ]);
   }
@@ -832,6 +968,7 @@ class Game {
       case 'connect': {
         if (this.selected.length !== 2) return;
         const wasDeduced = this.model.deduced;
+        const wasIdentityDeduced = this.model.identityDeduced;
         const [a, b] = this.selected,
           d = this.model.connect(a, b);
         if (d) {
@@ -843,6 +980,8 @@ class Game {
           this.renderBoard(d.conclusion);
           if (!wasDeduced && this.model.deduced)
             this.toast('THE CASE HAS A NEW LEAD', 'Someone is waiting outside the Memory Den.');
+          else if (!wasIdentityDeduced && this.model.identityDeduced)
+            this.toast('MARA VENN IDENTIFIED', 'Ask Lyra about her mother in the registry.');
         } else
           this.renderBoard(
             'Not enough to support a conclusion. Compare the details in the records and try another pair.',
@@ -888,6 +1027,12 @@ class Game {
         this.sync();
         this.refreshArea();
         this.toast('LYRA CONNECTED', 'You don’t have to do this alone.');
+        break;
+      case 'restore-name':
+        this.finishIdentity('restore');
+        break;
+      case 'preserve-name':
+        this.finishIdentity('preserve');
         break;
       case 'fight':
         this.closePanel();

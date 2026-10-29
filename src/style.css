@@ -1152,6 +1152,17 @@ button {
     center,
     55% center;
 }
+.evidence-drawing,
+.evidence-census,
+.evidence-badge,
+.evidence-purge,
+.evidence-letter,
+.evidence-audit {
+  background-image: linear-gradient(0deg, #0d171633, #0d171699), url('/env/den.webp');
+  background-position:
+    center,
+    70% center;
+}
 .card-category {
   font: 8px/1.6 var(--mono);
   letter-spacing: 0.5px;
@@ -2149,6 +2160,10 @@ button {
   }
   .map-place:nth-of-type(3) {
     top: 76% !important;
+    left: 68% !important;
+  }
+  .map-place:nth-of-type(4) {
+    top: 22% !important;
     left: 68% !important;
   }
   .map-place > span {

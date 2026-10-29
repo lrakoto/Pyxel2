@@ -65,6 +65,10 @@ export class Renderer {
       this.loadDepthLayers(),
       ...(Object.keys(AREAS) as AreaId[]).map(async (id) => {
         if (id === 'street') return;
+        if (id === 'registry') {
+          this.plates.set(id, this.buildRegistry(AREAS[id].width));
+          return;
+        }
         const image = new Image();
         image.src = `/env/${id}.webp`;
         await image.decode();
@@ -142,7 +146,8 @@ export class Renderer {
     }
     if (v.model.deduced && !v.model.save.companion && area === 'street')
       this.drawLyra(c, 1280 - cam, 438, t);
-    if (area === 'den') this.drawLyra(c, 1150 - cam, 438, t);
+    if (area === 'den') this.drawLyra(c, 1080 - cam, 438, t);
+    if (area === 'registry') this.drawLyra(c, 1450 - cam, 438, t);
     const p = v.player,
       tag = !p.grounded ? 'jump' : Math.abs(p.vx) > 8 ? 'walk' : 'idle';
     c.globalAlpha = 0.4;
@@ -231,6 +236,77 @@ export class Renderer {
     c.fillStyle = bottom;
     c.fillRect(0, 462, W, 78);
     c.restore();
+  }
+  private buildRegistry(width: number) {
+    const plate = document.createElement('canvas');
+    plate.width = width;
+    plate.height = H;
+    const c = plate.getContext('2d')!;
+    const wall = c.createLinearGradient(0, 0, 0, H);
+    wall.addColorStop(0, '#1b2928');
+    wall.addColorStop(0.72, '#111c1d');
+    wall.addColorStop(1, '#080f12');
+    c.fillStyle = wall;
+    c.fillRect(0, 0, width, H);
+    c.fillStyle = '#0b1315';
+    c.fillRect(0, 0, width, 72);
+    c.fillStyle = '#32403a';
+    c.fillRect(0, 70, width, 3);
+    for (let x = 30; x < width; x += 240) {
+      c.fillStyle = '#25332f';
+      c.fillRect(x, 28, 150, 4);
+      c.fillStyle = '#a5b88b18';
+      c.fillRect(x + 12, 74, 126, 220);
+      c.fillStyle = '#3b4940';
+      c.fillRect(x - 8, 72, 3, 370);
+    }
+    c.fillStyle = '#6f806a';
+    c.font = '12px monospace';
+    c.fillText('NEW ANGELES · PUBLIC MEMORY OFFICE', 118, 120);
+    c.fillStyle = '#9b3f35';
+    c.fillRect(118, 135, 82, 3);
+    for (let x = 270; x < width - 150; x += 190) {
+      c.fillStyle = '#1d2b2a';
+      c.fillRect(x, 205, 132, 226);
+      c.strokeStyle = '#46554a';
+      c.strokeRect(x + 0.5, 205.5, 131, 225);
+      for (let row = 0; row < 6; row++) {
+        const y = 218 + row * 33;
+        c.fillStyle = row % 2 ? '#263632' : '#293933';
+        c.fillRect(x + 10, y, 112, 25);
+        c.fillStyle = '#819076';
+        c.fillRect(x + 49, y + 6, 34, 2);
+        c.fillStyle = '#111d1c';
+        c.fillRect(x + 55, y + 15, 22, 4);
+      }
+    }
+    c.fillStyle = '#0c1719';
+    c.fillRect(800, 158, 210, 170);
+    c.strokeStyle = '#718671';
+    c.strokeRect(800.5, 158.5, 209, 169);
+    c.fillStyle = '#90b4a11a';
+    c.fillRect(812, 170, 186, 133);
+    c.fillStyle = '#9dbb9e';
+    c.font = '10px monospace';
+    c.fillText('IDENTITY INDEX / 001', 828, 194);
+    for (let i = 0; i < 7; i++) {
+      c.fillStyle = i === 2 ? '#b55243' : '#698c7c';
+      c.fillRect(830, 216 + i * 11, 112 - (i % 3) * 21, 2);
+    }
+    c.fillStyle = '#101b1b';
+    c.fillRect(0, 438, width, 102);
+    c.fillStyle = '#35423a';
+    c.fillRect(0, 438, width, 2);
+    c.strokeStyle = '#24312d';
+    for (let x = -100; x < width + 100; x += 120) {
+      c.beginPath();
+      c.moveTo(x, 540);
+      c.lineTo(x + 70, 438);
+      c.stroke();
+    }
+    c.fillStyle = '#7b8c6812';
+    for (let x = 120; x < width; x += 380) c.fillRect(x, 448, 190, 4);
+    return plate;
   }
   private async loadDepthLayers() {
     const sky = new Image(),

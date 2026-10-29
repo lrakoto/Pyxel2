@@ -44,11 +44,13 @@ npm run optimize-art  # Rebuild lossless WebP from PNG masters; verify decoded p
 
 On small screens and touch devices, movement and action buttons appear over the game. The touch fire button aims at the nearest enemy. Portrait and landscape layouts both work. Desktop keyboard and mouse remain the primary play experience. Pause settings include volume and reduced motion; system reduced-motion preferences are respected by default.
 
-## The chapter
+## The investigations
 
-Explore Sector 07, examine Graves’ studio, and connect evidence in the case board. Three deductions reveal a new contact and open the Memory Den. Recover archive 001, invite Lyra to accompany Cole, then protect the memory or take her escape route. The chapter has a definite ending and allows continued exploration afterward.
+Explore Sector 07, examine Graves’ studio, and connect evidence in the case board. Three deductions reveal a new contact and open the Memory Den. Recover archive 001, invite Lyra to accompany Cole, then protect the memory or take her escape route.
 
-This is a contained vertical slice: three areas, nine evidence records, three deductions, a persistent companion, and a two-wave combat encounter. It is not a full RPG campaign. There is no backend, account system, telemetry, multiplayer, or cloud save.
+The second investigation continues through the Civic Registry Annex. Reconstruct Mara Venn’s identity from six new records, make three more deductions, and decide whether to restore her name or preserve her anonymity. The choice changes later dialogue and persists with the case.
+
+This is a contained vertical slice: two investigations, four areas, fifteen evidence records, six deductions, a persistent companion, and a two-wave combat encounter. It is not a full RPG campaign. There is no backend, account system, telemetry, multiplayer, or cloud save. Version-1 checkpoints migrate automatically to the version-2 save format.
 
 ## Structure
 
@@ -68,7 +70,7 @@ This is a contained vertical slice: three areas, nine evidence records, three de
 | `assets/sprites/` | Drop `.aseprite` source files here |
 | `tests/game.test.ts` | Pure logic regression tests |
 
-The renderer uses a low-resolution canvas and four horizontal depth planes. It is a 2.5D presentation built from 2D layers, rather than a geometry-based 3D scene. Puddles mirror a capture of the live scene, including characters and combat effects, with strip distortion. Interior rooms use authored environment plates.
+The renderer uses a low-resolution canvas and four horizontal depth planes. It is a 2.5D presentation built from 2D layers, rather than a geometry-based 3D scene. Puddles mirror a capture of the live scene, including characters and combat effects, with strip distortion. The original interiors use authored environment plates; the Registry Annex uses a procedural plate.
 
 The production app has **no runtime npm dependencies**. Vite, TypeScript, the sprite compiler libraries, Sharp, and Prettier are development tools.
 
@@ -76,6 +78,6 @@ The production app has **no runtime npm dependencies**. Vite, TypeScript, the sp
 
 The original Aseprite importer is preserved. Place `cole.aseprite`, `enforcer.aseprite`, `drone.aseprite`, `ped_a.aseprite`, `ped_b.aseprite`, or `lyra.aseprite` in `assets/sprites/`. Development watches that directory; builds compile it automatically. Use `idle`, `walk`, and `jump` for Cole; `walk` for enemies and pedestrians; `idle` for Lyra. Playback supports the imported frame durations and forward / reverse / ping-pong directions. Missing sheets fall back to the existing procedural frames. The current renderer loops animation tags; finite repeats and one-shot completion callbacks are not implemented.
 
-New rooms belong in `AREAS` in `src/content.ts`, with a matching environment file and explicit doors. Current map routing assumes a street hub. A bigger district should replace that helper with graph routing. Keep clue and story identifiers stable; changing the save schema requires a version migration.
+New rooms belong in `AREAS` in `src/content.ts`, with a matching authored or procedural environment and explicit doors. Map routing uses the door graph and can guide Cole across multiple rooms. Keep clue and story identifiers stable; changing the save schema requires a version migration.
 
 Read [the project review](docs/PROJECT_REVIEW.md) for the architectural decisions and tradeoffs, [the art notes](docs/ART_CREDITS.md) for provenance, and [the QA record](docs/QA.md) for verified behavior.

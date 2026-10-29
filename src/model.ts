@@ -6,9 +6,10 @@ import {
   type ClueId,
   type DeductionId,
   type Hotspot,
+  type IdentityChoice,
 } from './content.ts';
 export interface SaveData {
-  version: 1;
+  version: 2;
   area: AreaId;
   x: number;
   clues: ClueId[];
@@ -16,18 +17,44 @@ export interface SaveData {
   contact: boolean;
   companion: boolean;
   escaped: boolean;
+  identityChoice: IdentityChoice | null;
 }
-export const SAVE_KEY = 'everybody-nobody:fragments:v1';
-/** The district is a hub: interior-to-interior routes pass through the street. */
+type StoredSave = Omit<Partial<SaveData>, 'version'> & { version?: number };
+export const SAVE_KEY = 'everybody-nobody:fragments:v2';
+export const LEGACY_SAVE_KEYS = ['everybody-nobody:fragments:v1'];
+export const CHAPTER_TWO_CLUES: ClueId[] = [
+  'drawing',
+  'census',
+  'badge',
+  'purge',
+  'letter',
+  'audit',
+];
+const solvedChapter = (deductions: DeductionId[], chapter: 1 | 2) =>
+  DEDUCTIONS.filter((d) => d.chapter === chapter).every((d) => deductions.includes(d.id));
 export function nextRouteHotspot(area: AreaId, destination: string): Hotspot | null {
-  const end = AREAS.street.hotspots.find((h) => h.id === destination);
-  if (!end || end.target === area) return null;
-  if (area === 'street') return end;
-  return AREAS[area].hotspots.find((h) => h.target === 'street') ?? null;
+  const location = Object.values(AREAS).find((a) => a.hotspots.some((h) => h.id === destination));
+  const end = location?.hotspots.find((h) => h.id === destination);
+  if (!location || !end || end.target === area) return null;
+  const target = end.target ?? location.id;
+  if (target === area) return end;
+  const visited = new Set<AreaId>([area]);
+  const queue = AREAS[area].hotspots
+    .filter((h) => h.target)
+    .map((h) => ({ area: h.target!, first: h }));
+  while (queue.length) {
+    const next = queue.shift()!;
+    if (next.area === target) return next.first;
+    if (visited.has(next.area)) continue;
+    visited.add(next.area);
+    for (const h of AREAS[next.area].hotspots)
+      if (h.target && !visited.has(h.target)) queue.push({ area: h.target, first: next.first });
+  }
+  return null;
 }
 export function freshSave(): SaveData {
   return {
-    version: 1,
+    version: 2,
     area: 'street',
     x: 440,
     clues: [],
@@ -35,14 +62,16 @@ export function freshSave(): SaveData {
     contact: false,
     companion: false,
     escaped: false,
+    identityChoice: null,
   };
 }
 export function parseSave(raw: string | null): SaveData {
   try {
     const d: unknown = JSON.parse(raw || 'null');
     if (!d || typeof d !== 'object') return freshSave();
-    const s = d as Partial<SaveData>;
-    if (s.version !== 1 || !s.area || !Object.hasOwn(AREAS, s.area)) return freshSave();
+    const s = d as StoredSave;
+    if ((s.version !== 1 && s.version !== 2) || !s.area || !Object.hasOwn(AREAS, s.area))
+      return freshSave();
     const clues = [
       ...new Set(
         (Array.isArray(s.clues) ? s.clues : []).filter(
@@ -53,11 +82,19 @@ export function parseSave(raw: string | null): SaveData {
     const deductions = DEDUCTIONS.filter(
       (d) => s.deductions?.includes(d.id) && d.pair.every((id) => clues.includes(id)),
     ).map((d) => d.id);
-    const contact = s.contact === true && deductions.length === 3;
+    const contact = s.contact === true && solvedChapter(deductions, 1);
     const companion = s.companion === true && contact && clues.includes('fragment');
-    const area = s.area === 'den' && !contact ? 'street' : s.area;
+    const escaped = companion && s.escaped === true;
+    const identityChoice =
+      escaped &&
+      solvedChapter(deductions, 2) &&
+      (s.identityChoice === 'restore' || s.identityChoice === 'preserve')
+        ? s.identityChoice
+        : null;
+    const area =
+      (s.area === 'den' && !contact) || (s.area === 'registry' && !escaped) ? 'street' : s.area;
     return {
-      version: 1,
+      version: 2,
       area,
       x:
         typeof s.x === 'number' && Number.isFinite(s.x)
@@ -67,7 +104,8 @@ export function parseSave(raw: string | null): SaveData {
       deductions,
       contact,
       companion,
-      escaped: companion && s.escaped === true,
+      escaped,
+      identityChoice,
     };
   } catch {
     return freshSave();
@@ -76,10 +114,21 @@ export function parseSave(raw: string | null): SaveData {
 export class CaseModel {
   constructor(public save: SaveData = freshSave()) {}
   get deduced() {
-    return this.save.deductions.length === 3;
+    return solvedChapter(this.save.deductions, 1);
+  }
+  get identityDeduced() {
+    return solvedChapter(this.save.deductions, 2);
   }
   get objective() {
-    if (this.save.escaped) return 'Find who erased the first one.';
+    if (this.save.identityChoice === 'restore')
+      return 'Mara Venn has her name back. See how Lyra carries it.';
+    if (this.save.identityChoice === 'preserve')
+      return 'Mara remains hidden. Her memory stays with you and Lyra.';
+    if (this.identityDeduced) return 'Ask Lyra what happened to Mara Venn.';
+    if (this.save.escaped && CHAPTER_TWO_CLUES.every((id) => this.save.clues.includes(id)))
+      return 'Open the case board. Connect Mara’s records.';
+    if (this.save.area === 'registry') return 'Search the annex. Reconstruct Mara Venn’s identity.';
+    if (this.save.escaped) return 'Enter the Civic Registry Annex through the Memory Den.';
     if (this.save.companion) return 'Leave the Den. Keep the memory safe.';
     if (this.save.clues.includes('fragment')) return 'Speak to Lyra about the first memory.';
     if (this.save.contact) return 'Enter the Memory Den. Recover archive 001.';
@@ -94,20 +143,35 @@ export class CaseModel {
     return 'Investigate Marlon Graves’ studio.';
   }
   get chapter() {
-    return this.save.escaped
-      ? 'THE FIRST ONE'
-      : this.save.contact
-        ? 'THE MEMORY KEEPER'
-        : this.deduced
-          ? 'SOMEONE IS WATCHING'
-          : 'THE LAST WORK';
+    return this.save.identityChoice
+      ? 'MARA VENN'
+      : this.identityDeduced
+        ? 'A NAME IN THE RAIN'
+        : this.save.escaped
+          ? 'THE FIRST ONE'
+          : this.save.contact
+            ? 'THE MEMORY KEEPER'
+            : this.deduced
+              ? 'SOMEONE IS WATCHING'
+              : 'THE LAST WORK';
+  }
+  get chapterNumber() {
+    if (this.save.identityChoice) return 6;
+    if (this.identityDeduced) return 5;
+    if (this.save.escaped) return 4;
+    if (this.save.contact) return 3;
+    if (this.deduced) return 2;
+    return 1;
   }
   available(h: Hotspot) {
     if (h.id === 'lyra' && this.save.companion) return false;
+    if (h.id === 'identity-record' && !this.save.identityChoice) return false;
     return !h.requires || (h.requires === 'deduced' ? this.deduced : true);
   }
   unlocked(h: Hotspot) {
-    return h.requires !== 'contact' || this.save.contact;
+    if (h.requires === 'contact') return this.save.contact;
+    if (h.requires === 'escaped') return this.save.escaped;
+    return true;
   }
   collect(id: ClueId) {
     if (this.save.clues.includes(id)) return false;
@@ -119,6 +183,11 @@ export class CaseModel {
     const match = DEDUCTIONS.find((d) => d.pair.includes(a) && d.pair.includes(b));
     if (match && !this.save.deductions.includes(match.id)) this.save.deductions.push(match.id);
     return match ?? null;
+  }
+  chooseIdentity(choice: IdentityChoice) {
+    if (!this.save.escaped || !this.identityDeduced) return false;
+    this.save.identityChoice = choice;
+    return true;
   }
 }
 export const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));

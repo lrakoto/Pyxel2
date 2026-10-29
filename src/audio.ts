@@ -69,7 +69,7 @@ export class AudioEngine {
     const t = this.ctx.currentTime;
     this.rain?.gain.setTargetAtTime(area === 'street' ? 0.24 : 0.07, t, 0.6);
     this.lowpass?.frequency.setTargetAtTime(area === 'street' ? 1900 : 250, t, 0.6);
-    this.hum?.gain.setTargetAtTime(area === 'den' ? 0.08 : 0.04, t, 0.6);
+    this.hum?.gain.setTargetAtTime(area === 'street' || area === 'studio' ? 0.04 : 0.08, t, 0.6);
   }
   tone(frequency: number, duration = 0.12, gain = 0.08, type: OscillatorType = 'sine', delay = 0) {
     if (!this.ctx || !this.master) return;

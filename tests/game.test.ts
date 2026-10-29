@@ -1,16 +1,41 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CaseModel, freshSave, parseSave, stepBody, segmentHits, type Body } from '../src/model.ts';
-import { AREAS, CLUES, DEDUCTIONS, type ClueId } from '../src/content.ts';
+import {
+  CaseModel,
+  freshSave,
+  parseSave,
+  stepBody,
+  segmentHits,
+  CHAPTER_TWO_CLUES,
+  type Body,
+} from '../src/model.ts';
+import { AREAS, CLUES, DEDUCTIONS } from '../src/content.ts';
 import { Combat } from '../src/combat.ts';
 const body = (): Body => ({ x: 500, y: 438, vx: 0, vy: 0, grounded: true, facing: 1 });
+const firstInvestigation = () => {
+  const m = new CaseModel();
+  for (const d of DEDUCTIONS.filter((d) => d.chapter === 1)) {
+    d.pair.forEach((id) => m.collect(id));
+    m.connect(...d.pair);
+  }
+  m.collect('fragment');
+  Object.assign(m.save, { contact: true, companion: true, escaped: true, area: 'den' });
+  return m;
+};
+const maraInvestigation = () => {
+  const m = firstInvestigation();
+  CHAPTER_TWO_CLUES.forEach((id) => m.collect(id));
+  for (const d of DEDUCTIONS.filter((d) => d.chapter === 2)) m.connect(...d.pair);
+  m.save.area = 'registry';
+  return m;
+};
 test('invalid, future, and hostile saves recover to a playable fresh case', () => {
   for (const raw of [
     null,
     '{',
     'null',
     '42',
-    '{"version":2}',
+    '{"version":99}',
     '{"version":1,"area":"__proto__"}',
   ]) {
     const s = parseSave(raw);
@@ -70,19 +95,15 @@ test('all six discovery orders lead to the same case objective', () => {
     assert.equal(m.objective, 'Find the woman outside the Memory Den.');
   }
 });
-test('complete chapter survives a serialized checkpoint and keeps Lyra across areas', () => {
-  const m = new CaseModel();
-  for (const id of Object.keys(CLUES) as ClueId[]) m.collect(id);
-  for (const d of DEDUCTIONS) m.connect(...d.pair);
-  m.save.contact = true;
-  m.save.companion = true;
-  m.save.escaped = true;
-  m.save.area = 'den';
+test('first investigation survives a serialized checkpoint and opens the registry lead', () => {
+  const m = firstInvestigation();
   const restored = new CaseModel(parseSave(JSON.stringify(m.save)));
   assert.equal(restored.deduced, true);
   assert.equal(restored.save.companion, true);
   assert.equal(restored.save.area, 'den');
-  assert.equal(restored.objective, 'Find who erased the first one.');
+  assert.equal(restored.save.version, 2);
+  assert.equal(restored.save.identityChoice, null);
+  assert.equal(restored.objective, 'Enter the Civic Registry Annex through the Memory Den.');
 });
 test('content door graph has valid destinations and every core clue is reachable', () => {
   const core = new Set(DEDUCTIONS.flatMap((d) => d.pair));
@@ -190,11 +211,100 @@ test('water samples the live scene above the surface in reversed vertical order'
   assert.ok(reflectionSourceY(438, 90) >= 0);
 });
 
-test('map routes interiors through the hub and stops at the requested room', async () => {
+test('map routes across the door graph and stops at the requested destination', async () => {
   const { nextRouteHotspot } = await import('../src/model.ts');
   assert.equal(nextRouteHotspot('studio', 'den-door')?.target, 'street');
   assert.equal(nextRouteHotspot('street', 'den-door')?.target, 'den');
   assert.equal(nextRouteHotspot('den', 'den-door'), null);
   assert.equal(nextRouteHotspot('den', 'studio-door')?.target, 'street');
+  assert.equal(nextRouteHotspot('studio', 'registry-door')?.target, 'street');
+  assert.equal(nextRouteHotspot('street', 'registry-door')?.target, 'den');
+  assert.equal(nextRouteHotspot('den', 'registry-door')?.target, 'registry');
+  assert.equal(nextRouteHotspot('registry', 'registry-door'), null);
+  assert.equal(nextRouteHotspot('registry', 'studio-door')?.target, 'den');
+  assert.equal(nextRouteHotspot('studio', 'noodles')?.target, 'street');
+  assert.equal(nextRouteHotspot('street', 'noodles')?.id, 'noodles');
   assert.equal(nextRouteHotspot('street', 'missing'), null);
+});
+
+test('version-one checkpoints migrate with their completed investigation intact', () => {
+  const completed = firstInvestigation();
+  const legacy = { ...completed.save, version: 1, identityChoice: undefined };
+  const restored = parseSave(JSON.stringify(legacy));
+  assert.equal(restored.version, 2);
+  assert.equal(restored.area, 'den');
+  assert.equal(restored.escaped, true);
+  assert.equal(restored.companion, true);
+  assert.equal(restored.deductions.length, 3);
+  assert.equal(restored.identityChoice, null);
+});
+
+test('Mara’s choice stays locked until all six records support three deductions', () => {
+  const m = firstInvestigation();
+  m.save.area = 'registry';
+  assert.equal(m.chooseIdentity('restore'), false);
+  assert.equal(m.objective, 'Search the annex. Reconstruct Mara Venn’s identity.');
+  CHAPTER_TWO_CLUES.forEach((id) => m.collect(id));
+  assert.equal(m.objective, 'Open the case board. Connect Mara’s records.');
+  assert.equal(m.chooseIdentity('restore'), false);
+  for (const d of DEDUCTIONS.filter((d) => d.chapter === 2)) m.connect(...d.pair);
+  assert.equal(m.identityDeduced, true);
+  assert.equal(m.objective, 'Ask Lyra what happened to Mara Venn.');
+  assert.equal(m.chooseIdentity('restore'), true);
+  assert.equal(m.chapterNumber, 6);
+});
+
+test('both identity conclusions survive serialization and produce distinct world state', () => {
+  for (const choice of ['restore', 'preserve'] as const) {
+    const m = maraInvestigation();
+    assert.equal(m.chooseIdentity(choice), true);
+    const restored = new CaseModel(parseSave(JSON.stringify(m.save)));
+    assert.equal(restored.save.identityChoice, choice);
+    assert.equal(restored.save.area, 'registry');
+    assert.equal(restored.chapter, 'MARA VENN');
+    assert.equal(
+      restored.objective,
+      choice === 'restore'
+        ? 'Mara Venn has her name back. See how Lyra carries it.'
+        : 'Mara remains hidden. Her memory stays with you and Lyra.',
+    );
+  }
+});
+
+test('save validation rejects an unearned identity choice and locked registry location', () => {
+  const m = firstInvestigation();
+  m.save.area = 'registry';
+  m.save.identityChoice = 'restore';
+  const unearned = parseSave(JSON.stringify(m.save));
+  assert.equal(unearned.identityChoice, null);
+  assert.equal(unearned.area, 'registry');
+  const locked = parseSave(JSON.stringify({ ...m.save, escaped: false }));
+  assert.equal(locked.identityChoice, null);
+  assert.equal(locked.area, 'street');
+});
+
+test('all six Mara deduction orders lead to the same conversation lead', () => {
+  const chapterTwo = DEDUCTIONS.filter((d) => d.chapter === 2);
+  for (const order of [
+    [0, 1, 2],
+    [0, 2, 1],
+    [1, 0, 2],
+    [1, 2, 0],
+    [2, 0, 1],
+    [2, 1, 0],
+  ]) {
+    const m = firstInvestigation();
+    for (const i of order) {
+      const d = chapterTwo[i];
+      d.pair.forEach((id) => m.collect(id));
+      m.connect(...d.pair);
+    }
+    assert.equal(m.identityDeduced, true);
+    assert.equal(m.objective, 'Ask Lyra what happened to Mara Venn.');
+  }
+});
+
+test('map destination ids are unique across the expanded district', () => {
+  const ids = Object.values(AREAS).flatMap((a) => a.hotspots.map((h) => h.id));
+  assert.equal(new Set(ids).size, ids.length);
 });

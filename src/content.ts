@@ -1,4 +1,4 @@
-export type AreaId = 'street' | 'studio' | 'den';
+export type AreaId = 'street' | 'studio' | 'den' | 'registry';
 export type ClueId =
   | 'camera'
   | 'lock'
@@ -8,8 +8,15 @@ export type ClueId =
   | 'residue'
   | 'device'
   | 'writing'
-  | 'fragment';
-export type DeductionId = 'harvest' | 'voices' | 'first';
+  | 'fragment'
+  | 'drawing'
+  | 'census'
+  | 'badge'
+  | 'purge'
+  | 'letter'
+  | 'audit';
+export type DeductionId = 'harvest' | 'voices' | 'first' | 'mother' | 'archivist' | 'sacrifice';
+export type IdentityChoice = 'restore' | 'preserve';
 export interface Clue {
   id: ClueId;
   title: string;
@@ -100,12 +107,69 @@ export const CLUES: Record<ClueId, Clue> = {
     observation:
       'A woman teaching a child to draw a bird. Not a masterpiece. Not something you could sell. Just a moment that made someone who they were.',
   },
+  drawing: {
+    id: 'drawing',
+    title: 'The same bird',
+    category: 'CHILDHOOD RECORD',
+    glyph: '⌁',
+    body: 'A child’s drawing of a bird, preserved behind registry glass. The uneven wing matches the bird in archive 001. It is signed “Lyra Venn.”',
+    observation:
+      'Same crooked wing. Same three lines for the tail. The child in Mara’s memory wasn’t a stranger. She was Lyra.',
+  },
+  census: {
+    id: 'census',
+    title: 'Mara and Lyra Venn',
+    category: 'CIVIC CENSUS',
+    glyph: '▤',
+    body: 'A school census lists Lyra Venn and her mother, Mara Venn. Mara’s entry ends in a redaction code; Lyra’s does not.',
+    observation:
+      'Mara Venn. Lyra’s mother. The city left the child’s name and cut the mother out of every record that followed.',
+  },
+  badge: {
+    id: 'badge',
+    title: 'Civic archivist zero-zero-one',
+    category: 'IDENTITY TRACE',
+    glyph: '⌑',
+    body: 'Mara Venn’s registry badge authorizes mnemonic archive design. Her employee number is 001—the same number Marlon painted beneath the first woman.',
+    observation:
+      'She didn’t just appear in archive zero-zero-one. She built the system that made it possible. Marlon wanted us to find its architect.',
+  },
+  purge: {
+    id: 'purge',
+    title: 'A child’s authorization',
+    category: 'REDACTION ORDER',
+    glyph: '▥',
+    body: 'The order erasing Mara Venn used Lyra’s childhood registry key. Its timing diverted a Veil search away from the unclaimed archives.',
+    observation:
+      'Lyra erased her own mother. The order turned Mara into a hole in the index just as Veil came looking for the archive.',
+  },
+  letter: {
+    id: 'letter',
+    title: 'Let them take my name',
+    category: 'PRIVATE LETTER',
+    glyph: '〃',
+    body: 'Mara’s unsent letter asks Lyra to erase her legal identity if Veil finds the archive. “Keep the memories. Let them take my name.”',
+    observation:
+      'She chose the erasure. Not because her name meant nothing. Because the people inside the archive meant more.',
+  },
+  audit: {
+    id: 'audit',
+    title: 'The architect’s fail-safe',
+    category: 'SYSTEM AUDIT',
+    glyph: '⌘',
+    body: 'Mara’s archive specification separates memories from civic identity. The purge removed her from search indexes while leaving archive 001 intact.',
+    observation:
+      'Mara built a place where a person could survive without a name. Lyra used her mother’s own fail-safe to hide her.',
+  },
 };
 export interface Deduction {
   id: DeductionId;
   pair: [ClueId, ClueId];
   title: string;
   conclusion: string;
+  chapter: 1 | 2;
+  question: string;
+  hint: string;
 }
 export const DEDUCTIONS: Deduction[] = [
   {
@@ -114,6 +178,9 @@ export const DEDUCTIONS: Deduction[] = [
     title: 'A mind was harvested',
     conclusion:
       'The receiver and the residue tell the same story. Marlon’s creative patterns were extracted through his implants. His death was the cost, not the purpose.',
+    chapter: 1,
+    question: 'What happened to Marlon?',
+    hint: 'Compare the machine with what it left behind.',
   },
   {
     id: 'voices',
@@ -121,6 +188,9 @@ export const DEDUCTIONS: Deduction[] = [
     title: 'The painting holds witnesses',
     conclusion:
       'The voices in the diary belong to the faces in the painting. Marlon made an archive of the people inside him. His last work is evidence.',
+    chapter: 1,
+    question: 'What is inside the painting?',
+    hint: 'Look for a personal account of the faces.',
   },
   {
     id: 'first',
@@ -128,6 +198,39 @@ export const DEDUCTIONS: Deduction[] = [
     title: 'Find archive zero-zero-one',
     conclusion:
       '“The first one” is the woman in the earliest portrait, numbered 001. Someone who deals in memories might still know where to find hers.',
+    chapter: 1,
+    question: 'Who is the first one?',
+    hint: 'His last words point to something he painted.',
+  },
+  {
+    id: 'mother',
+    pair: ['drawing', 'census'],
+    title: 'Mara was Lyra’s mother',
+    conclusion:
+      'The child in archive 001 was Lyra. The woman teaching her to draw was her mother, Mara Venn.',
+    chapter: 2,
+    question: 'Who is the woman in archive 001?',
+    hint: 'Compare the bird with the names left in the census.',
+  },
+  {
+    id: 'archivist',
+    pair: ['badge', 'audit'],
+    title: 'Mara built the archive',
+    conclusion:
+      'Mara designed the mnemonic archive and its identity fail-safe. Archive 001 was both her first memory and her life’s work.',
+    chapter: 2,
+    question: 'Why was Mara numbered 001?',
+    hint: 'Connect her registry role with the system she designed.',
+  },
+  {
+    id: 'sacrifice',
+    pair: ['purge', 'letter'],
+    title: 'A chosen erasure',
+    conclusion:
+      'Lyra erased Mara’s legal identity at Mara’s request. The sacrifice hid the archive from Veil without destroying its memories.',
+    chapter: 2,
+    question: 'Why was Mara’s name erased?',
+    hint: 'Compare the authorization with what Mara asked for.',
   },
 ];
 export interface Hotspot {
@@ -139,7 +242,7 @@ export interface Hotspot {
   clue?: ClueId;
   target?: AreaId;
   text?: string;
-  requires?: 'deduced' | 'contact';
+  requires?: 'deduced' | 'contact' | 'escaped';
 }
 export interface Area {
   id: AreaId;
@@ -258,7 +361,7 @@ export const AREAS: Record<AreaId, Area> = {
         kind: 'clue',
         clue: 'fragment',
       },
-      { id: 'lyra-den', x: 1150, y: 365, label: 'Lyra', kind: 'talk' },
+      { id: 'lyra-den', x: 1080, y: 365, label: 'Lyra', kind: 'talk' },
       {
         id: 'tapes',
         x: 420,
@@ -267,6 +370,47 @@ export const AREAS: Record<AreaId, Area> = {
         kind: 'flavor',
         text: 'Names on paper labels. A teacher. A mechanic. Someone’s father. The city calls them redundant data. Lyra keeps them in alphabetical order.',
       },
+      {
+        id: 'registry-door',
+        x: 1365,
+        y: 370,
+        label: 'Civic Registry Annex',
+        kind: 'door',
+        target: 'registry',
+        requires: 'escaped',
+      },
+    ],
+  },
+  registry: {
+    id: 'registry',
+    title: 'Civic Registry Annex',
+    subtitle: 'PUBLIC MEMORY OFFICE · ARCHIVE 001',
+    width: 1600,
+    spawn: 140,
+    color: '#b7c49a',
+    hotspots: [
+      {
+        id: 'registry-exit',
+        x: 90,
+        y: 370,
+        label: 'Return to the Memory Den',
+        kind: 'door',
+        target: 'den',
+      },
+      {
+        id: 'identity-record',
+        x: 205,
+        y: 305,
+        label: 'Mara’s civic record',
+        kind: 'flavor',
+      },
+      { id: 'drawing', x: 340, y: 315, label: 'A child’s drawing', kind: 'clue', clue: 'drawing' },
+      { id: 'census', x: 525, y: 350, label: 'School census', kind: 'clue', clue: 'census' },
+      { id: 'badge', x: 710, y: 360, label: 'Archivist badge', kind: 'clue', clue: 'badge' },
+      { id: 'purge', x: 900, y: 300, label: 'Redaction order', kind: 'clue', clue: 'purge' },
+      { id: 'letter', x: 1090, y: 355, label: 'Unsent letter', kind: 'clue', clue: 'letter' },
+      { id: 'audit', x: 1270, y: 320, label: 'Archive audit', kind: 'clue', clue: 'audit' },
+      { id: 'lyra-registry', x: 1450, y: 365, label: 'Speak to Lyra', kind: 'talk' },
     ],
   },
 };
