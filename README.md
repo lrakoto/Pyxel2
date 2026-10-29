@@ -1,4 +1,4 @@
-# EVERYBODY / NOBODY — Fragments
+# GRAVITY — Fragments
 
 A new interpretation of Pyxel: a playable cyberpunk noir investigation, built in this directory without changing the original game.
 
