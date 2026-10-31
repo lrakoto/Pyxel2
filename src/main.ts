@@ -25,6 +25,12 @@ import {
 import { Renderer, H } from './renderer.ts';
 import { AudioEngine } from './audio.ts';
 import { Combat } from './combat.ts';
+import {
+  justPressed,
+  readController,
+  type ControllerButton,
+  type ControllerFrame,
+} from './gamepad.ts';
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const icon = (name: string) => {
@@ -106,6 +112,9 @@ class Game {
   firing = false;
   keys = new Set<string>();
   touchPointers = new Map<number, string>();
+  controller: ControllerFrame = readController(null);
+  controllerJump = false;
+  inputMode: 'keyboard' | 'pointer' | 'controller' = 'keyboard';
   target: number | null = null;
   pending: Hotspot | null = null;
   queuedRoute: string | null = null;
@@ -293,8 +302,19 @@ class Game {
       );
       button.addEventListener('lostpointercapture', (e) => this.releaseTouch(e.pointerId), s);
     }
+    window.addEventListener('pointerdown', () => this.setInputMode('pointer'), s);
     window.addEventListener('keydown', (e) => this.keydown(e), s);
     window.addEventListener('keyup', (e) => this.keys.delete(e.code), s);
+    window.addEventListener('gamepadconnected', () => this.toast('CONTROLLER READY'), s);
+    window.addEventListener(
+      'gamepaddisconnected',
+      () => {
+        this.controller = readController(null);
+        this.controllerJump = false;
+        this.setInputMode('keyboard');
+      },
+      s,
+    );
     window.addEventListener('blur', () => this.clearInput(), s);
     document.addEventListener(
       'visibilitychange',
@@ -366,6 +386,7 @@ class Game {
     this.keys.clear();
     this.touchPointers.clear();
     this.firing = false;
+    this.controllerJump = false;
     this.player.vx = 0;
     this.target = null;
     this.pending = null;
@@ -378,7 +399,120 @@ class Game {
     this.keys.delete('touch-' + action);
     if (action === 'fire') this.firing = false;
   }
+  setInputMode(mode: 'keyboard' | 'pointer' | 'controller') {
+    if (this.inputMode === mode) return;
+    this.inputMode = mode;
+    this.sync();
+  }
+  cycleHotspot(direction: number) {
+    const spots = this.currentArea.hotspots.filter((h) => this.model.available(h));
+    if (!spots.length) return;
+    const current = this.pending ?? this.nearest;
+    let index = spots.findIndex((h) => h === current);
+    index = (index + direction + spots.length) % spots.length;
+    this.goTo(spots[index]);
+  }
+  focusPanel(direction: number, adjust = false) {
+    const active = document.activeElement;
+    if (adjust && active instanceof HTMLInputElement && active.type === 'range') {
+      const min = Number(active.min),
+        max = Number(active.max),
+        step = Number(active.step) || 1;
+      active.value = String(clamp(Number(active.value) + direction * step, min, max));
+      active.dispatchEvent(new Event('input', { bubbles: true }));
+      return;
+    }
+    const controls = Array.from(
+      $('panel').querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled])'),
+    ).filter((el) => el.getClientRects().length > 0);
+    if (!controls.length) return;
+    const current = controls.indexOf(active as HTMLElement);
+    const index =
+      current < 0
+        ? direction > 0
+          ? 0
+          : controls.length - 1
+        : (current + direction + controls.length) % controls.length;
+    controls[index].focus();
+  }
+  pollController() {
+    const previous = this.controller;
+    const pads = Array.from(navigator.getGamepads?.() ?? []);
+    const pad =
+      pads.find((p) => p?.connected && p.mapping === 'standard') ??
+      pads.find((p) => p?.connected) ??
+      null;
+    this.controller = readController(pad);
+    if (this.controller.active) this.setInputMode('controller');
+    const pressed = (action: ControllerButton) => justPressed(this.controller, previous, action);
+    if (pressed('pause')) {
+      if (this.modal) this.closePanel();
+      else if (this.lines.length) this.closeDialogue();
+      else if (this.started) this.openPause();
+      return;
+    }
+    if (this.modal) {
+      if (pressed('back')) this.closePanel();
+      else if (pressed('up')) this.focusPanel(-1);
+      else if (pressed('down')) this.focusPanel(1);
+      else if (pressed('left')) this.focusPanel(-1, true);
+      else if (pressed('right')) this.focusPanel(1, true);
+      else if (pressed('confirm')) {
+        const active = document.activeElement as HTMLElement | null;
+        if (active && $('panel').contains(active)) active.click();
+        else this.focusPanel(1);
+      }
+      return;
+    }
+    if (!this.started) {
+      if (pressed('confirm') && this.ready) this.begin();
+      return;
+    }
+    if (this.lines.length) {
+      if (pressed('confirm')) this.advance();
+      else if (pressed('back')) this.closeDialogue();
+      return;
+    }
+    if (this.transitioning) return;
+    if (pressed('board')) {
+      this.openBoard();
+      return;
+    }
+    if (pressed('map')) {
+      this.openMap();
+      return;
+    }
+    if (pressed('focus')) {
+      this.toggleScan();
+      return;
+    }
+    if (pressed('back')) {
+      if (this.combat) this.finishCombat(true);
+      return;
+    }
+    if (pressed('confirm')) {
+      if (this.combat) this.controllerJump = true;
+      else this.examineNearest();
+      return;
+    }
+    if (pressed('previous') || pressed('next')) {
+      this.cycleHotspot(pressed('previous') ? -1 : 1);
+      return;
+    }
+    if (Math.abs(this.controller.moveX) > 0.2) {
+      this.target = null;
+      this.pending = null;
+      this.queuedRoute = null;
+    }
+    if (this.combat && Math.hypot(this.controller.aimX, this.controller.aimY) > 0.1) {
+      this.aim = {
+        x: this.player.x + this.controller.aimX * 320,
+        y: this.player.y - 43 + this.controller.aimY * 320,
+      };
+    }
+  }
   keydown(e: KeyboardEvent) {
+    this.setInputMode('keyboard');
     if (e.code === 'Escape') {
       if (this.modal) return;
       e.preventDefault();
@@ -430,11 +564,7 @@ class Game {
         return;
       }
       if (e.code === 'BracketRight' || e.code === 'BracketLeft') {
-        const spots = this.currentArea.hotspots.filter((h) => this.model.available(h));
-        const current = this.pending ?? this.nearest;
-        let index = spots.findIndex((h) => h === current);
-        index = (index + (e.code === 'BracketRight' ? 1 : -1) + spots.length) % spots.length;
-        this.goTo(spots[index]);
+        this.cycleHotspot(e.code === 'BracketRight' ? 1 : -1);
         return;
       }
     }
@@ -678,7 +808,7 @@ class Game {
     $('dialogue-text').textContent = this.reducedMotion ? line.text : '';
     this.reveal = this.reducedMotion ? line.text.length : 0;
     $('advance-btn').innerHTML =
-      `${this.lineIndex === this.lines.length - 1 ? 'Close' : 'Continue'} <kbd>E</kbd>${icon('arrow')}`;
+      `${this.lineIndex === this.lines.length - 1 ? 'Close' : 'Continue'} <kbd>${this.inputMode === 'controller' ? 'A' : 'E'}</kbd>${icon('arrow')}`;
   }
   advance() {
     if (!this.lines.length) return;
@@ -761,9 +891,19 @@ class Game {
     $('companion').hidden = !this.model.save.companion || !!this.combat || !this.started;
     $('scene-hud').hidden = !!this.combat;
     $('combat-hud').hidden = !this.combat;
-    $('controls-hint').innerHTML = this.combat
-      ? '<span><kbd>A</kbd><kbd>D</kbd> Move</span><span><kbd>Space</kbd> Jump</span><span><kbd>Shift</kbd> Sprint</span><span>Hold click to fire</span>'
-      : '<span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span>';
+    const controllerMode = this.inputMode === 'controller';
+    $('controls-hint').innerHTML = controllerMode
+      ? this.combat
+        ? '<span><kbd>LS</kbd> Move</span><span><kbd>A</kbd> Jump</span><span><kbd>LT</kbd> Sprint</span><span><kbd>RT</kbd> Fire</span>'
+        : '<span><kbd>LS</kbd> Walk</span><span><kbd>A</kbd> Interact</span><span><kbd>X</kbd> Focus</span><span><kbd>LB</kbd><kbd>RB</kbd> Markers</span>'
+      : this.combat
+        ? '<span><kbd>A</kbd><kbd>D</kbd> Move</span><span><kbd>Space</kbd> Jump</span><span><kbd>Shift</kbd> Sprint</span><span>Hold click to fire</span>'
+        : '<span><kbd>A</kbd><kbd>D</kbd> Walk</span><span><kbd>E</kbd> Interact</span><span><kbd>I</kbd> Focus</span><span class="desktop-hint">Click to walk</span>';
+    $('interact-btn').querySelector('kbd')!.textContent = controllerMode ? 'A' : 'E';
+    $('focus-btn').querySelector('kbd')!.textContent = controllerMode ? 'X' : 'I';
+    $('withdraw-btn').querySelector('kbd')!.textContent = controllerMode ? 'B' : 'Q';
+    if (this.lines.length)
+      $('advance-btn').querySelector('kbd')!.textContent = controllerMode ? 'A' : 'E';
     $('stage').classList.toggle('in-combat', !!this.combat);
     $<HTMLButtonElement>('focus-btn').disabled = !!this.combat;
   }
@@ -864,7 +1004,7 @@ class Game {
     this.panel(
       this.started ? 'A moment in the rain.' : 'Before you step outside.',
       'EVERYBODY / NOBODY',
-      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Case board / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Both investigations allow continued exploration.</p></div>`,
+      `<div class="settings"><p class="settings-intro">The city can wait.</p><div class="setting-row"><label for="volume">Soundscape volume</label><span id="volume-value">${Math.round(this.audio.volume * 100)}%</span><input id="volume" type="range" min="0" max="1" step="0.05" value="${this.audio.volume}"></div><label class="setting-row switch-row" for="reduce-motion"><span>Reduced motion<small>Still rain, steady lights, no screen shake.</small></span><input id="reduce-motion" type="checkbox" ${this.reducedMotion ? 'checked' : ''}></label><div class="control-list"><span><kbd>A</kbd> <kbd>D</kbd> / Arrow keys</span><b>Walk</b><span><kbd>E</kbd> / Click a marker</span><b>Examine / enter</b><span><kbd>I</kbd></span><b>Highlight evidence</b><span><kbd>J</kbd> / <kbd>M</kbd></span><b>Case board / map</b><span><kbd>[</kbd> <kbd>]</kbd></span><b>Walk to next marker</b><span><kbd>B</kbd> on the street</span><b>Combat practice</b><span><kbd>Space</kbd> / Hold click</span><b>Jump / fire in combat</b></div><div class="control-list"><span><kbd>LS</kbd> / D-pad</span><b>Move / navigate menus</b><span><kbd>A</kbd> / <kbd>B</kbd></span><b>Confirm / back</b><span><kbd>RS</kbd> / <kbd>RT</kbd></span><b>Aim / fire in combat</b></div><div class="settings-actions"><button class="primary" data-action="close">${this.combat ? 'Resume encounter' : this.started ? 'Return to investigation' : 'Back'} ${icon('arrow')}</button><button class="text-button" data-action="new">Start a new investigation</button></div><p class="small-note">Progress saves automatically on this device. Both investigations allow continued exploration.</p></div>`,
       'pause',
     );
   }
@@ -1066,7 +1206,9 @@ class Game {
     this.sync();
     this.toast(
       story ? 'PROTECT THE MEMORY' : 'COMBAT PRACTICE',
-      'Aim with the mouse. Hold to fire. Space to jump. Q to disengage.',
+      this.inputMode === 'controller'
+        ? 'Right stick to aim. RT to fire. A to jump. B to disengage.'
+        : 'Aim with the mouse. Hold to fire. Space to jump. Q to disengage.',
     );
   }
   finishCombat(evaded = false) {
@@ -1084,6 +1226,7 @@ class Game {
     const elapsed = this.previous ? Math.min((now - this.previous) / 1000, 0.1) : 0;
     this.previous = now;
     if (!document.hidden) {
+      this.pollController();
       const active = this.started && !this.modal && !this.transitioning;
       if (!this.modal) this.time += elapsed;
       if (active && this.lines.length) {
@@ -1133,11 +1276,12 @@ class Game {
   }
   update(dt: number) {
     if (this.combat?.down || this.combat?.complete) return;
-    let axis =
+    const keyboardAxis =
       (this.keys.has('KeyD') || this.keys.has('ArrowRight') || this.keys.has('touch-right')
         ? 1
         : 0) -
       (this.keys.has('KeyA') || this.keys.has('ArrowLeft') || this.keys.has('touch-left') ? 1 : 0);
+    let axis = clamp(keyboardAxis + this.controller.moveX, -1, 1);
     if (this.target !== null) {
       const d = this.target - this.player.x;
       if (Math.abs(d) < 4) {
@@ -1153,11 +1297,13 @@ class Game {
     }
     const jump =
       !!this.combat &&
-      (this.keys.has('Space') ||
+      (this.controllerJump ||
+        this.keys.has('Space') ||
         this.keys.has('KeyW') ||
         this.keys.has('ArrowUp') ||
         this.keys.has('touch-jump'));
     if (jump) {
+      this.controllerJump = false;
       this.keys.delete('Space');
       this.keys.delete('KeyW');
       this.keys.delete('ArrowUp');
@@ -1171,7 +1317,8 @@ class Game {
         jump,
         dt,
         this.currentArea.width,
-        !!this.combat && (this.keys.has('ShiftLeft') || this.keys.has('ShiftRight')),
+        !!this.combat &&
+          (this.controller.sprint || this.keys.has('ShiftLeft') || this.keys.has('ShiftRight')),
       );
     if (Math.abs(this.player.vx) > 20 && this.player.grounded) {
       this.stepTime += dt;
@@ -1185,8 +1332,14 @@ class Game {
         .filter((h) => this.model.available(h) && Math.abs(h.x - this.player.x) < 65)
         .sort((a, b) => Math.abs(a.x - this.player.x) - Math.abs(b.x - this.player.x))[0] ?? null;
     if (this.combat) {
-      if (this.firing) {
-        if (this.keys.has('touch-fire') || matchMedia('(pointer: coarse)').matches) {
+      if (this.firing || this.controller.fire) {
+        const controllerAutoAim =
+          this.controller.fire && Math.hypot(this.controller.aimX, this.controller.aimY) < 0.1;
+        if (
+          this.keys.has('touch-fire') ||
+          matchMedia('(pointer: coarse)').matches ||
+          controllerAutoAim
+        ) {
           const enemy = this.combat.enemies.reduce<(typeof this.combat.enemies)[number] | null>(
             (best, e) =>
               !best || Math.abs(e.x - this.player.x) < Math.abs(best.x - this.player.x) ? e : best,

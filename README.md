@@ -42,7 +42,9 @@ npm run optimize-art  # Rebuild lossless WebP from PNG masters; verify decoded p
 | Shift | Sprint in combat |
 | Q | Disengage from combat |
 
-On small screens and touch devices, movement and action buttons appear over the game. The touch fire button aims at the nearest enemy. Portrait and landscape layouts both work. Desktop keyboard and mouse remain the primary play experience. Pause settings include volume and reduced motion; system reduced-motion preferences are respected by default.
+Standard controllers are supported. Use the left stick or D-pad to move, A to interact/jump/confirm, B to go back or disengage, X for focus, Y for the case board, Back for the map, Start to pause, and LB/RB to cycle markers. In combat, the right stick aims, RT fires, and LT sprints. Dialogue, evidence selection, map destinations, settings, and story choices can all be navigated with the controller. On-screen prompts switch after controller activity.
+
+On small screens and touch devices, movement and action buttons appear over the game. The touch fire button aims at the nearest enemy. Portrait and landscape layouts both work. Keyboard, mouse, standard controllers, and touch are supported. Pause settings include volume and reduced motion; system reduced-motion preferences are respected by default.
 
 ## The investigations
 
